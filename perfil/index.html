@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .page-header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            margin-bottom: 40px;
+        }
+        .profile-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        .profile-sidebar {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(251,191,36,0.3);
+        }
+        .avatar-selector {
+            margin-top: 15px;
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .avatar-option {
+            width: 50px;
+            height: 50px;
+            background: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .avatar-option:hover {
+            transform: scale(1.1);
+            background: #fef3c7;
+        }
+        .avatar-option.selected {
+            border-color: #fbbf24;
+            background: #fef3c7;
+        }
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .profile-email {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .profile-main {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .progress-section {
+            margin-bottom: 30px;
+        }
+        .progress-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            width: 0%;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .btn-editar {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .btn-editar:hover {
+            background: #e2e8f0;
+        }
+        @media (max-width: 768px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Lista de emojis para selector */
+        .avatar-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .avatar-item {
+            width: 55px;
+            height: 55px;
+            background: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .avatar-item:hover {
+            transform: scale(1.1);
+            background: #fef3c7;
+        }
+        .avatar-item.selected {
+            border-color: #fbbf24;
+            background: #fef3c7;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">Mini Retos</a></li></ul></nav></div></div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+            <p>Gestiona tu progreso y personaliza tu avatar</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div id="profileContent"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div>
+            <div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div>
+        </div>
+    </footer>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        // Lista de emojis disponibles
+        const avataresDisponibles = [
+            "🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"
+        ];
+
+        function renderProfile() {
+            const currentUser = getCurrentUser();
+            const profileContainer = document.getElementById('profileContent');
+            
+            if (!currentUser) {
+                profileContainer.innerHTML = `
+                    <div style="text-align: center; padding: 60px; background: white; border-radius: 25px;">
+                        <i class="fas fa-lock" style="font-size: 3rem; color: #fbbf24;"></i>
+                        <h3>Necesitas iniciar sesión</h3>
+                        <p>Para ver tu perfil, inicia sesión o regístrate.</p>
+                        <a href="../login.html" class="btn-primary" style="display: inline-block; margin-top: 20px;">Iniciar sesión</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const stats = currentUser.estadisticas;
+            const avatar = currentUser.avatar || "🚗";
+            const porcentajeAciertos = stats.totalPreguntas > 0 
+                ? Math.round((stats.totalAciertos / stats.totalPreguntas) * 100) 
+                : 0;
+            const ranking = getRanking();
+            const posicion = ranking.findIndex(u => u.id === currentUser.id) + 1;
+            
+            profileContainer.innerHTML = `
+                <div class="profile-container">
+                    <div class="profile-sidebar">
+                        <div class="profile-avatar" id="profileAvatar" onclick="toggleAvatarSelector()">${avatar}</div>
+                        <button class="btn-editar" onclick="toggleAvatarSelector()"><i class="fas fa-edit"></i> Cambiar avatar</button>
+                        <div id="avatarSelector" class="avatar-list" style="display: none; margin-top: 15px;">
+                            ${avataresDisponibles.map(a => `
+                                <div class="avatar-item ${avatar === a ? 'selected' : ''}" onclick="cambiarAvatar('${a}')">${a}</div>
+                            `).join('')}
+                        </div>
+                        <div class="profile-name">${currentUser.nombre}</div>
+                        <div class="profile-email">${currentUser.email}</div>
+                        <div class="profile-stats" style="margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 15px;">
+                            <p><i class="fas fa-calendar"></i> Miembro desde: ${currentUser.fechaRegistro}</p>
+                            <p><i class="fas fa-trophy"></i> Posición en ranking: ${posicion}º</p>
+                        </div>
+                    </div>
+                    <div class="profile-main">
+                        <h3><i class="fas fa-chart-simple"></i> Mi Progreso</h3>
+                        <div class="progress-section">
+                            <p>Temas completados</p>
+                            <div class="progress-bar"><div class="progress-fill" style="width: ${(stats.temasCompletados / 20) * 100}%;"></div></div>
+                            <p>${stats.temasCompletados}/20 temas</p>
+                        </div>
+                        <div class="progress-section">
+                            <p>Tests realizados</p>
+                            <div class="progress-bar"><div class="progress-fill" style="width: ${Math.min((stats.testsRealizados / 50) * 100, 100)}%;"></div></div>
+                            <p>${stats.testsRealizados} tests</p>
+                        </div>
+                        <h3 style="margin-top: 30px;"><i class="fas fa-chart-line"></i> Estadísticas</h3>
+                        <div class="stats-grid">
+                            <div class="stat-box"><div class="stat-number">${stats.testsRealizados}</div><div>Tests</div></div>
+                            <div class="stat-box"><div class="stat-number">${porcentajeAciertos}%</div><div>Aciertos</div></div>
+                            <div class="stat-box"><div class="stat-number">${stats.mejorResultado}%</div><div>Mejor resultado</div></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleAvatarSelector() {
+            const selector = document.getElementById('avatarSelector');
+            if (selector) {
+                selector.style.display = selector.style.display === 'none' ? 'flex' : 'none';
+            }
+        }
+        
+        function cambiarAvatar(avatar) {
+            const result = updateUserAvatar(avatar);
+            if (result) {
+                // Actualizar avatar en el perfil
+                const avatarDiv = document.getElementById('profileAvatar');
+                if (avatarDiv) avatarDiv.textContent = avatar;
+                
+                // Actualizar selección visual
+                document.querySelectorAll('.avatar-item').forEach(item => {
+                    item.classList.remove('selected');
+                    if (item.textContent === avatar) item.classList.add('selected');
+                });
+                
+                // Actualizar zona de usuario
+                renderUserZone();
+                
+                // Mostrar mensaje de éxito
+                const toast = document.createElement('div');
+                toast.textContent = '✅ Avatar actualizado correctamente';
+                toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:1000; animation:fadeInOut 2s ease;';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+                
+                // Ocultar selector
+                toggleAvatarSelector();
+            }
+        }
+        
+        function renderUserZone() {
+            const currentUser = getCurrentUser();
+            const userZone = document.getElementById('userZone');
+            
+            if (currentUser) {
+                const avatar = currentUser.avatar || "🚗";
+                userZone.innerHTML = `
+                    <div class="user-menu">
+                        <div class="user-avatar">${avatar}</div>
+                        <span class="user-name">${currentUser.nombre}</span>
+                        <a href="index.html" class="btn-profile">Mi perfil</a>
+                        <button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button>
+                    </div>
+                `;
+            } else {
+                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            }
+        }
+        
+        // Añadir animación CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translateY(20px); }
+                15% { opacity: 1; transform: translateY(0); }
+                85% { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        renderProfile();
+        renderUserZone();
+    </script>
+</body>
+</html>

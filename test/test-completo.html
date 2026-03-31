@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Completo | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* mismos estilos que test-rapido.html */
+        .page-header { text-align: center; padding: 40px 0; background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; margin-bottom: 30px; }
+        .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .test-container { background: white; border-radius: 30px; padding: 35px; margin-bottom: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; gap: 15px; }
+        .test-info { display: flex; gap: 20px; }
+        .test-info-item { background: #f8fafc; padding: 8px 18px; border-radius: 30px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .test-info-item i { color: #fbbf24; }
+        .timer { font-size: 1.5rem; font-weight: 700; font-family: monospace; background: #1e293b; color: white; padding: 8px 20px; border-radius: 50px; }
+        .timer.warning { background: #ef4444; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; transform: scale(1.02); } }
+        .pregunta { margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0; }
+        .pregunta.correcta { border-left: 4px solid #10b981; padding-left: 20px; background: #f0fdf4; border-radius: 12px; }
+        .pregunta.incorrecta { border-left: 4px solid #ef4444; padding-left: 20px; background: #fef2f2; border-radius: 12px; }
+        .pregunta-texto { font-weight: 600; margin-bottom: 18px; color: #1e293b; font-size: 1rem; }
+        .opcion { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; padding: 10px 15px; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #fafcff; border: 1px solid #e2e8f0; }
+        .opcion:hover:not(.disabled) { background: #fef3c7; border-color: #fbbf24; transform: translateX(5px); }
+        .opcion.disabled { cursor: not-allowed; opacity: 0.7; }
+        .opcion.correcta-respuesta { background: #d1fae5; border-color: #10b981; }
+        .opcion.incorrecta-respuesta { background: #fee2e2; border-color: #ef4444; }
+        .btn-enviar { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 12px 30px; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.3s; }
+        .resultado { margin-top: 25px; padding: 25px; border-radius: 20px; display: none; text-align: center; }
+        .resultado.exito { background: #d1fae5; color: #065f46; }
+        .resultado.error { background: #fee2e2; color: #991b1b; }
+        .explicacion { margin-top: 12px; padding: 12px 15px; background: #f8fafc; border-radius: 12px; font-size: 0.85rem; color: #475569; display: none; border-left: 3px solid #fbbf24; }
+        .explicacion.mostrar { display: block; }
+        .btn-ver-explicacion { background: none; border: none; color: #fbbf24; cursor: pointer; font-size: 0.75rem; margin-top: 8px; }
+        .volver { display: inline-block; margin-top: 20px; color: #64748b; text-decoration: none; }
+        @media (max-width: 768px) { .test-container { padding: 20px; } .test-header { flex-direction: column; text-align: center; } .test-info { flex-wrap: wrap; justify-content: center; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="page-header"><div class="container"><h1><i class="fas fa-list-check"></i> Test Completo</h1><p>30 preguntas como en el examen oficial</p></div></div>
+
+    <main><div class="container">
+        <div class="test-container">
+            <div class="test-header">
+                <div class="test-info"><div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">0</span></div><div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div></div>
+                <div class="timer" id="timer">30:00</div>
+            </div>
+            <div id="preguntasContainer"></div>
+            <button class="btn-enviar" id="btnEnviar">Finalizar test</button>
+            <div id="resultado" class="resultado"></div>
+            <a href="index.html" class="volver"><i class="fas fa-arrow-left"></i> Volver a tests</a>
+        </div>
+    </div></main>
+
+    <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="data/preguntas.js"></script>
+    <script>
+        let preguntasActuales = [], respuestas = [], tiempoRestante = 30 * 60, timerInterval, testFinalizado = false;
+        function iniciarTest() { preguntasActuales = obtenerPreguntasAleatorias(30); respuestas = new Array(30).fill(null); document.getElementById('totalPreguntas').textContent = preguntasActuales.length; renderizarPreguntas(); iniciarTemporizador(); }
+        function renderizarPreguntas() { const c = document.getElementById('preguntasContainer'); c.innerHTML = preguntasActuales.map((p, idx) => `<div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}"><div class="pregunta-texto">${idx + 1}. ${p.texto}</div>${p.opciones.map((opcion, optIdx) => `<label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}"><input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}><span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span></label>`).join('')}<button class="btn-ver-explicacion" onclick="mostrarExplicacion(${idx})"><i class="fas fa-lightbulb"></i> Ver explicación (después)</button><div class="explicacion" id="explicacion_${idx}"><i class="fas fa-info-circle"></i> ${p.explicacion}</div></div>`).join(''); document.querySelectorAll('.opcion input').forEach(i => i.addEventListener('change', (e) => { const idx = parseInt(e.target.name.split('_')[1]); respuestas[idx] = parseInt(e.target.value); document.getElementById('respondidas').textContent = respuestas.filter(r => r !== null).length; })); }
+        function iniciarTemporizador() { timerInterval = setInterval(() => { if (testFinalizado) return; tiempoRestante--; const m = Math.floor(tiempoRestante / 60), s = tiempoRestante % 60; const t = document.getElementById('timer'); t.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; if (tiempoRestante <= 60) t.classList.add('warning'); if (tiempoRestante <= 0) { clearInterval(timerInterval); alert('¡Tiempo agotado!'); finalizarTest(); } }, 1000); }
+        function mostrarExplicacion(idx) { if (testFinalizado) document.getElementById(`explicacion_${idx}`).classList.toggle('mostrar'); else alert('Las explicaciones solo después de finalizar.'); }
+        function finalizarTest() { if (testFinalizado) return; testFinalizado = true; clearInterval(timerInterval); let aciertos = 0; preguntasActuales.forEach((p, idx) => { const esCorrecto = (respuestas[idx] === p.correcta); if (esCorrecto) aciertos++; const div = document.querySelector(`.pregunta[data-id="${p.id}"]`); if (div) div.classList.add(esCorrecto ? 'correcta' : 'incorrecta'); document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => { op.classList.add('disabled'); if (optIdx === p.correcta) op.classList.add('correcta-respuesta'); if (respuestas[idx] === optIdx && respuestas[idx] !== p.correcta) op.classList.add('incorrecta-respuesta'); }); }); const pct = Math.round((aciertos / preguntasActuales.length) * 100), ok = pct >= 90, r = document.getElementById('resultado'); r.className = `resultado ${ok ? 'exito' : 'error'}`; r.innerHTML = `<i class="fas ${ok ? 'fa-trophy' : 'fa-book-open'}" style="font-size:2rem;"></i><h3>${ok ? '🎉 ¡Aprobado! 🎉' : '📚 No aprobado'}</h3><p>Has acertado <strong>${aciertos}</strong> de <strong>${preguntasActuales.length}</strong> preguntas (${pct}%)</p><button onclick="location.reload()" style="background:#fbbf24; color:#1a472a; border:none; padding:10px 20px; border-radius:50px; cursor:pointer;"><i class="fas fa-redo"></i> Nuevo test completo</button>`; r.style.display = 'block'; const tests = JSON.parse(localStorage.getItem('dgt_tests') || '[]'); tests.push({ tipo: 'test-completo', aciertos: aciertos, total: preguntasActuales.length, fecha: new Date().toISOString() }); localStorage.setItem('dgt_tests', JSON.stringify(tests)); }
+        function renderUserZone() { const u = getCurrentUser(); const z = document.getElementById('userZone'); if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`; else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`; }
+        renderUserZone(); document.getElementById('btnEnviar').addEventListener('click', () => { if (!testFinalizado && confirm('¿Finalizar test?')) finalizarTest(); }); iniciarTest();
+    </script>
+</body>
+</html>

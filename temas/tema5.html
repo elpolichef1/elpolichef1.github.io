@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema 5 - Velocidad | AprobadoYa</title>
+    <style>
+        .tema-header { background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; padding: 60px 0; text-align: center; margin-bottom: 40px; }
+        .tema-badge { display: inline-block; background: #fbbf24; color: #1a472a; padding: 5px 15px; border-radius: 50px; font-size: 0.8rem; margin-bottom: 20px; }
+        .tema-header h1 { font-size: 2.5rem; }
+        .tema-contenido { background: white; border-radius: 30px; padding: 40px; margin-bottom: 40px; }
+        .tema-contenido h2 { color: #1e293b; margin-top: 35px; margin-bottom: 20px; padding-left: 15px; border-left: 4px solid #fbbf24; }
+        .tabla-velocidades { width: 100%; border-collapse: collapse; margin: 20px 0; background: #f8fafc; border-radius: 15px; overflow: hidden; }
+        .tabla-velocidades th, .tabla-velocidades td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
+        .tabla-velocidades th { background: #1e293b; color: white; }
+        .regla-destacada { background: #fef3c7; padding: 20px; border-radius: 15px; margin: 25px 0; border-left: 4px solid #fbbf24; }
+        .btn-test { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; padding: 14px 35px; border-radius: 50px; text-decoration: none; display: inline-block; margin-top: 20px; }
+        .navegacion-temas { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; }
+        .btn-volver, .btn-siguiente { background: #f1f5f9; padding: 12px 25px; border-radius: 50px; text-decoration: none; color: #1e293b; display: inline-flex; align-items: center; gap: 8px; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header><div class="container"><div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div><div class="nav-container"><div class="nav-wrapper"><nav id="navMenu"><ul><li><a href="../index.html">Inicio</a></li><li><a href="index.html" class="active">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div><div class="user-zone" id="userZone"></div><button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button></div></header>
+
+    <div class="tema-header"><div class="container"><div class="tema-badge">Tema 5</div><h1>Velocidad y distancia de seguridad</h1><p>Límites, factores que afectan y cómo calcular la distancia</p></div></div>
+
+    <main><div class="container"><div class="tema-contenido">
+        <h2>📊 5.1 Límites genéricos de velocidad</h2>
+        <table class="tabla-velocidades"><thead><tr><th>Vehículo / Vía</th><th>Autopista/Autovía</th><th>Carretera convencional</th><th>Vía urbana</th></tr></thead><tbody>
+        <tr><td>Turismo</td><td>120 km/h</td><td>90 km/h</td><td>50/30/20 km/h</td></tr>
+        <tr><td>Motocicleta</td><td>120 km/h</td><td>90 km/h</td><td>50/30/20 km/h</td></tr>
+        <tr><td>Camiones</td><td>90 km/h</td><td>80 km/h</td><td>50 km/h</td></tr>
+        <tr><td>Autobuses</td><td>100 km/h</td><td>90 km/h</td><td>50 km/h</td></tr>
+        <tr><td>Vehículo con remolque</td><td>80 km/h</td><td>80 km/h</td><td>50 km/h</td></tr>
+        </tbody></table>
+
+        <h2>📏 5.2 Distancia de seguridad</h2>
+        <p>La <strong>distancia de seguridad</strong> es el espacio que debe mantenerse con el vehículo delantero para poder detenerse sin colisionar en caso de frenada brusca.</p>
+        <ul><li><strong>Regla del intervalo de seguridad:</strong> Dejar al menos 2 segundos con el vehículo delantero.</li>
+        <li><strong>Cálculo:</strong> Observa un punto fijo, cuenta 2 segundos desde que pasa el vehículo delantero hasta que pasas tú.</li>
+        <li><strong>En condiciones adversas:</strong> Duplicar la distancia (3-4 segundos).</li></ul>
+
+        <div class="regla-destacada"><i class="fas fa-car"></i> <strong>Fórmula de la distancia de seguridad:</strong> Distancia (metros) = velocidad (km/h) / 2. Ejemplo: a 120 km/h → 60 metros.</div>
+
+        <h2>🌧️ 5.3 Factores que afectan la velocidad y distancia</h2>
+        <ul><li><strong>Condiciones meteorológicas:</strong> Lluvia, nieve, niebla, hielo.</li>
+        <li><strong>Estado de la vía:</strong> Mojada, resbaladiza, en obras.</li>
+        <li><strong>Visibilidad:</strong> Noche, túneles, curvas sin visibilidad.</li>
+        <li><strong>Estado del vehículo:</strong> Frenos, neumáticos, carga.</li>
+        <li><strong>Conductor:</strong> Fatiga, distracciones, alcohol.</li></ul>
+
+        <h2>⚠️ 5.4 Consecuencias del exceso de velocidad</h2>
+        <ul><li><strong>Menor capacidad de reacción:</strong> A mayor velocidad, más tiempo para detenerse.</li>
+        <li><strong>Mayor gravedad en accidentes:</strong> La energía cinética aumenta con el cuadrado de la velocidad.</li>
+        <li><strong>Sanciones:</strong> Multas económicas y pérdida de puntos.</li></ul>
+
+        <div class="regla-destacada"><i class="fas fa-water"></i> <strong>Aquaplaning:</strong> Pérdida de adherencia por acumulación de agua. Actuar: no frenar, mantener dirección, reducir velocidad progresivamente.</div>
+
+        <div style="text-align:center; margin-top:40px;"><a href="../test/test-por-temas.html?tema=5" class="btn-test"><i class="fas fa-clipboard-list"></i> Practicar con test del tema 5</a></div>
+        <div class="navegacion-temas"><a href="tema4.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Tema anterior: Maniobras</a><a href="tema6.html" class="btn-siguiente">Siguiente tema: Conducción adversa <i class="fas fa-arrow-right"></i></a></div>
+    </div></div></main>
+
+    <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
+    <script src="../js/auth.js"></script><script src="../js/main.js"></script><script>function renderUserZone(){const u=getCurrentUser();const z=document.getElementById('userZone');if(u)z.innerHTML=`<div style="display:flex; align-items:center; gap:15px;"><span style="color:white;"><i class="fas fa-user-circle"></i> ${u.nombre}</span><a href="../perfil/index.html" class="btn-login" style="background:#fbbf24; color:#1a472a;">Mi perfil</a><button onclick="logoutUser()" class="btn-login" style="background:transparent; border:1px solid #fbbf24; color:#fbbf24;">Cerrar sesión</button></div>`;else z.innerHTML=`<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;}renderUserZone();</script>
+</body>
+</html>
