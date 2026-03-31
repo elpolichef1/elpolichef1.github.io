@@ -8,7 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        .page-header { text-align: center; padding: 40px 0; background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; margin-bottom: 30px; }
+        .page-header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            margin-bottom: 30px;
+        }
         .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
         
         .selector-tema {
@@ -17,10 +23,20 @@
             padding: 25px;
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
         }
         .selector-tema h3 { margin-bottom: 15px; color: #1e293b; }
         .temas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-        .tema-btn { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 15px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.3s; font-weight: 500; }
+        .tema-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
         .tema-btn:hover { border-color: #fbbf24; background: #fef3c7; transform: translateY(-2px); }
         .tema-btn.active { border-color: #fbbf24; background: #fef3c7; }
         .tema-numero { font-weight: 800; color: #fbbf24; }
@@ -37,31 +53,181 @@
             flex-wrap: wrap;
             gap: 20px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
         }
         .config-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .config-group label { font-weight: 600; color: #1e293b; }
         .config-group select { padding: 10px 20px; border-radius: 12px; border: 2px solid #e2e8f0; background: white; cursor: pointer; }
-        .btn-iniciar { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 12px 28px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-iniciar {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
         .btn-iniciar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251,191,36,0.3); }
         
-        .test-container { background: white; border-radius: 30px; padding: 35px; margin-bottom: 60px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; gap: 15px; }
+        .test-container {
+            background: white;
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 60px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
         .test-info { display: flex; gap: 20px; }
-        .test-info-item { background: #f8fafc; padding: 8px 18px; border-radius: 30px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .timer { font-size: 1.5rem; font-weight: 700; font-family: monospace; background: #1e293b; color: white; padding: 8px 20px; border-radius: 50px; }
+        .test-info-item {
+            background: #f8fafc;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .test-info-item i { color: #fbbf24; }
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            background: #1e293b;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+        }
         .timer.warning { background: #ef4444; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; transform: scale(1.02); } }
-        .pregunta { margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0; }
-        .pregunta.correcta { border-left: 4px solid #10b981; padding-left: 20px; background: #f0fdf4; border-radius: 12px; }
-        .pregunta.incorrecta { border-left: 4px solid #ef4444; padding-left: 20px; background: #fef2f2; border-radius: 12px; }
-        .opcion { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; padding: 10px 15px; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #fafcff; border: 1px solid #e2e8f0; }
-        .opcion:hover:not(.disabled) { background: #fef3c7; border-color: #fbbf24; transform: translateX(5px); }
-        .btn-enviar { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 12px 30px; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; }
-        .resultado { margin-top: 25px; padding: 25px; border-radius: 20px; display: none; text-align: center; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
+        
+        .pregunta {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .pregunta.correcta {
+            border-left: 4px solid #10b981;
+            padding-left: 20px;
+            background: #f0fdf4;
+            border-radius: 12px;
+        }
+        .pregunta.incorrecta {
+            border-left: 4px solid #ef4444;
+            padding-left: 20px;
+            background: #fef2f2;
+            border-radius: 12px;
+        }
+        .pregunta-texto {
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+        .opcion {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafcff;
+            border: 1px solid #e2e8f0;
+        }
+        .opcion:hover:not(.disabled) {
+            background: #fef3c7;
+            border-color: #fbbf24;
+            transform: translateX(5px);
+        }
+        .opcion.disabled { cursor: not-allowed; opacity: 0.7; }
+        .opcion.correcta-respuesta { background: #d1fae5; border-color: #10b981; }
+        .opcion.incorrecta-respuesta { background: #fee2e2; border-color: #ef4444; }
+        .btn-enviar {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251,191,36,0.3); }
+        
+        .resultado {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 20px;
+            display: none;
+            text-align: center;
+        }
         .resultado.exito { background: #d1fae5; color: #065f46; }
         .resultado.error { background: #fee2e2; color: #991b1b; }
-        .volver { display: inline-block; margin-top: 20px; color: #64748b; text-decoration: none; background: none; border: none; cursor: pointer; }
-        @media (max-width: 768px) { .configuracion-test { flex-direction: column; align-items: stretch; } .temas-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); } }
+        .resultado-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .resultado-stat { text-align: center; }
+        .resultado-stat-number { font-size: 2rem; font-weight: 800; }
+        .resultado-preguntas {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+        .resultado-pregunta {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+        .resultado-pregunta.correcta { background: #d1fae5; border-left: 4px solid #10b981; }
+        .resultado-pregunta.incorrecta { background: #fee2e2; border-left: 4px solid #ef4444; }
+        .btn-ver-resultados {
+            background: #f1f5f9;
+            color: #1e293b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        .btn-ver-resultados:hover { background: #e2e8f0; }
+        .volver {
+            display: inline-block;
+            margin-top: 20px;
+            color: #64748b;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .configuracion-test { flex-direction: column; align-items: stretch; }
+            .temas-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+            .test-info { flex-wrap: wrap; justify-content: center; }
+        }
     </style>
 </head>
 <body>
@@ -83,7 +249,20 @@
             <div class="config-group"><label><i class="fas fa-clock"></i> Tiempo límite:</label><select id="tiempoLimite"><option value="0">Sin límite</option><option value="5">5 minutos</option><option value="10">10 minutos</option><option value="15">15 minutos</option><option value="20">20 minutos</option><option value="30">30 minutos</option></select></div>
             <button class="btn-iniciar" id="btnIniciarTest"><i class="fas fa-play"></i> Iniciar Test</button>
         </div>
-        <div class="test-container" id="testContainer"><div class="test-header"><h3 id="testTitle"><i class="fas fa-book-open"></i> Test del tema</h3><div class="timer" id="timer">--:--</div></div><div id="preguntasContainer"></div><button class="btn-enviar" id="btnEnviar">Corregir test</button><div id="resultado" class="resultado"></div><button onclick="document.getElementById('testContainer').style.display='none'" class="volver"><i class="fas fa-arrow-left"></i> Volver a selección</button></div>
+        <div class="test-container" id="testContainer">
+            <div class="test-header">
+                <h3 id="testTitle"><i class="fas fa-book-open"></i> Test del tema</h3>
+                <div class="timer" id="timer">--:--</div>
+            </div>
+            <div class="test-info" style="margin-bottom: 20px;">
+                <div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">0</span></div>
+                <div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div>
+            </div>
+            <div id="preguntasContainer"></div>
+            <button class="btn-enviar" id="btnEnviar">Finalizar test</button>
+            <div id="resultado" class="resultado"></div>
+            <button onclick="document.getElementById('testContainer').style.display='none'" class="volver"><i class="fas fa-arrow-left"></i> Volver a selección</button>
+        </div>
     </div></main>
 
     <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
@@ -92,16 +271,180 @@
     <script src="../js/main.js"></script>
     <script src="data/preguntas.js"></script>
     <script>
-        const temasList = [{ numero: 1, nombre: "Normas generales" },{ numero: 2, nombre: "Señales" },{ numero: 3, nombre: "Circulación" },{ numero: 4, nombre: "Maniobras" },{ numero: 5, nombre: "Velocidad" },{ numero: 6, nombre: "Adversas" },{ numero: 7, nombre: "Vehículos" },{ numero: 8, nombre: "Conductores" },{ numero: 9, nombre: "Alcoholemia" },{ numero: 10, nombre: "Seguridad vial" },{ numero: 11, nombre: "Transporte" },{ numero: 12, nombre: "Vehículos especiales" },{ numero: 13, nombre: "Accidentes" },{ numero: 14, nombre: "Factores de riesgo" },{ numero: 15, nombre: "Medio ambiente" },{ numero: 16, nombre: "Permiso por puntos" },{ numero: 17, nombre: "ITV" },{ numero: 18, nombre: "Seguros" },{ numero: 19, nombre: "Movilidad" },{ numero: 20, nombre: "Legislación" }];
+        const temasList = [
+            { numero: 1, nombre: "Normas generales" },{ numero: 2, nombre: "Señales" },{ numero: 3, nombre: "Circulación" },{ numero: 4, nombre: "Maniobras" },{ numero: 5, nombre: "Velocidad" },
+            { numero: 6, nombre: "Adversas" },{ numero: 7, nombre: "Vehículos" },{ numero: 8, nombre: "Conductores" },{ numero: 9, nombre: "Alcoholemia" },{ numero: 10, nombre: "Seguridad vial" },
+            { numero: 11, nombre: "Transporte" },{ numero: 12, nombre: "Vehículos especiales" },{ numero: 13, nombre: "Accidentes" },{ numero: 14, nombre: "Factores de riesgo" },{ numero: 15, nombre: "Medio ambiente" },
+            { numero: 16, nombre: "Permiso por puntos" },{ numero: 17, nombre: "ITV" },{ numero: 18, nombre: "Seguros" },{ numero: 19, nombre: "Movilidad" },{ numero: 20, nombre: "Legislación" }
+        ];
         let temaSeleccionado = 1, preguntasActuales = [], respuestas = [], timerInterval, tiempoRestante = 0, testActivo = false;
-        function renderizarTemas() { document.getElementById('temasGrid').innerHTML = temasList.map(t => `<div class="tema-btn ${t.numero === temaSeleccionado ? 'active' : ''}" onclick="seleccionarTema(${t.numero})"><div class="tema-numero">Tema ${t.numero}</div><div class="tema-nombre">${t.nombre}</div></div>`).join(''); }
+
+        function renderizarTemas() {
+            document.getElementById('temasGrid').innerHTML = temasList.map(t => `<div class="tema-btn ${t.numero === temaSeleccionado ? 'active' : ''}" onclick="seleccionarTema(${t.numero})"><div class="tema-numero">Tema ${t.numero}</div><div class="tema-nombre">${t.nombre}</div></div>`).join('');
+        }
         function seleccionarTema(n) { temaSeleccionado = n; renderizarTemas(); }
-        function iniciarTest() { const num = parseInt(document.getElementById('numPreguntas').value), tiempoMin = parseInt(document.getElementById('tiempoLimite').value), todas = obtenerPreguntasPorTema(temaSeleccionado); if (todas.length === 0) { alert('No hay preguntas para este tema.'); return; } const mezcladas = [...todas]; for (let i = mezcladas.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]]; } preguntasActuales = mezcladas.slice(0, Math.min(num, mezcladas.length)); respuestas = new Array(preguntasActuales.length).fill(null); if (tiempoMin > 0) { tiempoRestante = tiempoMin * 60; iniciarTemporizador(); } else document.getElementById('timer').textContent = 'Sin límite'; document.getElementById('testTitle').innerHTML = `<i class="fas fa-book-open"></i> Tema ${temaSeleccionado}: ${temasList.find(t => t.numero === temaSeleccionado).nombre} (${preguntasActuales.length} preguntas)`; renderizarPreguntas(); document.getElementById('testContainer').style.display = 'block'; testActivo = true; document.getElementById('testContainer').scrollIntoView({ behavior: 'smooth' }); }
-        function renderizarPreguntas() { const c = document.getElementById('preguntasContainer'); c.innerHTML = preguntasActuales.map((p, idx) => `<div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}"><div class="pregunta-texto">${idx + 1}. ${p.texto}</div>${p.opciones.map((opcion, optIdx) => `<label class="opcion"><input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}><span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span></label>`).join('')}<div class="explicacion" id="explicacion_${idx}"><i class="fas fa-info-circle"></i> ${p.explicacion}</div></div>`).join(''); document.querySelectorAll('input[type="radio"]').forEach(i => i.addEventListener('change', (e) => { const idx = parseInt(e.target.name.split('_')[1]); respuestas[idx] = parseInt(e.target.value); })); }
-        function iniciarTemporizador() { if (timerInterval) clearInterval(timerInterval); const timerElem = document.getElementById('timer'); timerInterval = setInterval(() => { if (!testActivo) return; tiempoRestante--; const m = Math.floor(tiempoRestante / 60), s = tiempoRestante % 60; timerElem.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; if (tiempoRestante <= 60) timerElem.classList.add('warning'); if (tiempoRestante <= 0) { clearInterval(timerInterval); alert('¡Tiempo agotado!'); finalizarTest(); } }, 1000); }
-        function finalizarTest() { if (!testActivo) return; testActivo = false; if (timerInterval) clearInterval(timerInterval); let aciertos = 0; preguntasActuales.forEach((p, idx) => { const esCorrecto = (respuestas[idx] === p.correcta); if (esCorrecto) aciertos++; const div = document.querySelector(`.pregunta[data-id="${p.id}"]`); if (div) div.classList.add(esCorrecto ? 'correcta' : 'incorrecta'); document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => { op.classList.add('disabled'); if (optIdx === p.correcta) op.classList.add('correcta-respuesta'); if (respuestas[idx] === optIdx && respuestas[idx] !== p.correcta) op.classList.add('incorrecta-respuesta'); }); }); const pct = Math.round((aciertos / preguntasActuales.length) * 100), ok = pct >= 90, r = document.getElementById('resultado'); r.className = `resultado ${ok ? 'exito' : 'error'}`; r.innerHTML = `<i class="fas ${ok ? 'fa-trophy' : 'fa-book-open'}" style="font-size:2rem;"></i><h3>${ok ? '🎉 ¡Aprobado! 🎉' : '📚 No aprobado'}</h3><p>Has acertado <strong>${aciertos}</strong> de <strong>${preguntasActuales.length}</strong> preguntas (${pct}%)</p><button onclick="document.getElementById('testContainer').style.display='none'" style="background:#fbbf24; color:#1a472a; border:none; padding:10px 20px; border-radius:50px; cursor:pointer;">Volver a temas</button>`; r.style.display = 'block'; const tests = JSON.parse(localStorage.getItem('dgt_tests') || '[]'); tests.push({ tema: temaSeleccionado, aciertos: aciertos, total: preguntasActuales.length, fecha: new Date().toISOString() }); localStorage.setItem('dgt_tests', JSON.stringify(tests)); }
-        function renderUserZone() { const u = getCurrentUser(); const z = document.getElementById('userZone'); if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`; else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`; }
-        renderUserZone(); renderizarTemas(); document.getElementById('btnIniciarTest').addEventListener('click', iniciarTest); document.getElementById('btnEnviar').addEventListener('click', finalizarTest);
+
+        function iniciarTest() {
+            const num = parseInt(document.getElementById('numPreguntas').value);
+            const tiempoMin = parseInt(document.getElementById('tiempoLimite').value);
+            const todas = obtenerPreguntasPorTema(temaSeleccionado);
+            if (todas.length === 0) { alert('No hay preguntas para este tema.'); return; }
+            const mezcladas = [...todas];
+            for (let i = mezcladas.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]]; }
+            preguntasActuales = mezcladas.slice(0, Math.min(num, mezcladas.length));
+            respuestas = new Array(preguntasActuales.length).fill(null);
+            if (tiempoMin > 0) { tiempoRestante = tiempoMin * 60; iniciarTemporizador(); } else document.getElementById('timer').textContent = 'Sin límite';
+            document.getElementById('testTitle').innerHTML = `<i class="fas fa-book-open"></i> Tema ${temaSeleccionado}: ${temasList.find(t => t.numero === temaSeleccionado).nombre} (${preguntasActuales.length} preguntas)`;
+            document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
+            document.getElementById('respondidas').textContent = '0';
+            renderizarPreguntas();
+            document.getElementById('testContainer').style.display = 'block';
+            testActivo = true;
+            document.getElementById('testContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderizarPreguntas() {
+            const container = document.getElementById('preguntasContainer');
+            container.innerHTML = preguntasActuales.map((p, idx) => `
+                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
+                    <div class="pregunta-texto">${idx + 1}. ${p.texto}</div>
+                    ${p.opciones.map((opcion, optIdx) => `
+                        <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
+                            <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
+                            <span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.opcion input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
+                    const valor = parseInt(e.target.value);
+                    respuestas[preguntaIndex] = valor;
+                    const respondidas = respuestas.filter(r => r !== null).length;
+                    document.getElementById('respondidas').textContent = respondidas;
+                });
+            });
+        }
+
+        function iniciarTemporizador() {
+            if (timerInterval) clearInterval(timerInterval);
+            const timerElem = document.getElementById('timer');
+            timerInterval = setInterval(() => {
+                if (!testActivo) return;
+                tiempoRestante--;
+                const m = Math.floor(tiempoRestante / 60), s = tiempoRestante % 60;
+                timerElem.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if (tiempoRestante <= 60) timerElem.classList.add('warning');
+                if (tiempoRestante <= 0) { clearInterval(timerInterval); alert('⏰ ¡Tiempo agotado!'); finalizarTest(); }
+            }, 1000);
+        }
+
+        function finalizarTest() {
+            if (!testActivo) return;
+            testActivo = false;
+            if (timerInterval) clearInterval(timerInterval);
+            
+            let aciertos = 0;
+            const resultadosPreguntas = [];
+            
+            preguntasActuales.forEach((p, idx) => {
+                const respuesta = respuestas[idx];
+                const esCorrecto = (respuesta === p.correcta);
+                if (esCorrecto) aciertos++;
+                
+                resultadosPreguntas.push({
+                    texto: p.texto,
+                    opciones: p.opciones,
+                    correcta: p.correcta,
+                    seleccionada: respuesta,
+                    esCorrecto: esCorrecto,
+                    explicacion: p.explicacion
+                });
+                
+                // Marcar visualmente en el DOM
+                const preguntaDiv = document.querySelector(`.pregunta[data-id="${p.id}"]`);
+                if (preguntaDiv) preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
+                
+                document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => {
+                    op.classList.add('disabled');
+                    if (optIdx === p.correcta) op.classList.add('correcta-respuesta');
+                    if (respuesta === optIdx && respuesta !== p.correcta) op.classList.add('incorrecta-respuesta');
+                });
+            });
+            
+            const porcentaje = Math.round((aciertos / preguntasActuales.length) * 100);
+            const aprobado = porcentaje >= 90;
+            const resultadoDiv = document.getElementById('resultado');
+            
+            resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
+            resultadoDiv.innerHTML = `
+                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 2.5rem;"></i>
+                <h3>${aprobado ? '🎉 ¡Aprobado! 🎉' : '📚 No aprobado'}</h3>
+                <div class="resultado-stats">
+                    <div class="resultado-stat"><div class="resultado-stat-number">${aciertos}/${preguntasActuales.length}</div><div>Aciertos</div></div>
+                    <div class="resultado-stat"><div class="resultado-stat-number">${porcentaje}%</div><div>Porcentaje</div></div>
+                    <div class="resultado-stat"><div class="resultado-stat-number">${aprobado ? 'APTO' : 'NO APTO'}</div><div>Resultado</div></div>
+                </div>
+                <button class="btn-ver-resultados" id="btnVerResultados"><i class="fas fa-eye"></i> Ver respuestas correctas</button>
+                <div id="detalleResultados" style="display: none; margin-top: 20px;"></div>
+                <button onclick="reiniciarTest()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;"><i class="fas fa-redo"></i> Nuevo test</button>
+            `;
+            resultadoDiv.style.display = 'block';
+            
+            // Botón para mostrar respuestas
+            document.getElementById('btnVerResultados').addEventListener('click', () => {
+                const detalleDiv = document.getElementById('detalleResultados');
+                if (detalleDiv.style.display === 'none') {
+                    detalleDiv.innerHTML = `<h4 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Respuestas correctas:</h4>` + 
+                        resultadosPreguntas.map((p, idx) => `
+                            <div class="resultado-pregunta ${p.esCorrecto ? 'correcta' : 'incorrecta'}">
+                                <strong>${idx + 1}. ${p.texto}</strong><br>
+                                <span style="color: ${p.esCorrecto ? '#10b981' : '#ef4444'}">
+                                    ${p.esCorrecto ? '✅ Correcta' : '❌ Incorrecta'} - 
+                                    Respuesta correcta: ${String.fromCharCode(65 + p.correcta)}. ${p.opciones[p.correcta]}
+                                </span>
+                                <div style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">
+                                    <i class="fas fa-info-circle"></i> ${p.explicacion}
+                                </div>
+                            </div>
+                        `).join('');
+                    detalleDiv.style.display = 'block';
+                    document.getElementById('btnVerResultados').innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar respuestas';
+                } else {
+                    detalleDiv.style.display = 'none';
+                    document.getElementById('btnVerResultados').innerHTML = '<i class="fas fa-eye"></i> Ver respuestas correctas';
+                }
+            });
+            
+            // Guardar resultado
+            const tests = JSON.parse(localStorage.getItem('dgt_tests') || '[]');
+            tests.push({ tema: temaSeleccionado, aciertos: aciertos, total: preguntasActuales.length, fecha: new Date().toISOString() });
+            localStorage.setItem('dgt_tests', JSON.stringify(tests));
+            
+            // Actualizar estadísticas del usuario
+            const currentUser = getCurrentUser();
+            if (currentUser && typeof updateUserStats === 'function') {
+                updateUserStats(currentUser.id, aciertos, preguntasActuales.length);
+            }
+        }
+        
+        function reiniciarTest() {
+            location.reload();
+        }
+
+        function renderUserZone() {
+            const u = getCurrentUser();
+            const z = document.getElementById('userZone');
+            if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
+            else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+        }
+
+        renderUserZone();
+        renderizarTemas();
+        document.getElementById('btnIniciarTest').addEventListener('click', iniciarTest);
+        document.getElementById('btnEnviar').addEventListener('click', finalizarTest);
     </script>
 </body>
 </html>

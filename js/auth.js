@@ -299,6 +299,38 @@ function getUserStats() {
         totalUsers: ranking.length
     };
 }
-
+// Guardar resultado de test con userId
+function guardarResultadoTest(aciertos, total, tipo, tema = null) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return false;
+    
+    const tests = JSON.parse(localStorage.getItem('dgt_tests') || '[]');
+    tests.push({
+        userId: currentUser.id,
+        aciertos: aciertos,
+        total: total,
+        tipo: tipo,
+        tema: tema,
+        fecha: new Date().toISOString()
+    });
+    localStorage.setItem('dgt_tests', JSON.stringify(tests));
+    
+    // Actualizar estadísticas del usuario
+    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    if (userIndex !== -1) {
+        users[userIndex].estadisticas.testsRealizados++;
+        users[userIndex].estadisticas.totalAciertos += aciertos;
+        users[userIndex].estadisticas.totalPreguntas += total;
+        const porcentaje = Math.round((aciertos / total) * 100);
+        if (porcentaje > users[userIndex].estadisticas.mejorResultado) {
+            users[userIndex].estadisticas.mejorResultado = porcentaje;
+        }
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(users[userIndex]));
+    }
+    
+    return true;
+}
 // Inicializar
 initUsers();
