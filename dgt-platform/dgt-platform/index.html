@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AprobadoYa | Tu escuela de conducción online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper">
+                    <nav id="navMenu">
+                        <ul>
+                            <li><a href="index.html" class="active">Inicio</a></li>
+                            <li><a href="temas/index.html">Temas</a></li>
+                            <li><a href="test/index.html">Test</a></li>
+                            <li><a href="simulacro/index.html">Simulacro</a></li>
+                            <li><a href="videos/index.html">Videos</a></li>
+                            <li><a href="ranking/index.html">Ranking</a></li>
+                            <li><a href="mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Aprueba el carnet de conducir <span style="color: #fbbf24;">al primer intento</span></h1>
+            <p>La plataforma más completa para preparar el examen teórico de la DGT. Temas actualizados, tests oficiales y simulacros de examen.</p>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="temasCompletados">0</div>
+                    <p>Temas completados</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="progresoGeneral">0%</div>
+                    <p>Progreso general</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="testsRealizados">0</div>
+                    <p>Tests realizados</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="mediaAciertos">0%</div>
+                    <p>Media de aciertos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="quick-sections">
+        <div class="container">
+            <h2 class="section-title">¿Qué quieres hacer hoy?</h2>
+            <div class="quick-grid">
+                <a href="temas/index.html" class="quick-card"><i class="fas fa-book-open"></i><h3>Estudiar temas</h3><p>20 temas oficiales de la DGT</p></a>
+                <a href="test/index.html" class="quick-card"><i class="fas fa-clipboard-list"></i><h3>Practicar con tests</h3><p>Miles de preguntas oficiales</p></a>
+                <a href="simulacro/index.html" class="quick-card"><i class="fas fa-stopwatch"></i><h3>Simulacro de examen</h3><p>30 preguntas con temporizador</p></a>
+                <a href="videos/index.html" class="quick-card"><i class="fas fa-video"></i><h3>Videoteca educativa</h3><p>Clases en vídeo y explicaciones</p></a>
+                <a href="ranking/index.html" class="quick-card"><i class="fas fa-trophy"></i><h3>Ranking de usuarios</h3><p>Compara tu progreso</p></a>
+                <a href="mini-retos/index.html" class="quick-card"><i class="fas fa-gamepad"></i><h3>Mini Retos</h3><p>¡Demuestra tus conocimientos!</p></a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir al primer intento. Aprende, practica y aprueba.</p></div>
+                <div class="footer-col"><h4>Enlaces rápidos</h4><ul><li><a href="temas/index.html">Temas oficiales</a></li><li><a href="test/index.html">Tests DGT</a></li><li><a href="simulacro/index.html">Simulacro examen</a></li><li><a href="ranking/index.html">Ranking</a></li></ul></div>
+                <div class="footer-col"><h4>Información</h4><ul><li><a href="sobre-nosotros.html">Sobre nosotros</a></li><li><a href="#">Preguntas frecuentes</a></li><li><a href="#">Contacto</a></li></ul></div>
+            </div>
+            <div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p><p style="font-size:0.75rem; margin-top:10px;">Plataforma educativa independiente. No oficial de la DGT.</p></div>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function renderUserZone() { 
+            const u = getCurrentUser(); 
+            const zone = document.getElementById('userZone'); 
+            if (u) { 
+                zone.innerHTML = `<div class="user-menu"><span class="user-name"><i class="fas fa-user-circle"></i> ${u.nombre}</span><a href="perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`; 
+            } else { 
+                zone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`; 
+            } 
+        }
+        function cargarEstadisticas(){ 
+            const u = getCurrentUser(); 
+            if(u){ 
+                const s = u.estadisticas; 
+                const p = s.totalPreguntas > 0 ? Math.round((s.totalAciertos / s.totalPreguntas) * 100) : 0; 
+                document.getElementById('temasCompletados').textContent = s.temasCompletados; 
+                document.getElementById('progresoGeneral').textContent = `${Math.round((s.temasCompletados / 20) * 100)}%`; 
+                document.getElementById('testsRealizados').textContent = s.testsRealizados; 
+                document.getElementById('mediaAciertos').textContent = `${p}%`; 
+            } 
+        }
+        renderUserZone(); 
+        cargarEstadisticas();
+    </script>
+</body>
+</html>

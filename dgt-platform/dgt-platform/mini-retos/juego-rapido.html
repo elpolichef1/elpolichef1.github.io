@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ráfaga de preguntas | Mini Retos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .game-header { background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; padding: 30px 0; text-align: center; }
+        .game-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .score-board { display: flex; justify-content: space-between; background: white; border-radius: 25px; padding: 20px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .score-item { text-align: center; flex: 1; }
+        .score-value { font-size: 2rem; font-weight: 800; color: #fbbf24; }
+        .timer-circle { width: 120px; height: 120px; margin: 0 auto 20px; position: relative; }
+        .timer-svg { transform: rotate(-90deg); }
+        .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: 800; color: #1e293b; }
+        .question-card { background: white; border-radius: 30px; padding: 35px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; }
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; color: #1e293b; }
+        .options { display: grid; gap: 12px; }
+        .option-btn { padding: 12px 20px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 15px; cursor: pointer; transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 12px; }
+        .option-btn:hover:not(.disabled) { background: #fef3c7; border-color: #fbbf24; transform: translateX(5px); }
+        .result-message { margin-top: 20px; padding: 15px; border-radius: 15px; display: none; font-weight: 500; }
+        .result-message.correct { background: #d1fae5; color: #065f46; display: block; border-left: 4px solid #10b981; }
+        .result-message.wrong { background: #fee2e2; color: #991b1b; display: block; border-left: 4px solid #ef4444; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .time-warning { animation: pulse 0.5s ease-in-out; color: #ef4444; }
+    </style>
+</head>
+<body>
+    <header><div class="container"><div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div><div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../mini-retos/index.html" class="active">Mini Retos</a></li></ul></nav></div></div><div class="user-zone" id="userZone"></div><button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button></div></header>
+
+    <div class="game-header"><div class="container"><h1><i class="fas fa-bolt"></i> Ráfaga de preguntas</h1><p>Responde rápido antes de que se acabe el tiempo. ¡Cada acierto suma segundos!</p></div></div>
+
+    <div class="game-container">
+        <div class="score-board"><div class="score-item"><div class="score-value" id="puntos">0</div><div>🏆 Puntos</div></div><div class="score-item"><div class="score-value" id="racha">0</div><div>🔥 Racha</div></div><div class="score-item"><div class="score-value" id="respondidas">0</div><div>✅ Respondidas</div></div></div>
+        <div class="question-card"><div class="timer-circle"><svg width="120" height="120" class="timer-svg"><circle cx="60" cy="60" r="54" fill="none" stroke="#e2e8f0" stroke-width="8"/><circle cx="60" cy="60" r="54" fill="none" stroke="#fbbf24" stroke-width="8" stroke-dasharray="339.3" stroke-dashoffset="0" class="timer-progress" id="timerProgress"/></svg><div class="timer-text" id="timerText">3.0</div></div><div class="question-text" id="questionText">Cargando pregunta...</div><div class="options" id="optionsContainer"></div><div class="result-message" id="resultMessage"></div></div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../test/data/preguntas.js"></script>
+    <script>
+        let tiempo = 3.0, puntos = 0, racha = 0, respondidas = 0, preguntaActual = null, opcionSeleccionada = false, gameActivo = true, timerInterval, preguntasUsadas = [], CIRCUNFERENCIA = 2 * Math.PI * 54;
+        function obtenerPregunta() { let d = preguntasDGT.filter(p => !preguntasUsadas.includes(p.id)); if (d.length === 0) { preguntasUsadas = []; d = [...preguntasDGT]; } const i = Math.floor(Math.random() * d.length); const n = d[i]; preguntasUsadas.push(n.id); return n; }
+        function iniciarJuego() { cargarPregunta(); }
+        function cargarPregunta() { if (!gameActivo) return; preguntaActual = obtenerPregunta(); document.getElementById('questionText').textContent = preguntaActual.texto; const oc = document.getElementById('optionsContainer'); oc.innerHTML = preguntaActual.opciones.map((o, idx) => `<div class="option-btn" onclick="responder(${idx})"><span style="font-weight:800; width:35px;">${String.fromCharCode(65+idx)}.</span>${o}</div>`).join(''); opcionSeleccionada = false; document.getElementById('resultMessage').className = 'result-message'; document.getElementById('resultMessage').style.display = 'none'; iniciarTemporizador(); }
+        function iniciarTemporizador() { if (timerInterval) clearInterval(timerInterval); tiempo = 3.0; const p = document.getElementById('timerProgress'); p.style.strokeDashoffset = 0; document.getElementById('timerText').textContent = '3.0'; timerInterval = setInterval(() => { if (opcionSeleccionada || !gameActivo) return; tiempo -= 0.05; const offset = CIRCUNFERENCIA * (1 - (tiempo / 3.0)); p.style.strokeDashoffset = offset; document.getElementById('timerText').textContent = tiempo.toFixed(1); const tt = document.getElementById('timerText'); if (tiempo < 1) tt.classList.add('time-warning'); else tt.classList.remove('time-warning'); if (tiempo <= 0) { clearInterval(timerInterval); responder(-1); } }, 50); }
+        function responder(idx) { if (opcionSeleccionada || !gameActivo) return; clearInterval(timerInterval); opcionSeleccionada = true; const esCorrecto = (idx === preguntaActual.correcta); const msg = document.getElementById('resultMessage'); if (esCorrecto) { racha++; const puntosGanados = Math.floor(10 + (racha * 2) + (tiempo * 10)); puntos += puntosGanados; respondidas++; tiempo = Math.min(tiempo + 0.5, 3.0); msg.className = 'result-message correct'; msg.innerHTML = `<i class="fas fa-check-circle"></i> ✅ ¡Correcto! +${puntosGanados} pts<br><small>+0.5 segundos</small>`; actualizarPuntuacion(); setTimeout(() => cargarPregunta(), 600); } else { msg.className = 'result-message wrong'; msg.innerHTML = `<i class="fas fa-times-circle"></i> ❌ Incorrecto. La respuesta era: ${String.fromCharCode(65 + preguntaActual.correcta)}<br><small>${preguntaActual.explicacion}</small>`; msg.style.display = 'block'; gameActivo = false; setTimeout(() => mostrarGameOver(), 2000); } }
+        function actualizarPuntuacion() { document.getElementById('puntos').textContent = puntos; document.getElementById('racha').textContent = racha; document.getElementById('respondidas').textContent = respondidas; }
+        function mostrarGameOver() { const card = document.querySelector('.question-card'); const bonus = racha >= 10 ? 100 : (racha >= 5 ? 50 : 0), total = puntos + bonus; card.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-bolt" style="font-size:4rem; color:#fbbf24;"></i><h2>⏱️ ¡GAME OVER!</h2><p><strong>✅ Preguntas respondidas:</strong> ${respondidas}</p><p><strong>🏆 Puntuación final:</strong> ${total} pts</p><p><strong>🔥 Mejor racha:</strong> ${racha} aciertos</p>${bonus > 0 ? `<p><i class="fas fa-star"></i> Bonus: +${bonus} pts</p>` : ''}<div style="margin-top:20px;"><button onclick="reiniciarJuego()" style="background:#fbbf24; color:#1a472a; border:none; padding:10px 25px; border-radius:50px; cursor:pointer;"><i class="fas fa-redo"></i> Jugar de nuevo</button><a href="index.html" style="display:inline-block; margin-left:10px; background:#f1f5f9; color:#1e293b; padding:10px 25px; border-radius:50px; text-decoration:none;"><i class="fas fa-arrow-left"></i> Volver al menú</a></div></div>`; guardarPuntuacion(total); }
+        function reiniciarJuego() { location.reload(); }
+        function guardarPuntuacion(p) { const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}'); stats.totalJuegos = (stats.totalJuegos || 0) + 1; stats.totalPuntos = (stats.totalPuntos || 0) + p; localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats)); }
+        function renderUserZone() { const u = getCurrentUser(); const z = document.getElementById('userZone'); if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`; else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`; }
+        renderUserZone(); iniciarJuego();
+    </script>
+</body>
+</html>

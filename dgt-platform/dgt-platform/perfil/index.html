@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .page-header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .page-header h1 i { color: #fbbf24; }
+        
+        .profile-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .profile-sidebar {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 3rem;
+            cursor: pointer;
+        }
+        .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+        .profile-email { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+        .profile-stats-mini {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+        .profile-stats-mini p { margin: 8px 0; font-size: 0.85rem; }
+        
+        .profile-main {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i { color: #fbbf24; }
+        
+        .grafico-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        canvas { width: 200px; height: 200px; background: transparent; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: #fbbf24; }
+        .stat-label { font-size: 0.7rem; color: #64748b; margin-top: 5px; }
+        
+        .tests-por-tipo {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .tipo-card {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .tipo-numero { font-size: 1.3rem; font-weight: 700; color: #fbbf24; }
+        .tipo-label { font-size: 0.7rem; color: #64748b; }
+        
+        .progress-item { margin-bottom: 20px; }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            border-radius: 4px;
+            width: 0%;
+        }
+        
+        .tests-recientes {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .test-item.aprobado { border-left: 3px solid #10b981; padding-left: 15px; }
+        .test-item.suspendido { border-left: 3px solid #ef4444; padding-left: 15px; }
+        .test-tipo { font-weight: 600; color: #1e293b; }
+        .test-fecha { font-size: 0.7rem; color: #94a3b8; }
+        .test-resultado { font-weight: 700; }
+        .test-resultado.aprobado-text { color: #10b981; }
+        .test-resultado.suspendido-text { color: #ef4444; }
+        
+        .avatar-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .avatar-option {
+            width: 45px;
+            height: 45px;
+            background: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .avatar-option:hover { transform: scale(1.1); background: #fef3c7; }
+        .avatar-option.selected { border-color: #fbbf24; background: #fef3c7; }
+        
+        .btn-editar {
+            background: none;
+            border: none;
+            color: #fbbf24;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-recargar {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 15px;
+        }
+        
+        .empty-tests {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+        }
+        
+        @media (max-width: 992px) {
+            .profile-container { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .tests-por-tipo { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+            <p>Visualiza tu progreso y estadísticas</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div id="profileContent"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p></div></div>
+            <div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div>
+        </div>
+    </footer>
+
+    <script src="../js/auth.js"></script>
+    <script>
+        const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
+        
+        function renderProfile() {
+            const currentUser = getCurrentUser();
+            const container = document.getElementById('profileContent');
+            
+            if (!currentUser) {
+                container.innerHTML = `<div style="text-align:center; padding:60px; background:white; border-radius:25px;"><i class="fas fa-lock" style="font-size:3rem; color:#fbbf24;"></i><h3>Necesitas iniciar sesión</h3><p>Para ver tu perfil, inicia sesión o regístrate.</p><a href="../login.html" class="btn-primary" style="display:inline-block; margin-top:20px;">Iniciar sesión</a></div>`;
+                return;
+            }
+            
+            const stats = obtenerEstadisticasCompletas();
+            const avatar = currentUser.avatar || "🚗";
+            const porcentajeGlobal = stats?.porcentajeGlobal || 0;
+            
+            container.innerHTML = `
+                <div class="profile-container">
+                    <div class="profile-sidebar">
+                        <div class="profile-avatar" onclick="toggleAvatarSelector()">${avatar}</div>
+                        <div class="profile-name">${currentUser.nombre}</div>
+                        <div class="profile-email">${currentUser.email}</div>
+                        <div class="profile-stats-mini">
+                            <p><i class="fas fa-calendar"></i> Miembro desde: ${currentUser.fechaRegistro}</p>
+                            <p><i class="fas fa-trophy"></i> Tests realizados: ${stats?.totalTests || 0}</p>
+                            <p><i class="fas fa-chart-line"></i> Media de aciertos: ${porcentajeGlobal}%</p>
+                        </div>
+                        <div id="avatarSelector" class="avatar-selector" style="display: none;">
+                            ${avataresDisponibles.map(a => `<div class="avatar-option ${avatar === a ? 'selected' : ''}" onclick="cambiarAvatar('${a}')">${a}</div>`).join('')}
+                        </div>
+                        <button class="btn-editar" onclick="toggleAvatarSelector()"><i class="fas fa-edit"></i> Cambiar avatar</button>
+                    </div>
+                    <div class="profile-main">
+                        <div class="section-title"><i class="fas fa-chart-pie"></i> Progreso Global</div>
+                        <div class="grafico-container">
+                            <canvas id="graficoGlobal" width="200" height="200"></canvas>
+                        </div>
+                        
+                        <div class="section-title"><i class="fas fa-chart-simple"></i> Mis Estadísticas</div>
+                        <div class="stats-grid">
+                            <div class="stat-card"><div class="stat-number">${stats?.totalTests || 0}</div><div class="stat-label">Tests</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.totalAciertos || 0}</div><div class="stat-label">Aciertos</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.totalPreguntas || 0}</div><div class="stat-label">Preguntas</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
+                        </div>
+                        
+                        <div class="section-title"><i class="fas fa-chart-line"></i> Tests por Tipo</div>
+                        <div class="tests-por-tipo">
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-rapido'] || 0}</div><div class="tipo-label">Test Rápido</div></div>
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-completo'] || 0}</div><div class="tipo-label">Test Completo</div></div>
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-por-temas'] || 0}</div><div class="tipo-label">Test por Temas</div></div>
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-examen'] || 0}</div><div class="tipo-label">Examen Oficial</div></div>
+                        </div>
+                        
+                        <div class="section-title"><i class="fas fa-tasks"></i> Mi Progreso</div>
+                        <div class="progress-item">
+                            <div class="progress-header"><span>Tests realizados</span><span id="testsCount">0/50</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="testsFill"></div></div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header"><span>Tasa de aprobados</span><span id="tasaAprobados">0%</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="tasaFill"></div></div>
+                        </div>
+                        
+                        <div class="section-title"><i class="fas fa-history"></i> Tests Recientes</div>
+                        <div id="recentTestsList" class="tests-recientes"></div>
+                        
+                        <button class="btn-recargar" onclick="recargarEstadisticas()"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</button>
+                    </div>
+                </div>
+            `;
+            
+            crearGraficoCircular('graficoGlobal', porcentajeGlobal);
+            
+            const totalTests = stats?.totalTests || 0;
+            const pctTests = Math.min(Math.round((totalTests / 50) * 100), 100);
+            document.getElementById('testsFill').style.width = `${pctTests}%`;
+            document.getElementById('testsCount').textContent = `${totalTests}/50 (${pctTests}%)`;
+            
+            const tasa = stats?.tasaAprobados || 0;
+            document.getElementById('tasaAprobados').textContent = `${tasa}%`;
+            document.getElementById('tasaFill').style.width = `${tasa}%`;
+            
+            const recentList = document.getElementById('recentTestsList');
+            const testsRecientes = stats?.testsRecientes || [];
+            
+            if (testsRecientes.length === 0) {
+                recentList.innerHTML = '<div class="empty-tests"><i class="fas fa-clipboard-list"></i><p>No has realizado ningún test aún. ¡Empieza a practicar!</p></div>';
+            } else {
+                recentList.innerHTML = testsRecientes.map(test => {
+                    const fecha = new Date(test.fecha).toLocaleDateString('es-ES');
+                    const porcentaje = Math.round((test.aciertos / test.total) * 100);
+                    const aprobado = porcentaje >= 90;
+                    let tipoTexto = '';
+                    switch(test.tipo) {
+                        case 'test-rapido': tipoTexto = '⚡ Test Rápido'; break;
+                        case 'test-completo': tipoTexto = '📋 Test Completo'; break;
+                        case 'test-por-temas': tipoTexto = `📚 Test Tema ${test.tema}`; break;
+                        case 'test-examen': tipoTexto = '🎯 Examen Oficial'; break;
+                        default: tipoTexto = test.tipo || 'Test';
+                    }
+                    return `
+                        <div class="test-item ${aprobado ? 'aprobado' : 'suspendido'}">
+                            <div class="test-info">
+                                <span class="test-tipo">${tipoTexto}</span>
+                                <span class="test-fecha">${fecha}</span>
+                            </div>
+                            <div>
+                                <span class="test-resultado ${aprobado ? 'aprobado-text' : 'suspendido-text'}">${test.aciertos}/${test.total} (${porcentaje}%)</span>
+                                <span style="margin-left: 10px;">${aprobado ? '✅ Aprobado' : '❌ Suspendido'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        function toggleAvatarSelector() {
+            const selector = document.getElementById('avatarSelector');
+            if (selector) selector.style.display = selector.style.display === 'none' ? 'flex' : 'none';
+        }
+        
+        function cambiarAvatar(avatar) {
+            updateUserAvatar(avatar);
+            renderProfile();
+            renderUserZone();
+        }
+        
+        function recargarEstadisticas() {
+            renderProfile();
+        }
+        
+        function renderUserZone() {
+            const u = getCurrentUser();
+            const z = document.getElementById('userZone');
+            if (z) {
+                if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
+                else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            }
+        }
+        
+        renderUserZone();
+        renderProfile();
+    </script>
+</body>
+</html>

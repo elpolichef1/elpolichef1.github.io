@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tests DGT | AprobadoYa</title>
+    <meta name="description" content="Practica con tests oficiales de la DGT. Test rápido, test completo, test por temas y examen oficial con temporizador.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .page-header {
+            text-align: center;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: "📝";
+            position: absolute;
+            font-size: 150px;
+            opacity: 0.05;
+            bottom: -30px;
+            right: -30px;
+            transform: rotate(-15deg);
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        .page-header h1 i {
+            color: #fbbf24;
+        }
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Estadísticas del usuario */
+        .stats-section {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stats-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-title i {
+            color: #fbbf24;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: #fef3c7;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fbbf24;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
+        /* Grid de tests */
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 30px;
+            padding: 35px 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+        
+        .test-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .test-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(251,191,36,0.15);
+            border-color: #fbbf24;
+        }
+        
+        .test-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .test-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+        
+        .test-card p {
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .test-features {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .feature {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .feature i {
+            color: #fbbf24;
+        }
+        
+        .test-badge {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .tests-grid {
+                grid-template-columns: 1fr;
+            }
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .test-card {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .test-card:nth-child(1) { animation-delay: 0.05s; }
+        .test-card:nth-child(2) { animation-delay: 0.1s; }
+        .test-card:nth-child(3) { animation-delay: 0.15s; }
+        .test-card:nth-child(4) { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper">
+                    <nav id="navMenu">
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="../temas/index.html">Temas</a></li>
+                            <li><a href="index.html" class="active">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../videos/index.html">Videos</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-clipboard-list"></i> Tests DGT</h1>
+            <p>Practica con preguntas reales del examen oficial de conducir</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <!-- Estadísticas del usuario -->
+            <div class="stats-section">
+                <div class="stats-title">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Tu progreso</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalTests">0</div>
+                        <div class="stat-label">Tests realizados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="mediaAciertos">0%</div>
+                        <div class="stat-label">Media de aciertos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="mejorResultado">0%</div>
+                        <div class="stat-label">Mejor resultado</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPreguntas">0</div>
+                        <div class="stat-label">Preguntas respondidas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid de tests -->
+            <div class="tests-grid">
+                <div class="test-card" onclick="window.location.href='test-rapido.html'">
+                    <div class="test-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Test Rápido</h3>
+                    <p>10 preguntas aleatorias para practicar rápidamente</p>
+                    <div class="test-features">
+                        <span class="feature"><i class="fas fa-sliders-h"></i> 10 preguntas</span>
+                        <span class="feature"><i class="fas fa-clock"></i> 10 minutos</span>
+                    </div>
+                    <span class="test-badge"><i class="fas fa-play"></i> Comenzar ahora</span>
+                </div>
+                
+                <div class="test-card" onclick="window.location.href='test-completo.html'">
+                    <div class="test-icon"><i class="fas fa-list-check"></i></div>
+                    <h3>Test Completo</h3>
+                    <p>30 preguntas como en el examen oficial</p>
+                    <div class="test-features">
+                        <span class="feature"><i class="fas fa-sliders-h"></i> 30 preguntas</span>
+                        <span class="feature"><i class="fas fa-clock"></i> 30 minutos</span>
+                    </div>
+                    <span class="test-badge"><i class="fas fa-play"></i> Comenzar ahora</span>
+                </div>
+                
+                <div class="test-card" onclick="window.location.href='test-por-temas.html'">
+                    <div class="test-icon"><i class="fas fa-book"></i></div>
+                    <h3>Test por Temas</h3>
+                    <p>Elige el tema que quieres practicar</p>
+                    <div class="test-features">
+                        <span class="feature"><i class="fas fa-layer-group"></i> 20 temas</span>
+                        <span class="feature"><i class="fas fa-chart-line"></i> Personalizable</span>
+                    </div>
+                    <span class="test-badge"><i class="fas fa-play"></i> Comenzar ahora</span>
+                </div>
+                
+                <div class="test-card" onclick="window.location.href='test-examen.html'">
+                    <div class="test-icon"><i class="fas fa-stopwatch"></i></div>
+                    <h3>Examen Oficial</h3>
+                    <p>Simula el examen real con temporizador</p>
+                    <div class="test-features">
+                        <span class="feature"><i class="fas fa-stopwatch"></i> 30 minutos</span>
+                        <span class="feature"><i class="fas fa-trophy"></i> Resultado real</span>
+                    </div>
+                    <span class="test-badge"><i class="fas fa-play"></i> Comenzar ahora</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>AprobadoYa</h4>
+                    <p>Tu plataforma para aprobar el carnet de conducir al primer intento. Aprende, practica y aprueba.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces rápidos</h4>
+                    <ul>
+                        <li><a href="../index.html">Inicio</a></li>
+                        <li><a href="../temas/index.html">Temas oficiales</a></li>
+                        <li><a href="index.html">Tests DGT</a></li>
+                        <li><a href="../simulacro/index.html">Simulacro examen</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Información</h4>
+                    <ul>
+                        <li><a href="#">Sobre nosotros</a></li>
+                        <li><a href="#">Preguntas frecuentes</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+                <p style="font-size: 0.7rem; margin-top: 5px;">Plataforma educativa independiente. No oficial de la DGT.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        function cargarEstadisticas() {
+            const tests = localStorage.getItem('dgt_tests');
+            if (tests) {
+                const testsData = JSON.parse(tests);
+                const totalTests = testsData.length;
+                let totalAciertos = 0;
+                let totalPreguntas = 0;
+                let mejorPorcentaje = 0;
+                
+                testsData.forEach(test => {
+                    totalAciertos += test.aciertos;
+                    totalPreguntas += test.total;
+                    const porcentaje = Math.round((test.aciertos / test.total) * 100);
+                    if (porcentaje > mejorPorcentaje) mejorPorcentaje = porcentaje;
+                });
+                
+                const media = totalPreguntas > 0 ? Math.round((totalAciertos / totalPreguntas) * 100) : 0;
+                
+                document.getElementById('totalTests').textContent = totalTests;
+                document.getElementById('mediaAciertos').textContent = `${media}%`;
+                document.getElementById('mejorResultado').textContent = `${mejorPorcentaje}%`;
+                document.getElementById('totalPreguntas').textContent = totalPreguntas;
+            } else {
+                document.getElementById('totalTests').textContent = '0';
+                document.getElementById('mediaAciertos').textContent = '0%';
+                document.getElementById('mejorResultado').textContent = '0%';
+                document.getElementById('totalPreguntas').textContent = '0';
+            }
+        }
+        
+        function renderUserZone() {
+            const currentUser = getCurrentUser();
+            const userZone = document.getElementById('userZone');
+            
+            if (currentUser) {
+                const avatar = currentUser.avatar || "🚗";
+                userZone.innerHTML = `
+                    <div class="user-menu">
+                        <div class="user-avatar">${avatar}</div>
+                        <span class="user-name">${currentUser.nombre}</span>
+                        <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
+                        <button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button>
+                    </div>
+                `;
+            } else {
+                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            }
+        }
+        
+        renderUserZone();
+        cargarEstadisticas();
+    </script>
+</body>
+</html>

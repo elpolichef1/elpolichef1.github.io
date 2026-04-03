@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Multas | DGT Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .page-header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            margin-bottom: 40px;
+        }
+        .tabla-multas {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 60px;
+        }
+        .tabla-header {
+            display: grid;
+            grid-template-columns: 1fr 100px 100px 80px;
+            background: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        .tabla-row {
+            display: grid;
+            grid-template-columns: 1fr 100px 100px 80px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+        }
+        .infraccion-leve { border-left: 4px solid #fbbf24; }
+        .infraccion-grave { border-left: 4px solid #f97316; }
+        .infraccion-muy-grave { border-left: 4px solid #e53e3e; }
+        .multa { font-weight: 700; color: #e53e3e; }
+        .puntos { font-weight: 700; color: #f97316; }
+        @media (max-width: 768px) {
+            .tabla-header, .tabla-row {
+                grid-template-columns: 1fr 80px 80px 60px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-car"></i>
+                <h1>DGT<span>Academy</span></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../temas/index.html">Temas</a></li>
+                    <li><a href="../test/index.html">Test</a></li>
+                    <li><a href="../infracciones/index.html" class="active">Multas</a></li>
+                </ul>
+            </nav>
+            <div class="user-zone">
+                <a href="../perfil/index.html" class="btn-login"><i class="fas fa-user-circle"></i> Mi cuenta</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-gavel"></i> Tabla de Multas y Sanciones</h1>
+            <p>Infracciones de tráfico, multas y pérdida de puntos</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="tabla-multas">
+                <div class="tabla-header">
+                    <div>Infracción</div>
+                    <div>Multa (€)</div>
+                    <div>Puntos</div>
+                    <div>Tipo</div>
+                </div>
+                <div id="tablaInfracciones"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>DGT Academy</h4>
+                    <p>Plataforma educativa para la obtención del permiso de conducir.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 DGT Academy | Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        const infracciones = [
+            { descripcion: "Uso del teléfono móvil al volante", multa: 200, puntos: 3, tipo: "grave" },
+            { descripcion: "No usar el cinturón de seguridad", multa: 200, puntos: 3, tipo: "grave" },
+            { descripcion: "Exceso de velocidad (hasta 30 km/h sobre el límite)", multa: 100, puntos: 0, tipo: "leve" },
+            { descripcion: "Exceso de velocidad (entre 31 y 50 km/h)", multa: 300, puntos: 2, tipo: "grave" },
+            { descripcion: "Exceso de velocidad (más de 50 km/h)", multa: 600, puntos: 6, tipo: "muy-grave" },
+            { descripcion: "Conducir bajo efectos del alcohol (0.5-0.8 g/l)", multa: 500, puntos: 4, tipo: "grave" },
+            { descripcion: "Conducir bajo efectos del alcohol (>0.8 g/l)", multa: 1000, puntos: 6, tipo: "muy-grave" },
+            { descripcion: "Conducir bajo efectos de drogas", multa: 1000, puntos: 6, tipo: "muy-grave" },
+            { descripcion: "No respetar un semáforo en rojo", multa: 200, puntos: 4, tipo: "grave" },
+            { descripcion: "Adelantamiento prohibido", multa: 200, puntos: 4, tipo: "grave" },
+            { descripcion: "No llevar la ITV en vigor", multa: 200, puntos: 0, tipo: "grave" },
+            { descripcion: "No tener el seguro obligatorio", multa: 600, puntos: 0, tipo: "muy-grave" }
+        ];
+
+        function getTipoClass(tipo) {
+            switch(tipo) {
+                case 'leve': return 'infraccion-leve';
+                case 'grave': return 'infraccion-grave';
+                case 'muy-grave': return 'infraccion-muy-grave';
+                default: return '';
+            }
+        }
+
+        function getTipoTexto(tipo) {
+            switch(tipo) {
+                case 'leve': return 'Leve';
+                case 'grave': return 'Grave';
+                case 'muy-grave': return 'Muy grave';
+                default: return '';
+            }
+        }
+
+        function renderTabla() {
+            const container = document.getElementById('tablaInfracciones');
+            container.innerHTML = infracciones.map(inf => `
+                <div class="tabla-row ${getTipoClass(inf.tipo)}">
+                    <div>${inf.descripcion}</div>
+                    <div class="multa">${inf.multa}€</div>
+                    <div class="puntos">${inf.puntos > 0 ? `-${inf.puntos}` : '0'}</div>
+                    <div>${getTipoTexto(inf.tipo)}</div>
+                </div>
+            `).join('');
+        }
+
+        renderTabla();
+    </script>
+</body>
+</html>

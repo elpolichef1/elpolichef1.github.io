@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rápido | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .page-header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            margin-bottom: 30px;
+        }
+        .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .page-header p { opacity: 0.9; }
+        
+        .test-container {
+            background: white;
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .test-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .test-info-item {
+            background: #f8fafc;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .test-info-item i { color: #fbbf24; }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            background: #1e293b;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+        }
+        
+        .timer.warning {
+            background: #ef4444;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.02); }
+        }
+        
+        .pregunta {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .pregunta.correcta {
+            border-left: 4px solid #10b981;
+            padding-left: 20px;
+            background: #f0fdf4;
+            border-radius: 12px;
+        }
+        
+        .pregunta.incorrecta {
+            border-left: 4px solid #ef4444;
+            padding-left: 20px;
+            background: #fef2f2;
+            border-radius: 12px;
+        }
+        
+        .pregunta-texto {
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+        
+        .opcion {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafcff;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .opcion:hover:not(.disabled) {
+            background: #fef3c7;
+            border-color: #fbbf24;
+            transform: translateX(5px);
+        }
+        
+        .opcion.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .opcion.correcta-respuesta {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+        
+        .opcion.incorrecta-respuesta {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+        
+        .btn-enviar {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-enviar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(251,191,36,0.3);
+        }
+        
+        .resultado {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 20px;
+            display: none;
+            text-align: center;
+        }
+        
+        .resultado.exito {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .resultado.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .explicacion {
+            margin-top: 12px;
+            padding: 12px 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #475569;
+            display: none;
+            border-left: 3px solid #fbbf24;
+        }
+        
+        .explicacion.mostrar {
+            display: block;
+        }
+        
+        .btn-ver-explicacion {
+            background: none;
+            border: none;
+            color: #fbbf24;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+        
+        .volver {
+            display: inline-block;
+            margin-top: 20px;
+            color: #64748b;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+            .test-container { padding: 20px; }
+            .test-header { flex-direction: column; text-align: center; }
+            .test-info { flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-bolt"></i> Test Rápido</h1>
+            <p>10 preguntas aleatorias para practicar rápidamente</p>
+        </div>
+    </div>
+
+    <main><div class="container">
+        <div class="test-container">
+            <div class="test-header">
+                <div class="test-info">
+                    <div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">0</span></div>
+                    <div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div>
+                </div>
+                <div class="timer" id="timer">10:00</div>
+            </div>
+            <div id="preguntasContainer"></div>
+            <button class="btn-enviar" id="btnEnviar">Finalizar test</button>
+            <div id="resultado" class="resultado"></div>
+            <a href="index.html" class="volver"><i class="fas fa-arrow-left"></i> Volver a tests</a>
+        </div>
+    </div></main>
+
+    <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="data/preguntas.js"></script>
+    <script>
+        let preguntasActuales = [];
+        let respuestas = [];
+        let tiempoRestante = 10 * 60;
+        let timerInterval;
+        let testFinalizado = false;
+
+        // Preguntas base para el test rápido
+        const preguntasBase = [
+            { id: 1, texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1, explicacion: "Prioridad la derecha." },
+            { id: 2, texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Permiso de conducir", "ITV en vigor", "Todas son correctas"], correcta: 3, explicacion: "Debe llevar permiso de conducir, permiso de circulación e ITV." },
+            { id: 3, texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1, explicacion: "Infracción grave: 200€ y 3 puntos." },
+            { id: 4, texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Precaución"], correcta: 1, explicacion: "Detención obligatoria." },
+            { id: 5, texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
+            { id: 6, texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
+            { id: 7, texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2, explicacion: "Solo para evitar accidentes." },
+            { id: 8, texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse", "Reducir velocidad", "Tocar claxon"], correcta: 2, explicacion: "Reducir velocidad y extremar precaución." },
+            { id: 9, texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Detenerse", "Prioridad", "Prohibido", "Ceder el paso"], correcta: 3, explicacion: "Obligación de ceder el paso." },
+            { id: 10, texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2, explicacion: "8 puntos iniciales." },
+            { id: 11, texto: "¿Qué color tienen las señales de servicio?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 0, explicacion: "Color azul." },
+            { id: 12, texto: "¿Qué indica una señal triangular con borde rojo?", opciones: ["Prohibición", "Obligación", "Peligro", "Información"], correcta: 2, explicacion: "Indica peligro." },
+            { id: 13, texto: "¿Qué indica una señal circular de fondo azul con flecha blanca?", opciones: ["Prohibido", "Dirección obligatoria", "Peligro", "Información"], correcta: 1, explicacion: "Dirección obligatoria." },
+            { id: 14, texto: "¿Qué significa una línea discontinua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar", "Prohibido cambiar de carril", "Zona de estacionamiento"], correcta: 1, explicacion: "Permite adelantar si es seguro." },
+            { id: 15, texto: "¿Qué significa una señal de 'Prohibido estacionar'?", opciones: ["No se puede parar", "No se puede estacionar", "No se puede circular", "Zona de carga"], correcta: 1, explicacion: "Prohíbe estacionar." }
+        ];
+
+        function obtenerPreguntasAleatorias() {
+            const mezcladas = [...preguntasBase];
+            for (let i = mezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
+            }
+            return mezcladas.slice(0, 10);
+        }
+
+        function iniciarTest() {
+            preguntasActuales = obtenerPreguntasAleatorias();
+            respuestas = new Array(10).fill(null);
+            document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
+            renderizarPreguntas();
+            iniciarTemporizador();
+        }
+
+        function renderizarPreguntas() {
+            const container = document.getElementById('preguntasContainer');
+            container.innerHTML = preguntasActuales.map((p, idx) => `
+                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
+                    <div class="pregunta-texto">${idx + 1}. ${p.texto}</div>
+                    ${p.opciones.map((opcion, optIdx) => `
+                        <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
+                            <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
+                            <span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span>
+                        </label>
+                    `).join('')}
+                    <button class="btn-ver-explicacion" onclick="mostrarExplicacion(${idx})">
+                        <i class="fas fa-lightbulb"></i> Ver explicación (después)
+                    </button>
+                    <div class="explicacion" id="explicacion_${idx}">
+                        <i class="fas fa-info-circle"></i> ${p.explicacion}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.opcion input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
+                    const valor = parseInt(e.target.value);
+                    respuestas[preguntaIndex] = valor;
+                    const respondidas = respuestas.filter(r => r !== null).length;
+                    document.getElementById('respondidas').textContent = respondidas;
+                });
+            });
+        }
+
+        function iniciarTemporizador() {
+            timerInterval = setInterval(() => {
+                if (testFinalizado) return;
+                tiempoRestante--;
+                const minutos = Math.floor(tiempoRestante / 60);
+                const segundos = tiempoRestante % 60;
+                const timerElement = document.getElementById('timer');
+                timerElement.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+                if (tiempoRestante <= 60) timerElement.classList.add('warning');
+                if (tiempoRestante <= 0) { clearInterval(timerInterval); alert('¡Tiempo agotado!'); finalizarTest(); }
+            }, 1000);
+        }
+
+        function mostrarExplicacion(preguntaIndex) {
+            if (testFinalizado) {
+                document.getElementById(`explicacion_${preguntaIndex}`).classList.toggle('mostrar');
+            } else {
+                alert('Las explicaciones solo están disponibles después de finalizar el test.');
+            }
+        }
+
+        function finalizarTest() {
+            if (testFinalizado) return;
+            testFinalizado = true;
+            clearInterval(timerInterval);
+            
+            let aciertos = 0;
+            preguntasActuales.forEach((p, idx) => {
+                const respuesta = respuestas[idx];
+                const esCorrecto = (respuesta === p.correcta);
+                if (esCorrecto) aciertos++;
+                
+                const preguntaDiv = document.querySelector(`.pregunta[data-id="${p.id}"]`);
+                if (preguntaDiv) preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
+                
+                document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => {
+                    op.classList.add('disabled');
+                    if (optIdx === p.correcta) op.classList.add('correcta-respuesta');
+                    if (respuesta === optIdx && respuesta !== p.correcta) op.classList.add('incorrecta-respuesta');
+                });
+            });
+            
+            const porcentaje = Math.round((aciertos / preguntasActuales.length) * 100);
+            const aprobado = porcentaje >= 90;
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
+            resultadoDiv.innerHTML = `
+                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 2rem;"></i>
+                <h3>${aprobado ? '🎉 ¡Aprobado! 🎉' : '📚 No aprobado'}</h3>
+                <p>Has acertado <strong>${aciertos}</strong> de <strong>${preguntasActuales.length}</strong> preguntas (${porcentaje}%)</p>
+                <button onclick="location.reload()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 10px; cursor: pointer;"><i class="fas fa-redo"></i> Nuevo test rápido</button>
+            `;
+            resultadoDiv.style.display = 'block';
+            
+            // ==================== GUARDAR RESULTADO ====================
+            guardarResultadoTest(aciertos, preguntasActuales.length, 'test-rapido');
+        }
+
+        function renderUserZone() {
+            const u = getCurrentUser();
+            const z = document.getElementById('userZone');
+            if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
+            else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+        }
+
+        renderUserZone();
+        document.getElementById('btnEnviar').addEventListener('click', () => { if (!testFinalizado && confirm('¿Finalizar test?')) finalizarTest(); });
+        iniciarTest();
+    </script>
+</body>
+</html>
