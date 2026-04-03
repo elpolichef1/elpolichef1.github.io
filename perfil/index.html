@@ -25,7 +25,6 @@
             margin-bottom: 60px;
         }
         
-        /* Sidebar perfil */
         .profile-sidebar {
             background: white;
             border-radius: 25px;
@@ -33,8 +32,6 @@
             text-align: center;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
             border: 1px solid #e2e8f0;
-            position: sticky;
-            top: 100px;
         }
         .profile-avatar {
             width: 100px;
@@ -47,9 +44,7 @@
             margin: 0 auto 15px;
             font-size: 3rem;
             cursor: pointer;
-            transition: all 0.3s;
         }
-        .profile-avatar:hover { transform: scale(1.05); }
         .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
         .profile-email { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
         .profile-stats-mini {
@@ -60,7 +55,6 @@
         }
         .profile-stats-mini p { margin: 8px 0; font-size: 0.85rem; }
         
-        /* Main content */
         .profile-main {
             background: white;
             border-radius: 25px;
@@ -80,7 +74,13 @@
         }
         .section-title i { color: #fbbf24; }
         
-        /* Stats grid */
+        .grafico-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        canvas { width: 200px; height: 200px; background: transparent; }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -92,41 +92,26 @@
             padding: 15px;
             border-radius: 15px;
             text-align: center;
-            transition: all 0.3s;
         }
-        .stat-card:hover { transform: translateY(-3px); background: #fef3c7; }
         .stat-number { font-size: 1.8rem; font-weight: 800; color: #fbbf24; }
         .stat-label { font-size: 0.7rem; color: #64748b; margin-top: 5px; }
         
-        /* Gráficos */
-        .graficos-container {
+        .tests-por-tipo {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             margin-bottom: 30px;
         }
-        .grafico-card {
+        .tipo-card {
             background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px;
+            padding: 12px;
+            border-radius: 12px;
             text-align: center;
         }
-        .grafico-card h3 {
-            font-size: 1rem;
-            margin-bottom: 15px;
-            color: #1e293b;
-        }
-        .grafico-canvas {
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-        canvas { width: 100%; height: auto; background: transparent; }
+        .tipo-numero { font-size: 1.3rem; font-weight: 700; color: #fbbf24; }
+        .tipo-label { font-size: 0.7rem; color: #64748b; }
         
-        /* Progreso */
-        .progress-item {
-            margin-bottom: 20px;
-        }
+        .progress-item { margin-bottom: 20px; }
         .progress-header {
             display: flex;
             justify-content: space-between;
@@ -144,14 +129,14 @@
             background: linear-gradient(90deg, #fbbf24, #f59e0b);
             border-radius: 4px;
             width: 0%;
-            transition: width 0.5s ease;
         }
         
-        /* Tests recientes */
         .tests-recientes {
-            margin-top: 30px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
         }
-        .test-reciente-item {
+        .test-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -160,19 +145,43 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .test-reciente-item.aprobado { border-left: 3px solid #10b981; padding-left: 15px; }
-        .test-reciente-item.suspendido { border-left: 3px solid #ef4444; padding-left: 15px; }
-        .test-reciente-info { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-        .test-reciente-tipo { font-weight: 600; color: #1e293b; }
-        .test-reciente-fecha { font-size: 0.7rem; color: #94a3b8; }
-        .test-reciente-resultado { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-        .test-reciente-aciertos { font-weight: 600; }
-        .test-reciente-porcentaje { font-weight: 700; padding: 2px 8px; border-radius: 20px; font-size: 0.8rem; }
-        .test-reciente-porcentaje.aprobado-text { background: #d1fae5; color: #065f46; }
-        .test-reciente-porcentaje.suspendido-text { background: #fee2e2; color: #991b1b; }
-        .empty-tests { text-align: center; padding: 40px; color: #94a3b8; }
-        .empty-tests i { font-size: 3rem; margin-bottom: 10px; display: block; }
+        .test-item.aprobado { border-left: 3px solid #10b981; padding-left: 15px; }
+        .test-item.suspendido { border-left: 3px solid #ef4444; padding-left: 15px; }
+        .test-tipo { font-weight: 600; color: #1e293b; }
+        .test-fecha { font-size: 0.7rem; color: #94a3b8; }
+        .test-resultado { font-weight: 700; }
+        .test-resultado.aprobado-text { color: #10b981; }
+        .test-resultado.suspendido-text { color: #ef4444; }
         
+        .avatar-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .avatar-option {
+            width: 45px;
+            height: 45px;
+            background: #f8fafc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .avatar-option:hover { transform: scale(1.1); background: #fef3c7; }
+        .avatar-option.selected { border-color: #fbbf24; background: #fef3c7; }
+        
+        .btn-editar {
+            background: none;
+            border: none;
+            color: #fbbf24;
+            cursor: pointer;
+            margin-top: 10px;
+        }
         .btn-recargar {
             background: #f1f5f9;
             border: none;
@@ -180,18 +189,22 @@
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.8rem;
-            transition: all 0.3s;
+            margin-top: 15px;
         }
-        .btn-recargar:hover { background: #e2e8f0; }
+        
+        .empty-tests {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+        }
         
         @media (max-width: 992px) {
             .profile-container { grid-template-columns: 1fr; }
-            .graficos-container { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
-            .test-reciente-item { flex-direction: column; align-items: flex-start; }
+            .tests-por-tipo { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -207,8 +220,8 @@
 
     <div class="page-header">
         <div class="container">
-            <h1><i class="fas fa-chart-line"></i> Mi Perfil</h1>
-            <p>Visualiza tu progreso y estadísticas completas</p>
+            <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+            <p>Visualiza tu progreso y estadísticas</p>
         </div>
     </div>
 
@@ -226,8 +239,9 @@
     </footer>
 
     <script src="../js/auth.js"></script>
-    <script src="../js/stats.js"></script>
     <script>
+        const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
+        
         function renderProfile() {
             const currentUser = getCurrentUser();
             const container = document.getElementById('profileContent');
@@ -239,6 +253,7 @@
             
             const stats = obtenerEstadisticasCompletas();
             const avatar = currentUser.avatar || "🚗";
+            const porcentajeGlobal = stats?.porcentajeGlobal || 0;
             
             container.innerHTML = `
                 <div class="profile-container">
@@ -249,141 +264,97 @@
                         <div class="profile-stats-mini">
                             <p><i class="fas fa-calendar"></i> Miembro desde: ${currentUser.fechaRegistro}</p>
                             <p><i class="fas fa-trophy"></i> Tests realizados: ${stats?.totalTests || 0}</p>
-                            <p><i class="fas fa-chart-line"></i> Media global: ${stats?.porcentajeGlobal || 0}%</p>
+                            <p><i class="fas fa-chart-line"></i> Media de aciertos: ${porcentajeGlobal}%</p>
                         </div>
-                        <div class="avatar-selector" id="avatarSelector" style="display: none; margin-top: 15px;">
-                            <div class="avatar-list" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
-                                ${avataresDisponibles.map(a => `<div class="avatar-option" onclick="cambiarAvatar('${a}')" style="width:45px; height:45px; background:#f8fafc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; cursor:pointer; border:2px solid ${avatar === a ? '#fbbf24' : 'transparent'};">${a}</div>`).join('')}
-                            </div>
+                        <div id="avatarSelector" class="avatar-selector" style="display: none;">
+                            ${avataresDisponibles.map(a => `<div class="avatar-option ${avatar === a ? 'selected' : ''}" onclick="cambiarAvatar('${a}')">${a}</div>`).join('')}
                         </div>
-                        <button class="btn-editar" onclick="toggleAvatarSelector()" style="margin-top:10px; background:none; border:none; color:#fbbf24; cursor:pointer;"><i class="fas fa-edit"></i> Cambiar avatar</button>
+                        <button class="btn-editar" onclick="toggleAvatarSelector()"><i class="fas fa-edit"></i> Cambiar avatar</button>
                     </div>
                     <div class="profile-main">
-                        <div class="section-title"><i class="fas fa-chart-simple"></i> Estadísticas Generales</div>
+                        <div class="section-title"><i class="fas fa-chart-pie"></i> Progreso Global</div>
+                        <div class="grafico-container">
+                            <canvas id="graficoGlobal" width="200" height="200"></canvas>
+                        </div>
+                        
+                        <div class="section-title"><i class="fas fa-chart-simple"></i> Mis Estadísticas</div>
                         <div class="stats-grid">
-                            <div class="stat-card"><div class="stat-number" id="totalTests">0</div><div class="stat-label">Tests realizados</div></div>
-                            <div class="stat-card"><div class="stat-number" id="totalAciertos">0</div><div class="stat-label">Aciertos totales</div></div>
-                            <div class="stat-card"><div class="stat-number" id="totalPreguntas">0</div><div class="stat-label">Preguntas respondidas</div></div>
-                            <div class="stat-card"><div class="stat-number" id="porcentajeGlobal">0%</div><div class="stat-label">Media de aciertos</div></div>
-                            <div class="stat-card"><div class="stat-number" id="mejorResultado">0%</div><div class="stat-label">Mejor resultado</div></div>
-                            <div class="stat-card"><div class="stat-number" id="peorResultado">0%</div><div class="stat-label">Peor resultado</div></div>
-                            <div class="stat-card"><div class="stat-number" id="temasEstudiados">0/20</div><div class="stat-label">Temas estudiados</div></div>
-                            <div class="stat-card"><div class="stat-number" id="testsAprobados">0</div><div class="stat-label">Tests aprobados</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.totalTests || 0}</div><div class="stat-label">Tests</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.totalAciertos || 0}</div><div class="stat-label">Aciertos</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.totalPreguntas || 0}</div><div class="stat-label">Preguntas</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
                         </div>
                         
-                        <div class="section-title"><i class="fas fa-chart-pie"></i> Rendimiento Global</div>
-                        <div class="graficos-container">
-                            <div class="grafico-card">
-                                <h3>📊 Progreso general</h3>
-                                <div class="grafico-canvas">
-                                    <canvas id="graficoGlobal" width="200" height="200" style="width:100%; max-width:200px; height:auto;"></canvas>
-                                </div>
-                                <p id="porcentajeTexto" style="margin-top:10px; font-weight:600;">0% de aciertos</p>
-                            </div>
-                            <div class="grafico-card">
-                                <h3>📈 Rendimiento por temas (top 8)</h3>
-                                <div class="grafico-canvas">
-                                    <canvas id="graficoTemas" width="400" height="200" style="width:100%; height:auto;"></canvas>
-                                </div>
-                            </div>
+                        <div class="section-title"><i class="fas fa-chart-line"></i> Tests por Tipo</div>
+                        <div class="tests-por-tipo">
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-rapido'] || 0}</div><div class="tipo-label">Test Rápido</div></div>
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-completo'] || 0}</div><div class="tipo-label">Test Completo</div></div>
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-por-temas'] || 0}</div><div class="tipo-label">Test por Temas</div></div>
+                            <div class="tipo-card"><div class="tipo-numero">${stats?.testsPorTipo['test-examen'] || 0}</div><div class="tipo-label">Examen Oficial</div></div>
                         </div>
                         
-                        <div class="section-title"><i class="fas fa-tasks"></i> Progreso de estudio</div>
+                        <div class="section-title"><i class="fas fa-tasks"></i> Mi Progreso</div>
                         <div class="progress-item">
-                            <div class="progress-header"><span><i class="fas fa-book-open"></i> Temas completados</span><span id="temasProgressText">0/20 temas</span></div>
-                            <div class="progress-bar"><div class="progress-fill" id="temasProgressFill" style="width:0%"></div></div>
+                            <div class="progress-header"><span>Tests realizados</span><span id="testsCount">0/50</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="testsFill"></div></div>
                         </div>
                         <div class="progress-item">
-                            <div class="progress-header"><span><i class="fas fa-clipboard-list"></i> Tests realizados</span><span id="testsProgressText">0/50 tests</span></div>
-                            <div class="progress-bar"><div class="progress-fill" id="testsProgressFill" style="width:0%"></div></div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-header"><span><i class="fas fa-trophy"></i> Tasa de aprobados</span><span id="tasaAprobados">0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill" id="tasaProgressFill" style="width:0%"></div></div>
+                            <div class="progress-header"><span>Tasa de aprobados</span><span id="tasaAprobados">0%</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="tasaFill"></div></div>
                         </div>
                         
                         <div class="section-title"><i class="fas fa-history"></i> Tests Recientes</div>
                         <div id="recentTestsList" class="tests-recientes"></div>
                         
-                        <button class="btn-recargar" onclick="recargarEstadisticas()" style="margin-top:15px;"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</button>
+                        <button class="btn-recargar" onclick="recargarEstadisticas()"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</button>
                     </div>
                 </div>
             `;
             
-            // Actualizar estadísticas
-            if (stats) {
-                document.getElementById('totalTests').textContent = stats.totalTests;
-                document.getElementById('totalAciertos').textContent = stats.totalAciertos;
-                document.getElementById('totalPreguntas').textContent = stats.totalPreguntas;
-                document.getElementById('porcentajeGlobal').textContent = `${stats.porcentajeGlobal}%`;
-                document.getElementById('mejorResultado').textContent = `${stats.mejorResultado}%`;
-                document.getElementById('peorResultado').textContent = `${stats.peorResultado}%`;
-                document.getElementById('temasEstudiados').textContent = `${stats.temasEstudiados}/20`;
-                document.getElementById('testsAprobados').textContent = stats.testsAprobados;
-                document.getElementById('tasaAprobados').textContent = `${stats.tasaAprobados}%`;
-                document.getElementById('porcentajeTexto').textContent = `${stats.porcentajeGlobal}% de aciertos`;
-                
-                document.getElementById('tasaProgressFill').style.width = `${stats.tasaAprobados}%`;
-                
-                // Gráficos
-                crearGraficoCircular('graficoGlobal', stats.porcentajeGlobal);
-                
-                const temasRendimiento = [];
-                const temasNombres = [];
-                for (let i = 1; i <= 20; i++) {
-                    const tema = stats.estadisticasPorTema[i];
-                    if (tema.total > 0) {
-                        temasRendimiento.push(Math.round((tema.aciertos / tema.total) * 100));
-                        temasNombres.push(`T${i}`);
-                    }
-                }
-                if (temasRendimiento.length > 0) {
-                    crearGraficoBarras('graficoTemas', temasRendimiento.slice(0, 8), temasNombres.slice(0, 8));
-                }
-                
-                // Tests recientes
-                const recentList = document.getElementById('recentTestsList');
-                if (stats.testsRecientes.length > 0) {
-                    recentList.innerHTML = stats.testsRecientes.map(test => {
-                        const fecha = new Date(test.fecha).toLocaleDateString('es-ES');
-                        const porcentaje = Math.round((test.aciertos / test.total) * 100);
-                        const aprobado = porcentaje >= 90;
-                        const tipo = test.tema ? `Tema ${test.tema}` : (test.tipo || 'Test');
-                        return `
-                            <div class="test-reciente-item ${aprobado ? 'aprobado' : 'suspendido'}">
-                                <div class="test-reciente-info">
-                                    <span class="test-reciente-tipo">${tipo}</span>
-                                    <span class="test-reciente-fecha">${fecha}</span>
-                                </div>
-                                <div class="test-reciente-resultado">
-                                    <span class="test-reciente-aciertos">${test.aciertos}/${test.total}</span>
-                                    <span class="test-reciente-porcentaje ${aprobado ? 'aprobado-text' : 'suspendido-text'}">${porcentaje}%</span>
-                                    <span class="test-reciente-estado">${aprobado ? '✅ Aprobado' : '❌ Suspendido'}</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                } else {
-                    recentList.innerHTML = '<div class="empty-tests"><i class="fas fa-clipboard-list"></i><p>No has realizado ningún test aún. ¡Empieza a practicar!</p></div>';
-                }
-            }
+            crearGraficoCircular('graficoGlobal', porcentajeGlobal);
             
-            // Progreso de temas
-            const progreso = localStorage.getItem('aprobadoya_progreso');
-            const temasCompletados = progreso ? Object.values(JSON.parse(progreso)).filter(v => v === true).length : 0;
-            const pctTemas = Math.round((temasCompletados / 20) * 100);
-            document.getElementById('temasProgressFill').style.width = `${pctTemas}%`;
-            document.getElementById('temasProgressText').textContent = `${temasCompletados}/20 temas (${pctTemas}%)`;
-            
-            // Progreso de tests
-            const tests = JSON.parse(localStorage.getItem('dgt_tests') || '[]');
-            const totalTests = tests.length;
+            const totalTests = stats?.totalTests || 0;
             const pctTests = Math.min(Math.round((totalTests / 50) * 100), 100);
-            document.getElementById('testsProgressFill').style.width = `${pctTests}%`;
-            document.getElementById('testsProgressText').textContent = `${totalTests}/50 tests (${pctTests}%)`;
+            document.getElementById('testsFill').style.width = `${pctTests}%`;
+            document.getElementById('testsCount').textContent = `${totalTests}/50 (${pctTests}%)`;
+            
+            const tasa = stats?.tasaAprobados || 0;
+            document.getElementById('tasaAprobados').textContent = `${tasa}%`;
+            document.getElementById('tasaFill').style.width = `${tasa}%`;
+            
+            const recentList = document.getElementById('recentTestsList');
+            const testsRecientes = stats?.testsRecientes || [];
+            
+            if (testsRecientes.length === 0) {
+                recentList.innerHTML = '<div class="empty-tests"><i class="fas fa-clipboard-list"></i><p>No has realizado ningún test aún. ¡Empieza a practicar!</p></div>';
+            } else {
+                recentList.innerHTML = testsRecientes.map(test => {
+                    const fecha = new Date(test.fecha).toLocaleDateString('es-ES');
+                    const porcentaje = Math.round((test.aciertos / test.total) * 100);
+                    const aprobado = porcentaje >= 90;
+                    let tipoTexto = '';
+                    switch(test.tipo) {
+                        case 'test-rapido': tipoTexto = '⚡ Test Rápido'; break;
+                        case 'test-completo': tipoTexto = '📋 Test Completo'; break;
+                        case 'test-por-temas': tipoTexto = `📚 Test Tema ${test.tema}`; break;
+                        case 'test-examen': tipoTexto = '🎯 Examen Oficial'; break;
+                        default: tipoTexto = test.tipo || 'Test';
+                    }
+                    return `
+                        <div class="test-item ${aprobado ? 'aprobado' : 'suspendido'}">
+                            <div class="test-info">
+                                <span class="test-tipo">${tipoTexto}</span>
+                                <span class="test-fecha">${fecha}</span>
+                            </div>
+                            <div>
+                                <span class="test-resultado ${aprobado ? 'aprobado-text' : 'suspendido-text'}">${test.aciertos}/${test.total} (${porcentaje}%)</span>
+                                <span style="margin-left: 10px;">${aprobado ? '✅ Aprobado' : '❌ Suspendido'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
-        
-        const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
         
         function toggleAvatarSelector() {
             const selector = document.getElementById('avatarSelector');
@@ -394,11 +365,6 @@
             updateUserAvatar(avatar);
             renderProfile();
             renderUserZone();
-            const toast = document.createElement('div');
-            toast.textContent = '✅ Avatar actualizado correctamente';
-            toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:1000; animation:fadeInOut 2s ease;';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
         }
         
         function recargarEstadisticas() {
@@ -408,8 +374,10 @@
         function renderUserZone() {
             const u = getCurrentUser();
             const z = document.getElementById('userZone');
-            if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
-            else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            if (z) {
+                if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
+                else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            }
         }
         
         renderUserZone();
