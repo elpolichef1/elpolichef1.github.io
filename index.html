@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>AprobadoYa | Tu escuela de conducción online</title>
+    <meta name="description" content="Aprende las normas de tráfico, practica con tests oficiales y consigue tu carnet al primer intento.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -45,22 +46,10 @@
     <section class="stats">
         <div class="container">
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="temasCompletados">0</div>
-                    <p>Temas completados</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="progresoGeneral">0%</div>
-                    <p>Progreso general</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="testsRealizados">0</div>
-                    <p>Tests realizados</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="mediaAciertos">0%</div>
-                    <p>Media de aciertos</p>
-                </div>
+                <div class="stat-card"><div class="stat-number" id="temasCompletados">0</div><p>Temas completados</p></div>
+                <div class="stat-card"><div class="stat-number" id="progresoGeneral">0%</div><p>Progreso general</p></div>
+                <div class="stat-card"><div class="stat-number" id="testsRealizados">0</div><p>Tests realizados</p></div>
+                <div class="stat-card"><div class="stat-number" id="mediaAciertos">0%</div><p>Media de aciertos</p></div>
             </div>
         </div>
     </section>
@@ -82,39 +71,34 @@
     <footer>
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir al primer intento. Aprende, practica y aprueba.</p></div>
-                <div class="footer-col"><h4>Enlaces rápidos</h4><ul><li><a href="temas/index.html">Temas oficiales</a></li><li><a href="test/index.html">Tests DGT</a></li><li><a href="simulacro/index.html">Simulacro examen</a></li><li><a href="ranking/index.html">Ranking</a></li></ul></div>
-                <div class="footer-col"><h4>Información</h4><ul><li><a href="sobre-nosotros.html">Sobre nosotros</a></li><li><a href="#">Preguntas frecuentes</a></li><li><a href="#">Contacto</a></li></ul></div>
+                <div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p></div>
+                <div class="footer-col"><h4>Enlaces rápidos</h4><ul><li><a href="temas/index.html">Temas</a></li><li><a href="test/index.html">Tests</a></li><li><a href="simulacro/index.html">Simulacro</a></li></ul></div>
+                <div class="footer-col"><h4>Información</h4><ul><li><a href="sobre-nosotros.html">Sobre nosotros</a></li><li><a href="preguntas-frecuentes.html">Preguntas frecuentes</a></li><li><a href="contacto.html">Contacto</a></li></ul></div>
             </div>
-            <div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p><p style="font-size:0.75rem; margin-top:10px;">Plataforma educativa independiente. No oficial de la DGT.</p></div>
+            <div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div>
         </div>
     </footer>
 
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     <script>
-        function renderUserZone() { 
-            const u = getCurrentUser(); 
-            const zone = document.getElementById('userZone'); 
-            if (u) { 
-                zone.innerHTML = `<div class="user-menu"><span class="user-name"><i class="fas fa-user-circle"></i> ${u.nombre}</span><a href="perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`; 
-            } else { 
-                zone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`; 
-            } 
+        function cargarEstadisticas() {
+            const user = getCurrentUser();
+            if (user) {
+                const stats = user.estadisticas;
+                const porcentaje = stats.totalPreguntas > 0 ? Math.round((stats.totalAciertos / stats.totalPreguntas) * 100) : 0;
+                document.getElementById('temasCompletados').textContent = stats.temasCompletados;
+                document.getElementById('progresoGeneral').textContent = `${Math.round((stats.temasCompletados / 20) * 100)}%`;
+                document.getElementById('testsRealizados').textContent = stats.testsRealizados;
+                document.getElementById('mediaAciertos').textContent = `${porcentaje}%`;
+            }
         }
-        function cargarEstadisticas(){ 
-            const u = getCurrentUser(); 
-            if(u){ 
-                const s = u.estadisticas; 
-                const p = s.totalPreguntas > 0 ? Math.round((s.totalAciertos / s.totalPreguntas) * 100) : 0; 
-                document.getElementById('temasCompletados').textContent = s.temasCompletados; 
-                document.getElementById('progresoGeneral').textContent = `${Math.round((s.temasCompletados / 20) * 100)}%`; 
-                document.getElementById('testsRealizados').textContent = s.testsRealizados; 
-                document.getElementById('mediaAciertos').textContent = `${p}%`; 
-            } 
-        }
-        renderUserZone(); 
-        cargarEstadisticas();
+        
+        // Esperar a que el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            renderUserZone();
+            cargarEstadisticas();
+        });
     </script>
 </body>
 </html>

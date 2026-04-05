@@ -254,27 +254,8 @@
         let timerInterval;
         let testFinalizado = false;
 
-        // Preguntas base para el test rápido
-        const preguntasBase = [
-            { id: 1, texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1, explicacion: "Prioridad la derecha." },
-            { id: 2, texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Permiso de conducir", "ITV en vigor", "Todas son correctas"], correcta: 3, explicacion: "Debe llevar permiso de conducir, permiso de circulación e ITV." },
-            { id: 3, texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1, explicacion: "Infracción grave: 200€ y 3 puntos." },
-            { id: 4, texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Precaución"], correcta: 1, explicacion: "Detención obligatoria." },
-            { id: 5, texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
-            { id: 6, texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
-            { id: 7, texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2, explicacion: "Solo para evitar accidentes." },
-            { id: 8, texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse", "Reducir velocidad", "Tocar claxon"], correcta: 2, explicacion: "Reducir velocidad y extremar precaución." },
-            { id: 9, texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Detenerse", "Prioridad", "Prohibido", "Ceder el paso"], correcta: 3, explicacion: "Obligación de ceder el paso." },
-            { id: 10, texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2, explicacion: "8 puntos iniciales." },
-            { id: 11, texto: "¿Qué color tienen las señales de servicio?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 0, explicacion: "Color azul." },
-            { id: 12, texto: "¿Qué indica una señal triangular con borde rojo?", opciones: ["Prohibición", "Obligación", "Peligro", "Información"], correcta: 2, explicacion: "Indica peligro." },
-            { id: 13, texto: "¿Qué indica una señal circular de fondo azul con flecha blanca?", opciones: ["Prohibido", "Dirección obligatoria", "Peligro", "Información"], correcta: 1, explicacion: "Dirección obligatoria." },
-            { id: 14, texto: "¿Qué significa una línea discontinua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar", "Prohibido cambiar de carril", "Zona de estacionamiento"], correcta: 1, explicacion: "Permite adelantar si es seguro." },
-            { id: 15, texto: "¿Qué significa una señal de 'Prohibido estacionar'?", opciones: ["No se puede parar", "No se puede estacionar", "No se puede circular", "Zona de carga"], correcta: 1, explicacion: "Prohíbe estacionar." }
-        ];
-
         function obtenerPreguntasAleatorias() {
-            const mezcladas = [...preguntasBase];
+            const mezcladas = [...preguntasDGT];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
@@ -375,7 +356,7 @@
             `;
             resultadoDiv.style.display = 'block';
             
-            // ==================== GUARDAR RESULTADO ====================
+            // Guardar resultado
             guardarResultadoTest(aciertos, preguntasActuales.length, 'test-rapido');
         }
 

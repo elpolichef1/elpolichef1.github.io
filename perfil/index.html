@@ -145,8 +145,8 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .test-item.aprobado { border-left: 3px solid #10b981; padding-left: 15px; }
-        .test-item.suspendido { border-left: 3px solid #ef4444; padding-left: 15px; }
+        .test-item.aprobado { border-left: 3px solid #10b981; padding-left: 15px; background: #f0fdf4; }
+        .test-item.suspendido { border-left: 3px solid #ef4444; padding-left: 15px; background: #fef2f2; }
         .test-tipo { font-weight: 600; color: #1e293b; }
         .test-fecha { font-size: 0.7rem; color: #94a3b8; }
         .test-resultado { font-weight: 700; }
@@ -212,7 +212,7 @@
     <header>
         <div class="container">
             <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
             <div class="user-zone" id="userZone"></div>
             <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
@@ -253,7 +253,7 @@
             
             const stats = obtenerEstadisticasCompletas();
             const avatar = currentUser.avatar || "🚗";
-            const porcentajeGlobal = stats?.porcentajeGlobal || 0;
+            const tasaAprobados = stats?.tasaAprobados || 0;
             
             container.innerHTML = `
                 <div class="profile-container">
@@ -264,7 +264,7 @@
                         <div class="profile-stats-mini">
                             <p><i class="fas fa-calendar"></i> Miembro desde: ${currentUser.fechaRegistro}</p>
                             <p><i class="fas fa-trophy"></i> Tests realizados: ${stats?.totalTests || 0}</p>
-                            <p><i class="fas fa-chart-line"></i> Media de aciertos: ${porcentajeGlobal}%</p>
+                            <p><i class="fas fa-chart-line"></i> Tasa de aprobados: ${tasaAprobados}%</p>
                         </div>
                         <div id="avatarSelector" class="avatar-selector" style="display: none;">
                             ${avataresDisponibles.map(a => `<div class="avatar-option ${avatar === a ? 'selected' : ''}" onclick="cambiarAvatar('${a}')">${a}</div>`).join('')}
@@ -272,7 +272,7 @@
                         <button class="btn-editar" onclick="toggleAvatarSelector()"><i class="fas fa-edit"></i> Cambiar avatar</button>
                     </div>
                     <div class="profile-main">
-                        <div class="section-title"><i class="fas fa-chart-pie"></i> Progreso Global</div>
+                        <div class="section-title"><i class="fas fa-chart-pie"></i> Tasa de aprobados</div>
                         <div class="grafico-container">
                             <canvas id="graficoGlobal" width="200" height="200"></canvas>
                         </div>
@@ -280,8 +280,8 @@
                         <div class="section-title"><i class="fas fa-chart-simple"></i> Mis Estadísticas</div>
                         <div class="stats-grid">
                             <div class="stat-card"><div class="stat-number">${stats?.totalTests || 0}</div><div class="stat-label">Tests</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats?.testsAprobados || 0}</div><div class="stat-label">Aprobados</div></div>
                             <div class="stat-card"><div class="stat-number">${stats?.totalAciertos || 0}</div><div class="stat-label">Aciertos</div></div>
-                            <div class="stat-card"><div class="stat-number">${stats?.totalPreguntas || 0}</div><div class="stat-label">Preguntas</div></div>
                             <div class="stat-card"><div class="stat-number">${stats?.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
                         </div>
                         
@@ -295,12 +295,8 @@
                         
                         <div class="section-title"><i class="fas fa-tasks"></i> Mi Progreso</div>
                         <div class="progress-item">
-                            <div class="progress-header"><span>Tests realizados</span><span id="testsCount">0/50</span></div>
-                            <div class="progress-bar"><div class="progress-fill" id="testsFill"></div></div>
-                        </div>
-                        <div class="progress-item">
-                            <div class="progress-header"><span>Tasa de aprobados</span><span id="tasaAprobados">0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill" id="tasaFill"></div></div>
+                            <div class="progress-header"><span>Tests por temas realizados</span><span id="temasCount">0/50</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="temasFill"></div></div>
                         </div>
                         
                         <div class="section-title"><i class="fas fa-history"></i> Tests Recientes</div>
@@ -311,16 +307,14 @@
                 </div>
             `;
             
-            crearGraficoCircular('graficoGlobal', porcentajeGlobal);
+            // Gráfico circular de tasa de aprobados
+            crearGraficoCircular('graficoGlobal', tasaAprobados);
             
-            const totalTests = stats?.totalTests || 0;
-            const pctTests = Math.min(Math.round((totalTests / 50) * 100), 100);
-            document.getElementById('testsFill').style.width = `${pctTests}%`;
-            document.getElementById('testsCount').textContent = `${totalTests}/50 (${pctTests}%)`;
-            
-            const tasa = stats?.tasaAprobados || 0;
-            document.getElementById('tasaAprobados').textContent = `${tasa}%`;
-            document.getElementById('tasaFill').style.width = `${tasa}%`;
+            // Barra de progreso SOLO para tests por temas (objetivo 50)
+            const testsPorTemas = stats?.testsPorTipo['test-por-temas'] || 0;
+            const pctTemas = Math.min(Math.round((testsPorTemas / 50) * 100), 100);
+            document.getElementById('temasFill').style.width = `${pctTemas}%`;
+            document.getElementById('temasCount').textContent = `${testsPorTemas}/50 (${pctTemas}%)`;
             
             const recentList = document.getElementById('recentTestsList');
             const testsRecientes = stats?.testsRecientes || [];

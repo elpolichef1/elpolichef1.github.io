@@ -82,6 +82,7 @@ function loginUser(email, password) {
     
     if (user) {
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+        console.log("✅ Usuario logueado:", user.nombre);
         return { success: true, user: user };
     }
     return { success: false };
@@ -89,7 +90,9 @@ function loginUser(email, password) {
 
 function getCurrentUser() {
     const userJson = localStorage.getItem(CURRENT_USER_KEY);
-    return userJson ? JSON.parse(userJson) : null;
+    const user = userJson ? JSON.parse(userJson) : null;
+    console.log("👤 Usuario actual:", user?.nombre || "No logueado");
+    return user;
 }
 
 function logoutUser() {
@@ -112,12 +115,12 @@ function updateUserAvatar(avatar) {
     return false;
 }
 
-// ==================== GUARDAR TESTS ====================
+// ==================== GUARDAR RESULTADOS DE TESTS ====================
 
-function guardarResultadoTest(aciertos, total, tipo, tema = null) {
+function guardarResultadoTest(aciertos, total, tipo, tema = null, nivel = null, testId = null) {
     const user = getCurrentUser();
     if (!user) {
-        console.log("No hay usuario logueado");
+        console.log("❌ No hay usuario logueado");
         return false;
     }
     
@@ -129,14 +132,16 @@ function guardarResultadoTest(aciertos, total, tipo, tema = null) {
         total: total,
         tipo: tipo,
         tema: tema,
+        nivel: nivel,
+        testId: testId,
         fecha: new Date().toISOString()
     };
-    
     tests.push(nuevoTest);
     localStorage.setItem(TESTS_KEY, JSON.stringify(tests));
     
+    console.log(`✅ Test guardado para usuario ${user.nombre} (ID: ${user.id}):`, nuevoTest);
+    
     actualizarEstadisticasUsuario(user.id);
-    console.log("Test guardado:", nuevoTest);
     return true;
 }
 
@@ -170,10 +175,13 @@ function actualizarEstadisticasUsuario(userId) {
     
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
     
+    // Actualizar usuario actual si es el mismo
     const currentUser = getCurrentUser();
     if (currentUser && currentUser.id === userId) {
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(users[userIndex]));
     }
+    
+    console.log("📊 Estadísticas actualizadas:", users[userIndex].estadisticas);
 }
 
 function obtenerTestsUsuario() {
@@ -225,7 +233,7 @@ function obtenerEstadisticasCompletas() {
         testsAprobados,
         tasaAprobados,
         testsPorTipo,
-        testsRecientes: tests.slice(0, 10)
+        testsRecientes: tests.slice(-10).reverse()
     };
 }
 

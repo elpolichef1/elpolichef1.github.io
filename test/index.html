@@ -272,16 +272,16 @@
                         <div class="stat-label">Tests realizados</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="mediaAciertos">0%</div>
-                        <div class="stat-label">Media de aciertos</div>
+                        <div class="stat-number" id="testsAprobados">0</div>
+                        <div class="stat-label">Tests aprobados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="tasaAprobados">0%</div>
+                        <div class="stat-label">Tasa de aciertos</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="mejorResultado">0%</div>
                         <div class="stat-label">Mejor resultado</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalPreguntas">0</div>
-                        <div class="stat-label">Preguntas respondidas</div>
                     </div>
                 </div>
             </div>
@@ -354,9 +354,9 @@
                 <div class="footer-col">
                     <h4>Información</h4>
                     <ul>
-                        <li><a href="#">Sobre nosotros</a></li>
-                        <li><a href="#">Preguntas frecuentes</a></li>
-                        <li><a href="#">Contacto</a></li>
+                        <li><a href="../sobre-nosotros.html">Sobre nosotros</a></li>
+                        <li><a href="../preguntas-frecuentes.html">Preguntas frecuentes</a></li>
+                        <li><a href="../contacto.html">Contacto</a></li>
                     </ul>
                 </div>
             </div>
@@ -371,32 +371,19 @@
     <script src="../js/main.js"></script>
     <script>
         function cargarEstadisticas() {
-            const tests = localStorage.getItem('dgt_tests');
-            if (tests) {
-                const testsData = JSON.parse(tests);
-                const totalTests = testsData.length;
-                let totalAciertos = 0;
-                let totalPreguntas = 0;
-                let mejorPorcentaje = 0;
-                
-                testsData.forEach(test => {
-                    totalAciertos += test.aciertos;
-                    totalPreguntas += test.total;
-                    const porcentaje = Math.round((test.aciertos / test.total) * 100);
-                    if (porcentaje > mejorPorcentaje) mejorPorcentaje = porcentaje;
-                });
-                
-                const media = totalPreguntas > 0 ? Math.round((totalAciertos / totalPreguntas) * 100) : 0;
-                
-                document.getElementById('totalTests').textContent = totalTests;
-                document.getElementById('mediaAciertos').textContent = `${media}%`;
-                document.getElementById('mejorResultado').textContent = `${mejorPorcentaje}%`;
-                document.getElementById('totalPreguntas').textContent = totalPreguntas;
+            // Usar la función de auth.js para obtener estadísticas reales
+            const stats = obtenerEstadisticasCompletas();
+            
+            if (stats) {
+                document.getElementById('totalTests').textContent = stats.totalTests || 0;
+                document.getElementById('testsAprobados').textContent = stats.testsAprobados || 0;
+                document.getElementById('tasaAprobados').textContent = `${stats.tasaAprobados || 0}%`;
+                document.getElementById('mejorResultado').textContent = `${stats.mejorResultado || 0}%`;
             } else {
                 document.getElementById('totalTests').textContent = '0';
-                document.getElementById('mediaAciertos').textContent = '0%';
+                document.getElementById('testsAprobados').textContent = '0';
+                document.getElementById('tasaAprobados').textContent = '0%';
                 document.getElementById('mejorResultado').textContent = '0%';
-                document.getElementById('totalPreguntas').textContent = '0';
             }
         }
         
@@ -419,8 +406,11 @@
             }
         }
         
-        renderUserZone();
-        cargarEstadisticas();
+        // Esperar a que el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            renderUserZone();
+            cargarEstadisticas();
+        });
     </script>
 </body>
 </html>
