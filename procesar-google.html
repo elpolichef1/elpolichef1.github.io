@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procesando Google - AprobadoYa</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .loading {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="spinner"></div>
+        <p>Verificando cuenta de Google...</p>
+    </div>
+
+    <script>
+        // Guardar a dónde ir después del login de Google
+        const hash = window.location.hash;
+        
+        // Intentar detectar de qué página venimos
+        let returnPage = 'index.html';
+        
+        // Revisar si venimos de registro o login (por el referrer)
+        if (document.referrer.includes('registro')) {
+            returnPage = 'registro.html';
+        } else if (document.referrer.includes('login')) {
+            returnPage = 'login.html';
+        }
+        
+        // Redirigir con el hash de Google
+        if (hash) {
+            window.location.href = returnPage + hash;
+        } else {
+            window.location.href = returnPage;
+        }
+    </script>
+</body>
+</html>

@@ -41,7 +41,6 @@
             margin: 0 auto;
         }
         
-        /* Estadísticas del usuario */
         .stats-section {
             background: white;
             border-radius: 30px;
@@ -96,7 +95,6 @@
             margin-top: 5px;
         }
         
-        /* Grid de tests */
         .tests-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -260,33 +258,19 @@
 
     <main>
         <div class="container">
-            <!-- Estadísticas del usuario -->
             <div class="stats-section">
                 <div class="stats-title">
                     <i class="fas fa-chart-line"></i>
                     <span>Tu progreso</span>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalTests">0</div>
-                        <div class="stat-label">Tests realizados</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="testsAprobados">0</div>
-                        <div class="stat-label">Tests aprobados</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="tasaAprobados">0%</div>
-                        <div class="stat-label">Tasa de aciertos</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="mejorResultado">0%</div>
-                        <div class="stat-label">Mejor resultado</div>
-                    </div>
+                    <div class="stat-card"><div class="stat-number" id="totalTests">0</div><div class="stat-label">Tests realizados</div></div>
+                    <div class="stat-card"><div class="stat-number" id="testsAprobados">0</div><div class="stat-label">Tests aprobados</div></div>
+                    <div class="stat-card"><div class="stat-number" id="tasaAprobados">0%</div><div class="stat-label">Tasa de aciertos</div></div>
+                    <div class="stat-card"><div class="stat-number" id="mejorResultado">0%</div><div class="stat-label">Mejor resultado</div></div>
                 </div>
             </div>
 
-            <!-- Grid de tests -->
             <div class="tests-grid">
                 <div class="test-card" onclick="window.location.href='test-rapido.html'">
                     <div class="test-icon"><i class="fas fa-bolt"></i></div>
@@ -338,40 +322,23 @@
     <footer>
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>AprobadoYa</h4>
-                    <p>Tu plataforma para aprobar el carnet de conducir al primer intento. Aprende, practica y aprueba.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Enlaces rápidos</h4>
-                    <ul>
-                        <li><a href="../index.html">Inicio</a></li>
-                        <li><a href="../temas/index.html">Temas oficiales</a></li>
-                        <li><a href="index.html">Tests DGT</a></li>
-                        <li><a href="../simulacro/index.html">Simulacro examen</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Información</h4>
-                    <ul>
-                        <li><a href="../sobre-nosotros.html">Sobre nosotros</a></li>
-                        <li><a href="../preguntas-frecuentes.html">Preguntas frecuentes</a></li>
-                        <li><a href="../contacto.html">Contacto</a></li>
-                    </ul>
-                </div>
+                <div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p></div>
+                <div class="footer-col"><h4>Enlaces rápidos</h4><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html">Tests</a></li></ul></div>
+                <div class="footer-col"><h4>Información</h4><ul><li><a href="../sobre-nosotros.html">Sobre nosotros</a></li><li><a href="../preguntas-frecuentes.html">Preguntas frecuentes</a></li><li><a href="../contacto.html">Contacto</a></li></ul></div>
             </div>
-            <div class="footer-bottom">
-                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
-                <p style="font-size: 0.7rem; margin-top: 5px;">Plataforma educativa independiente. No oficial de la DGT.</p>
-            </div>
+            <div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div>
         </div>
     </footer>
 
     <script src="../js/auth.js"></script>
     <script src="../js/main.js"></script>
     <script>
+        // ==================== PROTECCIÓN ====================
+        if (!requireAuth()) {
+            // Redirigido al login
+        }
+        
         function cargarEstadisticas() {
-            // Usar la función de auth.js para obtener estadísticas reales
             const stats = obtenerEstadisticasCompletas();
             
             if (stats) {
@@ -379,11 +346,6 @@
                 document.getElementById('testsAprobados').textContent = stats.testsAprobados || 0;
                 document.getElementById('tasaAprobados').textContent = `${stats.tasaAprobados || 0}%`;
                 document.getElementById('mejorResultado').textContent = `${stats.mejorResultado || 0}%`;
-            } else {
-                document.getElementById('totalTests').textContent = '0';
-                document.getElementById('testsAprobados').textContent = '0';
-                document.getElementById('tasaAprobados').textContent = '0%';
-                document.getElementById('mejorResultado').textContent = '0%';
             }
         }
         
@@ -406,7 +368,6 @@
             }
         }
         
-        // Esperar a que el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
             renderUserZone();
             cargarEstadisticas();

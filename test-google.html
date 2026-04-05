@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Google Login</title>
+    <style>
+        body { font-family: Arial; padding: 40px; text-align: center; }
+        button { background: #4285f4; color: white; padding: 15px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; }
+        pre { background: #f0f0f0; padding: 15px; text-align: left; display: inline-block; border-radius: 10px; }
+        .datos { margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 10px; display: none; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test de Google Login</h1>
+    <button id="googleTestBtn">Iniciar sesión con Google (TEST)</button>
+    
+    <div id="resultado"></div>
+    <div id="datosGuardados" class="datos"></div>
+
+    <script>
+        // ⚠️ PON AQUÍ TU CLIENT ID DE GOOGLE ⚠️
+        const CLIENT_ID = "TU_CLIENT_ID_AQUI.apps.googleusercontent.com";
+        
+        const resultado = document.getElementById('resultado');
+        const datosDiv = document.getElementById('datosGuardados');
+        
+        // Verificar si ya hay datos guardados
+        function verificarDatosGuardados() {
+            const googleUser = localStorage.getItem('usuario_apruebaloya');
+            if (googleUser) {
+                try {
+                    const user = JSON.parse(googleUser);
+                    datosDiv.style.display = 'block';
+                    datosDiv.innerHTML = `
+                        <h3>✅ Datos guardados en localStorage:</h3>
+                        <pre>${JSON.stringify(user, null, 2)}</pre>
+                        <p><strong>Nombre:</strong> ${user.nombre}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <button onclick="cerrarSesion()">Cerrar sesión</button>
+                    `;
+                    resultado.innerHTML = '<p style="color: green;">✅ Hay un usuario logueado con Google</p>';
+                } catch(e) {
+                    resultado.innerHTML = '<p class="error">Error al leer datos: ' + e.message + '</p>';
+                }
+            } else {
+                datosDiv.style.display = 'none';
+                resultado.innerHTML = '<p>❌ No hay usuario logueado con Google</p>';
+            }
+        }
+        
+        // Función para iniciar sesión con Google
+        function iniciarSesionGoogle() {
+            const redirectUri = encodeURIComponent(window.location.origin + '/procesar-google-test.html');
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=email%20profile&prompt=select_account`;
+            
+            resultado.innerHTML = '<p>🔐 Redirigiendo a Google...</p>';
+            window.location.href = authUrl;
+        }
+        
+        // Procesar el callback de Google
+        function procesarCallback() {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return;
+            
+            const params = new URLSearchParams(hash);
+            const accessToken = params.get('access_token');
+            
+            if (accessToken) {
+                resultado.innerHTML = '<p>🔄 Token obtenido. Cargando datos del usuario...</p>';
+                
+                fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                })
+                .then(res => res.json())
+                .then(user => {
+                    console.log('Usuario de Google:', user);
+                    
+                    // Guardar en localStorage
+                    const usuarioData = {
+                        nombre: user.name,
+                        email: user.email,
+                        foto: user.picture,
+                        autenticado: true,
+                        provider: 'google',
+                        fecha: new Date().toLocaleDateString()
+                    };
+                    
+                    localStorage.setItem('usuario_apruebaloya', JSON.stringify(usuarioData));
+                    
+                    resultado.innerHTML = '<p style="color: green;">✅ Datos guardados correctamente. <a href="test-google.html">Volver a ver</a></p>';
+                    
+                    // Limpiar el hash de la URL
+                    window.location.hash = '';
+                    
+                    verificarDatosGuardados();
+                })
+                .catch(error => {
+                    resultado.innerHTML = '<p class="error">❌ Error al obtener datos: ' + error.message + '</p>';
+                });
+            }
+        }
+        
+        function cerrarSesion() {
+            localStorage.removeItem('usuario_apruebaloya');
+            resultado.innerHTML = '<p>🔓 Sesión cerrada</p>';
+            verificarDatosGuardados();
+        }
+        
+        // Eventos
+        document.getElementById('googleTestBtn').addEventListener('click', iniciarSesionGoogle);
+        
+        // Ejecutar al cargar
+        verificarDatosGuardados();
+        procesarCallback();
+    </script>
+</body>
+</html>

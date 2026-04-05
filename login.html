@@ -22,10 +22,53 @@
         .form-group input:focus { outline: none; border-color: #fbbf24; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1); }
         .btn-login { width: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4); }
+        
+        .google-btn {
+            width: 100%;
+            background: white;
+            color: #333;
+            border: 2px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .google-btn:hover {
+            background: #f8f9fa;
+            border-color: #fbbf24;
+            transform: translateY(-2px);
+        }
+        .google-btn i {
+            font-size: 1.2rem;
+            color: #4285f4;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .divider::before { margin-right: 15px; }
+        .divider::after { margin-left: 15px; }
+        
         .register-link { text-align: center; margin-top: 25px; color: #64748b; }
         .register-link a { color: #fbbf24; text-decoration: none; font-weight: 600; }
         .error-message { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 10px; margin-top: 15px; display: none; text-align: center; }
-        .demo-info { margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 12px; text-align: center; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -48,17 +91,22 @@
                 <button type="submit" class="btn-login">Iniciar sesión</button>
                 <div id="errorMessage" class="error-message"></div>
             </form>
+
+            <div class="divider">O continúa con</div>
+            
+            <button id="googleLoginBtn" class="google-btn">
+                <i class="fab fa-google"></i>
+                Iniciar sesión con Google
+            </button>
+
             <div class="register-link">
                 ¿No tienes cuenta? <a href="registro.html">Regístrate gratis</a>
-            </div>
-            <div class="demo-info">
-                <i class="fas fa-info-circle"></i> Cuentas de demo:<br>
-                <strong>carlos@email.com</strong> / carlos123 | <strong>ana@email.com</strong> / ana123
             </div>
         </div>
     </div>
 
     <script src="js/auth.js"></script>
+    <script src="js/google-auth.js"></script>
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();

@@ -17,13 +17,11 @@ function initNavCarousel() {
         return hasOverflow;
     }
     
-    // Eliminar botones existentes para evitar duplicados
     const existingLeft = document.querySelector('.nav-scroll-left');
     const existingRight = document.querySelector('.nav-scroll-right');
     if (existingLeft) existingLeft.remove();
     if (existingRight) existingRight.remove();
     
-    // Crear botones de navegación
     const leftBtn = document.createElement('button');
     leftBtn.className = 'nav-scroll-btn nav-scroll-left';
     leftBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -75,7 +73,6 @@ function initMobileMenu() {
     const menuBtn = document.getElementById('menuMobileBtn');
     const nav = document.getElementById('navMenu');
     if (menuBtn && nav) {
-        // Eliminar event listener anterior para evitar duplicados
         const newBtn = menuBtn.cloneNode(true);
         menuBtn.parentNode.replaceChild(newBtn, menuBtn);
         newBtn.addEventListener('click', (e) => {
@@ -107,13 +104,11 @@ function initSmoothScroll() {
     });
 }
 
-// ===== ZONA DE USUARIO (MUESTRA EL MENÚ CON AVATAR Y NOMBRE) =====
+// ===== ZONA DE USUARIO =====
 function renderUserZone() {
     const currentUser = getCurrentUser();
     const userZone = document.getElementById('userZone');
     if (!userZone) return;
-    
-    console.log("Renderizando zona de usuario, usuario:", currentUser);
     
     if (currentUser) {
         const avatar = currentUser.avatar || "🚗";
@@ -175,22 +170,12 @@ function actualizarStats() {
     }
 }
 
-// ===== INICIALIZACIÓN PRINCIPAL =====
+// ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar carrusel
     initNavCarousel();
-    
-    // Inicializar menú móvil
     initMobileMenu();
-    
-    // Inicializar scroll suave
     initSmoothScroll();
-    
-    // Renderizar zona de usuario
     renderUserZone();
-    
-    // Actualizar estadísticas
     actualizarStats();
-    
     console.log('🚗 AprobadoYa cargada correctamente');
 });
