@@ -509,7 +509,6 @@
             color: #8ba39b;
         }
 
-        /* Toast de notificación */
         .toast-notification {
             position: fixed;
             bottom: 30px;
@@ -532,17 +531,10 @@
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Modal de edición de nombre */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -613,11 +605,6 @@
             color: #475569;
         }
 
-        .btn-save:hover,
-        .btn-cancel:hover {
-            transform: scale(0.96);
-        }
-
         footer {
             background: #0f2a22;
             color: #cbdcd6;
@@ -645,67 +632,25 @@
         }
 
         @media (max-width: 1000px) {
-            .profile-container {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .graficos-dobles {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-
-            nav ul {
-                gap: 18px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .menu-mobile {
-                display: block;
-            }
-
-            .nav-wrapper {
-                display: none;
-            }
-
-            .nav-wrapper.active {
-                display: block;
-                width: 100%;
-                margin-top: 16px;
-            }
-
-            header .container {
-                flex-wrap: wrap;
-            }
+            .profile-container { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .graficos-dobles { grid-template-columns: 1fr; gap: 24px; }
+            nav ul { gap: 18px; flex-wrap: wrap; justify-content: center; }
+            .menu-mobile { display: block; }
+            .nav-wrapper { display: none; }
+            .nav-wrapper.active { display: block; width: 100%; margin-top: 16px; }
+            header .container { flex-wrap: wrap; }
         }
 
         @media (max-width: 560px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tests-por-tema {
-                grid-template-columns: 1fr;
-            }
-
-            .profile-main {
-                padding: 24px 20px;
-            }
+            .stats-grid { grid-template-columns: 1fr; }
+            .tests-por-tema { grid-template-columns: 1fr; }
+            .profile-main { padding: 24px 20px; }
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -743,18 +688,19 @@
     </div>
 
     <main>
-        <div class="container" id="profileContent"></div>
+        <div class="container" id="profileContent">
+            <div class="loading-spinner" style="text-align:center; padding:60px;">Cargando perfil...</div>
+        </div>
     </main>
 
-    <!-- Modal para editar nombre -->
     <div id="editNameModal" class="modal-overlay">
         <div class="modal-content">
             <i class="fas fa-user-edit" style="font-size: 2.5rem; color: #f5b042; margin-bottom: 10px;"></i>
             <h3>Editar nombre</h3>
             <input type="text" id="editNameInput" placeholder="Tu nombre completo" maxlength="50">
             <div class="modal-buttons">
-                <button class="btn-save" onclick="guardarNombre()">Guardar</button>
-                <button class="btn-cancel" onclick="cerrarModalNombre()">Cancelar</button>
+                <button class="btn-save" id="saveNameBtn">Guardar</button>
+                <button class="btn-cancel" id="cancelNameBtn">Cancelar</button>
             </div>
         </div>
     </div>
@@ -771,13 +717,15 @@
         </div>
     </footer>
 
-    <script src="../js/auth.js"></script>
-    <script>
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut, db, doc, getDoc, updateDoc } from '../js/firebase-init.js';
+        
         const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
-
+        
         let chartPie = null;
         let chartBar = null;
-
+        let currentUserData = null;
+        
         function showToast(message) {
             const existingToast = document.querySelector('.toast-notification');
             if (existingToast) existingToast.remove();
@@ -793,160 +741,140 @@
                 setTimeout(() => toast.remove(), 300);
             }, 2500);
         }
-
-        function obtenerEstadisticasUsuario(userId) {
-            return calcularEstadisticasUsuario(userId);
+        
+        async function updateUserInFirestore(uid, updates) {
+            const userRef = doc(db, "usuarios", uid);
+            await updateDoc(userRef, updates);
         }
-
-        function renderProfile() {
-            const currentUser = getCurrentUser();
+        
+        async function renderProfile(user) {
             const container = document.getElementById('profileContent');
-
-            if (!currentUser) {
-                container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-id-card" style="font-size:3.5rem; color:#f5b042;"></i><h3 style="margin:15px 0">Accede a tu cuenta</h3><button onclick="window.location.href='../login.html'" style="background:#f5b042; padding:12px 32px; border-radius:60px; border:none; font-weight:600; cursor:pointer;">Iniciar sesión</button></div>`;
+            
+            if (!user) {
+                container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-id-card" style="font-size:3.5rem; color:#f5b042;"></i><h3 style="margin:15px 0">Accede a tu cuenta</h3><a href="../login.html" style="background:#f5b042; padding:12px 32px; border-radius:60px; border:none; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block;">Iniciar sesión</a></div>`;
                 return;
             }
-
-            const stats = obtenerEstadisticasUsuario(currentUser.id);
-            const avatar = currentUser.avatar || "🚗";
-            const porcentajeGlobal = stats?.mediaAciertos || 0;
-
-            // Agrupar tests por tema para el desglose
-            const testsKey = `${STORAGE_TESTS}_${currentUser.id}`;
-            const tests = JSON.parse(localStorage.getItem(testsKey) || '[]');
-            const temasMap = new Map();
             
-            for (const test of tests) {
-                const tema = test.tema || 'General';
-                if (!temasMap.has(tema)) {
-                    temasMap.set(tema, { count: 0, aciertos: 0, preguntas: 0 });
-                }
-                const temaData = temasMap.get(tema);
-                temaData.count++;
-                temaData.aciertos += test.aciertos;
-                temaData.preguntas += test.total;
-            }
+            // Obtener datos de Firestore
+            const userRef = doc(db, "usuarios", user.uid);
+            const userDoc = await getDoc(userRef);
+            const userData = userDoc.exists() ? userDoc.data() : { nombre: user.email.split('@')[0], avatar: "🚗", testsRealizados: 0, mediaAciertos: 0, mejorResultado: 0 };
+            currentUserData = userData;
             
-            const temasArray = Array.from(temasMap.entries()).map(([nombre, data]) => ({
-                tema: nombre,
-                cantidad: data.count,
-                porcentajeAciertos: data.preguntas > 0 ? Math.round((data.aciertos / data.preguntas) * 100) : 0
-            })).sort((a, b) => b.cantidad - a.cantidad);
-
-            const temasHtml = temasArray.length > 0
-                ? temasArray.map(tema => `
-                    <div class="tema-card">
-                        <div class="tema-numero">${tema.cantidad}</div>
-                        <div class="tema-label">📘 ${tema.tema}</div>
-                        <div style="font-size:0.7rem; margin-top:6px; color:#7f8c8d;">Aciertos: ${tema.porcentajeAciertos}%</div>
-                    </div>
-                `).join('')
-                : '<div class="empty-tests" style="grid-column:1/-1;"><i class="fas fa-folder-open"></i><p>No hay tests por temas aún. ¡Comienza a practicar por temas!</p></div>';
-
-            // Tests recientes
-            const testsRecientes = [...tests].sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).slice(0, 8);
+            const avatar = userData.avatar || "🚗";
+            const porcentajeGlobal = userData.mediaAciertos || 0;
             
             container.innerHTML = `
                 <div class="profile-container">
                     <div class="profile-sidebar">
-                        <div class="profile-avatar" onclick="toggleAvatarSelector()">${avatar}</div>
+                        <div class="profile-avatar" id="profileAvatar">${avatar}</div>
                         <div class="profile-name-container">
-                            <div class="profile-name" id="profileNameDisplay">${escapeHtml(currentUser.nombre)}</div>
-                            <button class="btn-edit-name" onclick="abrirModalEditarNombre()">
+                            <div class="profile-name" id="profileNameDisplay">${escapeHtml(userData.nombre)}</div>
+                            <button class="btn-edit-name" id="editNameBtn">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
                         </div>
-                        <div class="profile-email">${currentUser.email}</div>
+                        <div class="profile-email">${user.email}</div>
                         <div class="profile-stats-mini">
-                            <p><i class="fas fa-calendar-alt"></i> Miembro desde: ${currentUser.fechaRegistro}</p>
-                            <p><i class="fas fa-clipboard-list"></i> Tests realizados: ${stats.totalTests}</p>
+                            <p><i class="fas fa-calendar-alt"></i> Miembro desde: ${userData.fechaRegistro || new Date(user.metadata?.creationTime).toLocaleDateString() || '2026-04-06'}</p>
+                            <p><i class="fas fa-clipboard-list"></i> Tests realizados: ${userData.testsRealizados || 0}</p>
                             <p><i class="fas fa-chart-simple"></i> Media de aciertos: ${porcentajeGlobal}%</p>
                         </div>
                         <div id="avatarSelector" class="avatar-selector" style="display: none;">
-                            ${avataresDisponibles.map(a => `<div class="avatar-option ${avatar === a ? 'selected' : ''}" onclick="cambiarAvatar('${a}')">${a}</div>`).join('')}
+                            ${avataresDisponibles.map(a => `<div class="avatar-option ${avatar === a ? 'selected' : ''}" data-avatar="${a}">${a}</div>`).join('')}
                         </div>
-                        <button class="btn-editar" onclick="toggleAvatarSelector()"><i class="fas fa-edit"></i> Cambiar avatar</button>
+                        <button class="btn-editar" id="toggleAvatarBtn"><i class="fas fa-edit"></i> Cambiar avatar</button>
                     </div>
                     <div class="profile-main">
                         <div class="section-title"><i class="fas fa-chart-pie"></i> Progreso global & Gráficos</div>
                         <div class="graficos-dobles">
                             <div class="grafico-card"><h4><i class="fas fa-percent"></i> Aciertos totales</h4><canvas id="graficoPastel" width="200" height="200"></canvas></div>
-                            <div class="grafico-card"><h4><i class="fas fa-chart-bar"></i> Tests realizados por tema</h4><canvas id="graficoBarras" width="300" height="180"></canvas></div>
+                            <div class="grafico-card"><h4><i class="fas fa-chart-bar"></i> Tests realizados</h4><canvas id="graficoBarras" width="300" height="180"></canvas></div>
                         </div>
                         <div class="section-title"><i class="fas fa-chart-line"></i> Mis Estadísticas</div>
                         <div class="stats-grid">
-                            <div class="stat-card"><div class="stat-number">${stats.totalTests}</div><div class="stat-label">Tests realizados</div></div>
-                            <div class="stat-card"><div class="stat-number">${stats.totalAciertos}</div><div class="stat-label">Aciertos totales</div></div>
-                            <div class="stat-card"><div class="stat-number">${stats.totalPreguntas}</div><div class="stat-label">Preguntas contestadas</div></div>
-                            <div class="stat-card"><div class="stat-number">${stats.mejorResultado}%</div><div class="stat-label">Mejor resultado</div></div>
+                            <div class="stat-card"><div class="stat-number">${userData.testsRealizados || 0}</div><div class="stat-label">Tests realizados</div></div>
+                            <div class="stat-card"><div class="stat-number">${userData.totalAciertos || 0}</div><div class="stat-label">Aciertos totales</div></div>
+                            <div class="stat-card"><div class="stat-number">${userData.totalPreguntas || 0}</div><div class="stat-label">Preguntas contestadas</div></div>
+                            <div class="stat-card"><div class="stat-number">${userData.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
                         </div>
-                        <div class="section-title"><i class="fas fa-layer-group"></i> Tests por Temas (desglose)</div>
-                        <div class="tests-por-tema">${temasHtml}</div>
                         <div class="section-title"><i class="fas fa-chart-simple"></i> Mi Progreso</div>
                         <div class="progress-item">
-                            <div class="progress-header"><span>🏁 Tests realizados (meta 50)</span><span id="testsCount">${stats.totalTests}/50</span></div>
-                            <div class="progress-bar"><div class="progress-fill" id="testsFill" style="width: ${Math.min((stats.totalTests / 50) * 100, 100)}%"></div></div>
+                            <div class="progress-header"><span>🏁 Tests realizados (meta 50)</span><span id="testsCount">${userData.testsRealizados || 0}/50</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="testsFill" style="width: ${Math.min(((userData.testsRealizados || 0) / 50) * 100, 100)}%"></div></div>
                         </div>
-                        <div class="progress-item">
-                            <div class="progress-header"><span>✅ Tasa de aprobados (≥90%)</span><span id="tasaAprobados">${stats.tasaAprobados}%</span></div>
-                            <div class="progress-bar"><div class="progress-fill" id="tasaFill" style="width: ${stats.tasaAprobados}%"></div></div>
-                        </div>
-                        <div class="section-title"><i class="fas fa-history"></i> Tests Recientes</div>
-                        <div id="recentTestsList" class="tests-recientes"></div>
-                        <button class="btn-recargar" onclick="recargarEstadisticas()"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</button>
+                        <div class="btn-recargar" id="refreshStatsBtn"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</div>
                     </div>
                 </div>
             `;
-
-            // Historial reciente
-            const recentDiv = document.getElementById('recentTestsList');
-            if (testsRecientes.length === 0) {
-                recentDiv.innerHTML = '<div class="empty-tests"><i class="fas fa-folder-open"></i><p>No hay tests recientes. ¡Empieza a practicar!</p></div>';
-            } else {
-                recentDiv.innerHTML = testsRecientes.map(test => {
-                    const fecha = new Date(test.fecha).toLocaleDateString('es-ES');
-                    const porcentaje = test.total > 0 ? Math.round((test.aciertos / test.total) * 100) : 0;
-                    const aprobado = porcentaje >= 90;
-                    return `<div class="test-item ${aprobado ? 'aprobado' : 'suspendido'}">
-                                <div>
-                                    <span class="test-tipo">📚 ${test.tema || 'General'}</span>
-                                    <div class="test-fecha">${fecha}</div>
-                                </div>
-                                <div>
-                                    <strong>${test.aciertos}/${test.total}</strong> (${porcentaje}%) 
-                                    ${aprobado ? '✅ Aprobado' : '❌ Suspendido'}
-                                </div>
-                            </div>`;
-                }).join('');
-            }
-
-            // Gráficos
+            
+            // Gráficos de ejemplo
             if (chartPie) chartPie.destroy();
             if (chartBar) chartBar.destroy();
-
-            const aciertosVal = stats.totalAciertos || 0;
-            const fallosVal = (stats.totalPreguntas || 0) - aciertosVal;
+            
             const ctxPie = document.getElementById('graficoPastel')?.getContext('2d');
             if (ctxPie) {
                 chartPie = new Chart(ctxPie, {
                     type: 'doughnut',
-                    data: { labels: ['Aciertos', 'Fallos'], datasets: [{ data: [aciertosVal, Math.max(0, fallosVal)], backgroundColor: ['#f5b042', '#e2cfb3'], borderWidth: 0, hoverOffset: 10 }] },
-                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+                    data: { labels: ['Aciertos', 'Fallos'], datasets: [{ data: [userData.totalAciertos || 0, (userData.totalPreguntas || 0) - (userData.totalAciertos || 0)], backgroundColor: ['#f5b042', '#e2cfb3'], borderWidth: 0 }] },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
                 });
             }
-
-            const temasLabels = temasArray.map(t => t.tema.length > 18 ? t.tema.substring(0, 15) + '…' : t.tema);
-            const temasCantidades = temasArray.map(t => t.cantidad);
+            
             const ctxBar = document.getElementById('graficoBarras')?.getContext('2d');
             if (ctxBar) {
                 chartBar = new Chart(ctxBar, {
                     type: 'bar',
-                    data: { labels: temasLabels.length ? temasLabels : ['Sin datos'], datasets: [{ label: 'Tests realizados', data: temasLabels.length ? temasCantidades : [0], backgroundColor: '#f5b042', borderRadius: 14, barPercentage: 0.7 }] },
-                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Cantidad de tests' }, ticks: { stepSize: 1 } } } }
+                    data: { labels: ['Tests realizados'], datasets: [{ label: 'Cantidad', data: [userData.testsRealizados || 0], backgroundColor: '#f5b042', borderRadius: 14 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
                 });
             }
+            
+            // Eventos
+            document.getElementById('toggleAvatarBtn')?.addEventListener('click', () => {
+                const selector = document.getElementById('avatarSelector');
+                selector.style.display = selector.style.display === 'none' ? 'flex' : 'none';
+            });
+            
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.addEventListener('click', async () => {
+                    const newAvatar = opt.dataset.avatar;
+                    await updateUserInFirestore(user.uid, { avatar: newAvatar });
+                    showToast('Avatar actualizado');
+                    renderProfile(user);
+                    updateUserInterface(user);
+                });
+            });
+            
+            document.getElementById('editNameBtn')?.addEventListener('click', () => {
+                const modal = document.getElementById('editNameModal');
+                const input = document.getElementById('editNameInput');
+                input.value = userData.nombre;
+                modal.style.display = 'flex';
+            });
+            
+            document.getElementById('saveNameBtn')?.addEventListener('click', async () => {
+                const input = document.getElementById('editNameInput');
+                const newName = input.value.trim();
+                if (newName) {
+                    await updateUserInFirestore(user.uid, { nombre: newName });
+                    showToast('Nombre actualizado');
+                    renderProfile(user);
+                    updateUserInterface(user);
+                }
+                document.getElementById('editNameModal').style.display = 'none';
+            });
+            
+            document.getElementById('cancelNameBtn')?.addEventListener('click', () => {
+                document.getElementById('editNameModal').style.display = 'none';
+            });
+            
+            document.getElementById('refreshStatsBtn')?.addEventListener('click', () => {
+                renderProfile(user);
+                showToast('Estadísticas actualizadas');
+            });
         }
-
+        
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/[&<>]/g, function(m) {
@@ -956,82 +884,46 @@
                 return m;
             });
         }
-
-        function toggleAvatarSelector() {
-            const sel = document.getElementById('avatarSelector');
-            if (sel) sel.style.display = sel.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        function cambiarAvatar(avatar) {
-            updateUserAvatar(avatar);
-            renderProfile();
-            renderUserZone();
-            showToast('Avatar actualizado correctamente');
-        }
-
-        function abrirModalEditarNombre() {
-            const currentUser = getCurrentUser();
-            const modal = document.getElementById('editNameModal');
-            const input = document.getElementById('editNameInput');
-            if (input && currentUser) input.value = currentUser.nombre;
-            if (modal) modal.style.display = 'flex';
-        }
-
-        function cerrarModalNombre() {
-            const modal = document.getElementById('editNameModal');
-            if (modal) modal.style.display = 'none';
-        }
-
-        function guardarNombre() {
-            const input = document.getElementById('editNameInput');
-            if (input && input.value.trim()) {
-                updateUserName(input.value);
-                renderProfile();
-                renderUserZone();
-                cerrarModalNombre();
-                showToast('Nombre actualizado correctamente');
-                // Forzar actualización en otras páginas
-                localStorage.setItem('user_update_flag', Date.now().toString());
+        
+        function updateUserInterface(user) {
+            const userZone = document.getElementById('userZone');
+            if (user) {
+                userZone.innerHTML = `
+                    <div class="user-menu">
+                        <div class="user-avatar">🚗</div>
+                        <span class="user-name">${user.email.split('@')[0]}</span>
+                        <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
+                        <button id="logoutBtnHeader" class="btn-logout">Cerrar sesión</button>
+                    </div>
+                `;
+                document.getElementById('logoutBtnHeader')?.addEventListener('click', async () => {
+                    await signOut(auth);
+                    window.location.href = '../index.html';
+                });
+            } else {
+                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
             }
         }
-
-        function recargarEstadisticas() {
-            renderProfile();
-            showToast('Estadísticas actualizadas');
-        }
-
-        // Escuchar cambios de usuario globales
-        window.addEventListener('userUpdated', function() {
-            renderProfile();
-            renderUserZone();
-        });
-
-        // Exponer funciones globales
-        window.toggleAvatarSelector = toggleAvatarSelector;
-        window.cambiarAvatar = cambiarAvatar;
-        window.recargarEstadisticas = recargarEstadisticas;
-        window.abrirModalEditarNombre = abrirModalEditarNombre;
-        window.cerrarModalNombre = cerrarModalNombre;
-        window.guardarNombre = guardarNombre;
-        window.refreshProfileData = renderProfile;
-
+        
         // Menú móvil
         document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
             const wrapper = document.getElementById('navWrapper');
             if (wrapper) wrapper.classList.toggle('active');
         });
-
+        
         // Cerrar modal al hacer clic fuera
         window.onclick = function(event) {
             const modal = document.getElementById('editNameModal');
             if (event.target === modal) {
-                cerrarModalNombre();
+                modal.style.display = 'none';
             }
         };
-
+        
         // Inicializar
-        renderUserZone();
-        renderProfile();
+        onAuthStateChanged(auth, (user) => {
+            updateUserInterface(user);
+            renderProfile(user);
+        });
     </script>
 </body>
 </html>

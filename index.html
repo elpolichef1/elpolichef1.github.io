@@ -178,7 +178,7 @@
             margin: 20px auto;
             max-width: 1200px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            display: none;
+            display: flex;
             align-items: center;
             gap: 20px;
             flex-wrap: wrap;
@@ -212,12 +212,23 @@
             font-weight: 600;
             display: inline-block;
         }
+        .loading-spinner-small {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <div class="logo">
+            <div class="logo" onclick="window.location.href='index.html'">
                 <i class="fas fa-check-circle"></i>
                 <h1>Aprobado<span>Ya</span></h1>
             </div>
@@ -229,14 +240,15 @@
                             <li><a href="javascript:void(0)" onclick="verificarAcceso('temas/index.html')">Temas</a></li>
                             <li><a href="javascript:void(0)" onclick="verificarAcceso('test/index.html')">Test</a></li>
                             <li><a href="javascript:void(0)" onclick="verificarAcceso('simulacro/index.html')">Simulacro</a></li>
-                            <li><a href="javascript:void(0)" onclick="verificarAcceso('videos/index.html')">Videos</a></li>
                             <li><a href="javascript:void(0)" onclick="verificarAcceso('ranking/index.html')">Ranking</a></li>
                             <li><a href="javascript:void(0)" onclick="verificarAcceso('mini-retos/index.html')">🏎️ Mini Retos</a></li>
                         </ul>
                     </nav>
                 </div>
             </div>
-            <div class="user-zone" id="userZone"></div>
+            <div class="user-zone" id="userZone">
+                <div class="loading-spinner-small"></div>
+            </div>
             <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
     </header>
@@ -284,10 +296,10 @@
     <section class="stats">
         <div class="container">
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-number" id="temasCompletados">0</div><p>Temas completados</p></div>
-                <div class="stat-card"><div class="stat-number" id="progresoGeneral">0%</div><p>Progreso general</p></div>
-                <div class="stat-card"><div class="stat-number" id="testsRealizados">0</div><p>Tests realizados</p></div>
-                <div class="stat-card"><div class="stat-number" id="mediaAciertos">0%</div><p>Media de aciertos</p></div>
+                <div class="stat-card"><div class="stat-number" id="temasCompletados">20</div><p>Temas disponibles</p></div>
+                <div class="stat-card"><div class="stat-number" id="testsDisponibles">500+</div><p>Preguntas</p></div>
+                <div class="stat-card"><div class="stat-number" id="usuariosRegistrados">0</div><p>Usuarios activos</p></div>
+                <div class="stat-card"><div class="stat-number" id="tasaAprobados">95%</div><p>Tasa de aprobados</p></div>
             </div>
         </div>
     </section>
@@ -299,7 +311,6 @@
                 <a href="javascript:void(0)" onclick="verificarAcceso('temas/index.html')" class="quick-card"><i class="fas fa-book-open"></i><h3>Estudiar temas</h3><p>20 temas oficiales de la DGT</p></a>
                 <a href="javascript:void(0)" onclick="verificarAcceso('test/index.html')" class="quick-card"><i class="fas fa-clipboard-list"></i><h3>Practicar con tests</h3><p>Miles de preguntas oficiales</p></a>
                 <a href="javascript:void(0)" onclick="verificarAcceso('simulacro/index.html')" class="quick-card"><i class="fas fa-stopwatch"></i><h3>Simulacro de examen</h3><p>30 preguntas con temporizador</p></a>
-                <a href="javascript:void(0)" onclick="verificarAcceso('videos/index.html')" class="quick-card"><i class="fas fa-video"></i><h3>Videoteca educativa</h3><p>Clases en vídeo y explicaciones</p></a>
                 <a href="javascript:void(0)" onclick="verificarAcceso('ranking/index.html')" class="quick-card"><i class="fas fa-trophy"></i><h3>Ranking de usuarios</h3><p>Compara tu progreso</p></a>
                 <a href="javascript:void(0)" onclick="verificarAcceso('mini-retos/index.html')" class="quick-card"><i class="fas fa-gamepad"></i><h3>Mini Retos</h3><p>¡Demuestra tus conocimientos!</p></a>
             </div>
@@ -317,91 +328,96 @@
         </div>
     </footer>
 
-    <script src="js/auth.js"></script>
-    <script src="js/google-auth.js"></script>   <!-- 👈 NUEVO -->
-    <script>
-        // Función para verificar acceso (muestra modal si no está logueado)
-        function verificarAcceso(url) {
-            const user = getCurrentUser();
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut, db, collection, getDocs } from './js/firebase-init.js';
+        
+        // Elementos DOM
+        const userZone = document.getElementById('userZone');
+        const welcomeContainer = document.getElementById('welcomeBannerContainer');
+        const modal = document.getElementById('modalBloqueo');
+        
+        // Función para contar usuarios registrados
+        async function contarUsuarios() {
+            try {
+                const usersRef = collection(db, "usuarios");
+                const snapshot = await getDocs(usersRef);
+                const usuariosCount = document.getElementById('usuariosRegistrados');
+                if (usuariosCount) usuariosCount.textContent = snapshot.size;
+            } catch (error) {
+                console.error("Error al contar usuarios:", error);
+            }
+        }
+        
+        // Función para verificar acceso
+        window.verificarAcceso = function(url) {
+            const user = auth.currentUser;
             if (user) {
                 window.location.href = url;
             } else {
                 mostrarModal();
             }
-        }
+        };
         
-        function mostrarModal() {
-            const modal = document.getElementById('modalBloqueo');
-            if (modal) {
-                modal.classList.add('active');
-            }
-        }
+        window.mostrarModal = function() {
+            if (modal) modal.classList.add('active');
+        };
         
-        function cerrarModal() {
-            const modal = document.getElementById('modalBloqueo');
-            if (modal) {
-                modal.classList.remove('active');
-            }
-        }
+        window.cerrarModal = function() {
+            if (modal) modal.classList.remove('active');
+        };
         
-        // Función para renderizar el header con el usuario
-        function renderUserZone() {
-            const user = getCurrentUser();
-            const userZone = document.getElementById('userZone');
-            const welcomeContainer = document.getElementById('welcomeBannerContainer');
-            
+        // Actualizar interfaz según usuario
+        function updateUserInterface(user) {
             if (user) {
-                const avatar = user.avatar || (user.foto ? '👤' : "🚗");
+                const nombre = user.displayName || user.email.split('@')[0];
                 userZone.innerHTML = `
                     <div class="user-menu">
-                        <div class="user-avatar">${avatar}</div>
-                        <span class="user-name">${user.nombre}</span>
+                        <div class="user-avatar">🚗</div>
+                        <span class="user-name">${nombre}</span>
                         <a href="perfil/index.html" class="btn-profile">Mi perfil</a>
-                        <button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button>
+                        <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
                     </div>
                 `;
                 
                 welcomeContainer.innerHTML = `
-                    <div class="welcome-banner" style="display: flex;">
-                        <div class="welcome-avatar">${avatar}</div>
+                    <div class="welcome-banner">
+                        <div class="welcome-avatar">🚗</div>
                         <div class="welcome-text">
-                            <h2>¡Bienvenido de vuelta, ${user.nombre}!</h2>
+                            <h2>¡Bienvenido de vuelta, ${nombre}!</h2>
                             <p>¿Listo para seguir practicando? Continúa con los test y mejora tu puntuación.</p>
                         </div>
                         <a href="test/index.html" class="btn-test">Empezar test <i class="fas fa-arrow-right"></i></a>
                     </div>
                 `;
+                
+                document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+                    await signOut(auth);
+                    window.location.reload();
+                });
             } else {
                 userZone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
                 welcomeContainer.innerHTML = '';
             }
         }
         
-        // Inicializar todo cuando cargue la página
-        document.addEventListener('DOMContentLoaded', function() {
-            renderUserZone();
-            
-            // Menú móvil
-            const menuBtn = document.getElementById('menuMobileBtn');
-            const navContainer = document.querySelector('.nav-container');
-            if (menuBtn && navContainer) {
-                menuBtn.addEventListener('click', function() {
-                    if (navContainer.style.display === 'block') {
-                        navContainer.style.display = 'none';
-                    } else {
-                        navContainer.style.display = 'block';
-                    }
-                });
-            }
+        // Escuchar cambios de autenticación
+        onAuthStateChanged(auth, (user) => {
+            updateUserInterface(user);
+            contarUsuarios();
         });
         
         // Cerrar modal al hacer clic fuera
         window.onclick = function(event) {
-            const modal = document.getElementById('modalBloqueo');
             if (event.target === modal) {
                 cerrarModal();
             }
-        }
+        };
+        
+        // Menú móvil
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const navWrapper = document.querySelector('.nav-wrapper');
+            if (navWrapper) navWrapper.classList.toggle('active');
+        });
     </script>
 </body>
 </html>
