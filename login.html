@@ -35,47 +35,161 @@
             padding: 40px;
             text-align: center;
         }
-        .login-header i { font-size: 3.5rem; margin-bottom: 15px; color: #fbbf24; }
-        .login-header h1 { font-size: 1.8rem; margin-bottom: 8px; }
-        .login-header p { opacity: 0.8; font-size: 0.9rem; }
-        .login-body { padding: 40px; }
-        .form-group { margin-bottom: 22px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 0.85rem; }
-        .form-group label i { color: #fbbf24; width: 20px; }
+        .login-header i {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: #fbbf24;
+        }
+        .login-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        .login-header p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        .login-body {
+            padding: 40px;
+        }
+        .form-group {
+            margin-bottom: 22px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.85rem;
+        }
+        .form-group label i {
+            color: #fbbf24;
+            width: 20px;
+        }
         .form-group input {
-            width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 14px;
-            font-size: 1rem; transition: all 0.3s; font-family: inherit;
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
         }
-        .form-group input:focus { outline: none; border-color: #fbbf24; box-shadow: 0 0 0 3px rgba(251,191,36,0.1); }
+        .form-group input:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251,191,36,0.1);
+        }
         .btn-login {
-            width: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a;
-            border: none; padding: 14px; border-radius: 14px; font-size: 1rem;
-            font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 10px;
+            width: 100%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
         }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251,191,36,0.4); }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(251,191,36,0.4);
+        }
         .google-btn {
-            width: 100%; background: white; color: #1e293b; border: 2px solid #e2e8f0;
-            padding: 12px; border-radius: 14px; font-size: 1rem; font-weight: 500;
-            cursor: pointer; transition: all 0.3s; display: flex; align-items: center;
-            justify-content: center; gap: 12px; margin-top: 15px;
+            width: 100%;
+            background: white;
+            color: #1e293b;
+            border: 2px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
         }
-        .google-btn:hover { background: #f8fafc; border-color: #fbbf24; transform: translateY(-2px); }
-        .google-btn i.fa-google { color: #4285f4; }
-        .divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: #94a3b8; font-size: 0.8rem; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
+        .google-btn:hover {
+            background: #f8fafc;
+            border-color: #fbbf24;
+            transform: translateY(-2px);
+        }
+        .google-btn i.fa-google {
+            color: #4285f4;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
         .divider::before { margin-right: 15px; }
         .divider::after { margin-left: 15px; }
-        .register-link { text-align: center; margin-top: 25px; color: #64748b; font-size: 0.85rem; }
-        .register-link a { color: #fbbf24; text-decoration: none; font-weight: 600; }
-        .error-message { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 12px; margin-top: 15px; display: none; text-align: center; font-size: 0.85rem; }
-        .loading-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 1000; align-items: center;
-            justify-content: center; flex-direction: column; gap: 15px;
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 0.85rem;
         }
-        .loading-spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.3); border-top-color: #fbbf24; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: white; font-size: 1rem; }
+        .register-link a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: white;
+            font-size: 1rem;
+        }
+        @media (max-width: 480px) {
+            .login-header { padding: 30px; }
+            .login-body { padding: 30px 25px; }
+        }
     </style>
 </head>
 <body>
@@ -95,7 +209,9 @@
                     <label><i class="fas fa-lock"></i> Contraseña</label>
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</button>
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                </button>
                 <div id="errorMessage" class="error-message"></div>
             </form>
             <div class="divider">O continúa con</div>
@@ -113,96 +229,51 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyC15mRJfoeD4F-5u32YyAhoQ8c0ZW9_O8s",
-            authDomain: "aprobadoya-login.firebaseapp.com",
-            projectId: "aprobadoya-login",
-            storageBucket: "aprobadoya-login.firebasestorage.app",
-            messagingSenderId: "786027866487",
-            appId: "1:786027866487:web:0e08ee55100e456c521972",
-            measurementId: "G-7DDRTDGEGY"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-        
-        provider.setCustomParameters({ prompt: 'select_account' });
+        import { 
+            auth, 
+            signInWithPopup, 
+            googleProvider,
+            signInWithEmailAndPassword
+        } from './js/firebase-init.js';
+        import { guardarUsuarioFirestore } from './js/ranking-firebase.js';
         
         const googleBtn = document.getElementById('googleLoginBtn');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const errorDiv = document.getElementById('errorMessage');
-        
-        function guardarUsuario(user) {
-            let users = JSON.parse(localStorage.getItem('aprobadoya_usuarios') || '[]');
-            let existingUser = users.find(u => u.id === user.uid || u.email === user.email);
-            
-            if (!existingUser) {
-                const newUser = {
-                    id: user.uid,
-                    nombre: user.displayName || user.email.split('@')[0],
-                    email: user.email,
-                    avatar: '🚗',
-                    fotoUrl: user.photoURL || null,
-                    fechaRegistro: new Date().toISOString().split('T')[0]
-                };
-                users.push(newUser);
-                localStorage.setItem('aprobadoya_usuarios', JSON.stringify(users));
-                existingUser = newUser;
-            }
-            
-            localStorage.setItem('aprobadoya_user_actual', existingUser.id);
-            return existingUser;
-        }
         
         async function loginWithGoogle() {
             loadingOverlay.style.display = 'flex';
             googleBtn.disabled = true;
             
             try {
-                const result = await signInWithPopup(auth, provider);
-                console.log("Usuario logueado:", result.user);
-                guardarUsuario(result.user);
+                const result = await signInWithPopup(auth, googleProvider);
+                await guardarUsuarioFirestore(result.user);
                 window.location.href = 'index.html';
             } catch (error) {
-                console.error("Error detallado:", error);
+                console.error(error);
                 loadingOverlay.style.display = 'none';
                 googleBtn.disabled = false;
-                
-                let mensaje = 'Error al iniciar sesión: ';
-                if (error.code === 'auth/popup-blocked') {
-                    mensaje = 'El navegador bloqueó la ventana emergente. Permite popups para este sitio.';
-                } else if (error.code === 'auth/popup-closed-by-user') {
-                    mensaje = 'Cerraste la ventana de Google. Intenta de nuevo.';
-                } else if (error.code === 'auth/unauthorized-domain') {
-                    mensaje = 'Dominio no autorizado. Agrega este dominio en Firebase Console → Authentication → Settings → Authorized domains';
-                } else {
-                    mensaje += error.message;
-                }
-                
-                errorDiv.textContent = '❌ ' + mensaje;
+                errorDiv.textContent = '❌ Error al iniciar sesión: ' + error.message;
                 errorDiv.style.display = 'block';
-                setTimeout(() => errorDiv.style.display = 'none', 8000);
+                setTimeout(() => errorDiv.style.display = 'none', 5000);
             }
         }
         
         googleBtn.addEventListener('click', loginWithGoogle);
         
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            let users = JSON.parse(localStorage.getItem('aprobadoya_usuarios') || '[]');
-            let user = users.find(u => u.email === email);
+            errorDiv.style.display = 'none';
             
-            if (user && (user.password === btoa(password) || !user.password)) {
-                localStorage.setItem('aprobadoya_user_actual', user.id);
+            try {
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                await guardarUsuarioFirestore(result.user);
                 window.location.href = 'index.html';
-            } else {
+            } catch (error) {
+                console.error(error);
                 errorDiv.textContent = '❌ Email o contraseña incorrectos';
                 errorDiv.style.display = 'block';
             }
