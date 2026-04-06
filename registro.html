@@ -267,8 +267,7 @@
             
             try {
                 const result = await signInWithPopup(auth, googleProvider);
-                await guardarUsuarioFirestore(result.user);
-                window.location.href = 'index.html';
+                await guardarUsuarioFirestore(result.user, nombre);                window.location.href = 'index.html';
             } catch (error) {
                 console.error(error);
                 loadingOverlay.style.display = 'none';

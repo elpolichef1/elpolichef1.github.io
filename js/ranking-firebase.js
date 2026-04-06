@@ -21,7 +21,7 @@ async function guardarUsuarioFirestore(user, nombreAdicional = null) {
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-        const nuevoUsuario = {
+       const nuevoUsuario = {
             id: user.uid,
             nombre: nombreAdicional || user.displayName || user.email.split('@')[0],
             email: user.email,

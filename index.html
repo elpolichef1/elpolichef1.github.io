@@ -328,96 +328,115 @@
         </div>
     </footer>
 
-    <script type="module">
-        import { auth, onAuthStateChanged, signOut, db, collection, getDocs } from './js/firebase-init.js';
-        
-        // Elementos DOM
-        const userZone = document.getElementById('userZone');
-        const welcomeContainer = document.getElementById('welcomeBannerContainer');
-        const modal = document.getElementById('modalBloqueo');
-        
-        // Función para contar usuarios registrados
-        async function contarUsuarios() {
-            try {
-                const usersRef = collection(db, "usuarios");
-                const snapshot = await getDocs(usersRef);
-                const usuariosCount = document.getElementById('usuariosRegistrados');
-                if (usuariosCount) usuariosCount.textContent = snapshot.size;
-            } catch (error) {
-                console.error("Error al contar usuarios:", error);
+   <script type="module">
+    import { auth, onAuthStateChanged, signOut, db, collection, getDocs, doc, getDoc } from './js/firebase-init.js';
+    
+    // Elementos DOM
+    const userZone = document.getElementById('userZone');
+    const welcomeContainer = document.getElementById('welcomeBannerContainer');
+    const modal = document.getElementById('modalBloqueo');
+    
+    // Función para obtener el nombre del usuario desde Firestore
+    async function obtenerNombreUsuario(user) {
+        try {
+            const userRef = doc(db, "usuarios", user.uid);
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                return userData.nombre || user.displayName || user.email.split('@')[0];
             }
+        } catch (error) {
+            console.error("Error al obtener nombre:", error);
         }
-        
-        // Función para verificar acceso
-        window.verificarAcceso = function(url) {
-            const user = auth.currentUser;
-            if (user) {
-                window.location.href = url;
-            } else {
-                mostrarModal();
-            }
-        };
-        
-        window.mostrarModal = function() {
-            if (modal) modal.classList.add('active');
-        };
-        
-        window.cerrarModal = function() {
-            if (modal) modal.classList.remove('active');
-        };
-        
-        // Actualizar interfaz según usuario
-        function updateUserInterface(user) {
-            if (user) {
-                const nombre = user.displayName || user.email.split('@')[0];
-                userZone.innerHTML = `
-                    <div class="user-menu">
-                        <div class="user-avatar">🚗</div>
-                        <span class="user-name">${nombre}</span>
-                        <a href="perfil/index.html" class="btn-profile">Mi perfil</a>
-                        <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
-                    </div>
-                `;
-                
-                welcomeContainer.innerHTML = `
-                    <div class="welcome-banner">
-                        <div class="welcome-avatar">🚗</div>
-                        <div class="welcome-text">
-                            <h2>¡Bienvenido de vuelta, ${nombre}!</h2>
-                            <p>¿Listo para seguir practicando? Continúa con los test y mejora tu puntuación.</p>
-                        </div>
-                        <a href="test/index.html" class="btn-test">Empezar test <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                `;
-                
-                document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-                    await signOut(auth);
-                    window.location.reload();
-                });
-            } else {
-                userZone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
-                welcomeContainer.innerHTML = '';
-            }
+        return user.displayName || user.email.split('@')[0];
+    }
+    
+    // Función para contar usuarios registrados
+    async function contarUsuarios() {
+        try {
+            const usersRef = collection(db, "usuarios");
+            const snapshot = await getDocs(usersRef);
+            const usuariosCount = document.getElementById('usuariosRegistrados');
+            if (usuariosCount) usuariosCount.textContent = snapshot.size;
+        } catch (error) {
+            console.error("Error al contar usuarios:", error);
         }
-        
-        // Escuchar cambios de autenticación
-        onAuthStateChanged(auth, (user) => {
-            updateUserInterface(user);
-            contarUsuarios();
-        });
-        
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            if (event.target === modal) {
-                cerrarModal();
-            }
-        };
-        
-        // Menú móvil
-        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-            const navWrapper = document.querySelector('.nav-wrapper');
-            if (navWrapper) navWrapper.classList.toggle('active');
-        });
-    </script>
+    }
+    
+    // Función para verificar acceso
+    window.verificarAcceso = function(url) {
+        const user = auth.currentUser;
+        if (user) {
+            window.location.href = url;
+        } else {
+            mostrarModal();
+        }
+    };
+    
+    window.mostrarModal = function() {
+        if (modal) modal.classList.add('active');
+    };
+    
+    window.cerrarModal = function() {
+        if (modal) modal.classList.remove('active');
+    };
+    
+    // Actualizar interfaz según usuario
+    async function updateUserInterface(user) {
+        if (user) {
+            // Obtener el nombre completo desde Firestore
+            const nombreCompleto = await obtenerNombreUsuario(user);
+            // Tomar solo el primer nombre para el header (opcional)
+            const primerNombre = nombreCompleto.split(' ')[0];
+            
+            userZone.innerHTML = `
+                <div class="user-menu">
+                    <div class="user-avatar">🚗</div>
+                    <span class="user-name">${primerNombre}</span>
+                    <a href="perfil/index.html" class="btn-profile">Mi perfil</a>
+                    <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+                </div>
+            `;
+            
+            welcomeContainer.innerHTML = `
+                <div class="welcome-banner">
+                    <div class="welcome-avatar">🚗</div>
+                    <div class="welcome-text">
+                        <h2>¡Bienvenido de vuelta, ${nombreCompleto}!</h2>
+                        <p>¿Listo para seguir practicando? Continúa con los test y mejora tu puntuación.</p>
+                    </div>
+                    <a href="test/index.html" class="btn-test">Empezar test <i class="fas fa-arrow-right"></i></a>
+                </div>
+            `;
+            
+            document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+                await signOut(auth);
+                window.location.reload();
+            });
+        } else {
+            userZone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            welcomeContainer.innerHTML = '';
+        }
+    }
+    
+    // Escuchar cambios de autenticación
+    onAuthStateChanged(auth, async (user) => {
+        await updateUserInterface(user);
+        contarUsuarios();
+    });
+    
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            cerrarModal();
+        }
+    };
+    
+    // Menú móvil
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+        const navWrapper = document.querySelector('.nav-wrapper');
+        if (navWrapper) navWrapper.classList.toggle('active');
+    });
+</script>
 </body>
 </html>
