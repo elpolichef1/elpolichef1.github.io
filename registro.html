@@ -3,33 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro | AprobadoYa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <title>Registrarse | AprobadoYa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .register-container { max-width: 450px; width: 100%; background: white; border-radius: 30px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.2); animation: fadeInUp 0.6s ease; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .register-header { background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; padding: 40px; text-align: center; }
-        .register-header i { font-size: 3rem; margin-bottom: 15px; color: #fbbf24; }
-        .register-header h1 { font-size: 1.8rem; margin-bottom: 8px; }
-        .register-body { padding: 40px; }
-        .form-group { margin-bottom: 25px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-        .form-group input { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem; transition: all 0.3s; }
-        .form-group input:focus { outline: none; border-color: #fbbf24; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1); }
-        .btn-register { width: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .register-container {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .register-header {
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .register-header i {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: #fbbf24;
+        }
+        
+        .register-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .register-header p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        .register-body {
+            padding: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.85rem;
+        }
+        
+        .form-group label i {
+            color: #fbbf24;
+            width: 20px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+        }
+        
+        .btn-register {
+            width: 100%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4);
+        }
         
         .google-btn {
             width: 100%;
             background: white;
-            color: #333;
+            color: #1e293b;
             border: 2px solid #e2e8f0;
             padding: 12px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
@@ -40,12 +140,16 @@
             gap: 12px;
             margin-top: 15px;
         }
+        
         .google-btn:hover {
-            background: #f8f9fa;
+            background: #f8fafc;
             border-color: #fbbf24;
             transform: translateY(-2px);
         }
-        .google-btn i { font-size: 1.2rem; color: #4285f4; }
+        
+        .google-btn i.fa-google {
+            color: #4285f4;
+        }
         
         .divider {
             display: flex;
@@ -53,74 +157,245 @@
             text-align: center;
             margin: 25px 0;
             color: #94a3b8;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
-        .divider::before, .divider::after {
+        
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
             border-bottom: 1px solid #e2e8f0;
         }
-        .divider::before { margin-right: 15px; }
-        .divider::after { margin-left: 15px; }
         
-        .login-link { text-align: center; margin-top: 25px; color: #64748b; }
-        .login-link a { color: #fbbf24; text-decoration: none; font-weight: 600; }
-        .error-message { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 10px; margin-top: 15px; display: none; text-align: center; }
+        .divider::before {
+            margin-right: 15px;
+        }
+        
+        .divider::after {
+            margin-left: 15px;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+        
+        .login-link a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        
+        .success-message {
+            background: #d1fae5;
+            color: #059669;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 480px) {
+            .register-header {
+                padding: 30px;
+            }
+            .register-body {
+                padding: 30px 25px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="register-container">
         <div class="register-header">
             <i class="fas fa-user-plus"></i>
-            <h1>AprobadoYa</h1>
-            <p>Crea tu cuenta gratis</p>
+            <h1>Crear cuenta</h1>
+            <p>Regístrate gratis y empieza a practicar</p>
         </div>
+        
         <div class="register-body">
             <form id="registerForm">
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> Nombre</label>
-                    <input type="text" id="nombre" placeholder="Tu nombre" required>
+                    <label><i class="fas fa-user"></i> Nombre completo</label>
+                    <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
                 </div>
+                
                 <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="email" placeholder="tu@email.com" required>
+                    <label><i class="fas fa-envelope"></i> Correo electrónico</label>
+                    <input type="email" id="email" placeholder="ejemplo@email.com" required>
                 </div>
+                
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Contraseña</label>
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
+                
                 <div class="form-group">
                     <label><i class="fas fa-check-circle"></i> Confirmar contraseña</label>
                     <input type="password" id="confirmPassword" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-register">Registrarme</button>
+                
+                <button type="submit" class="btn-register">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </button>
+                
                 <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
             </form>
-
+            
             <div class="divider">O regístrate con</div>
             
             <button id="googleRegisterBtn" class="google-btn">
                 <i class="fab fa-google"></i>
-                Registrarme con Google
+                Registrarse con Google
             </button>
-
+            
             <div class="login-link">
-                ¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>
+                ¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
             </div>
         </div>
     </div>
-
+    
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Conectando con Google...</div>
+    </div>
+    
     <script src="js/auth.js"></script>
-    <script src="js/google-auth.js"></script>
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyC15mRJfoeD4F-5u32YyAhoQ8c0ZW9_O8s",
+            authDomain: "aprobadoya-login.firebaseapp.com",
+            projectId: "aprobadoya-login",
+            storageBucket: "aprobadoya-login.firebasestorage.app",
+            messagingSenderId: "786027866487",
+            appId: "1:786027866487:web:0e08ee55100e456c521972",
+            measurementId: "G-7DDRTDGEGY"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        
+        provider.setCustomParameters({ prompt: 'select_account' });
+        
+        const googleBtn = document.getElementById('googleRegisterBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const registerForm = document.getElementById('registerForm');
+        const errorDiv = document.getElementById('errorMessage');
+        const successDiv = document.getElementById('successMessage');
+        
+        function guardarUsuario(user) {
+            let users = JSON.parse(localStorage.getItem('aprobadoya_usuarios') || '[]');
+            let existingUser = users.find(u => u.id === user.uid || u.email === user.email);
+            
+            if (!existingUser) {
+                const newUser = {
+                    id: user.uid,
+                    nombre: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    avatar: '🚗',
+                    fotoUrl: user.photoURL || null,
+                    fechaRegistro: new Date().toISOString().split('T')[0]
+                };
+                users.push(newUser);
+                localStorage.setItem('aprobadoya_usuarios', JSON.stringify(users));
+                existingUser = newUser;
+            }
+            
+            localStorage.setItem('aprobadoya_user_actual', existingUser.id);
+            return existingUser;
+        }
+        
+        async function registerWithGoogle() {
+            loadingOverlay.style.display = 'flex';
+            googleBtn.disabled = true;
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                guardarUsuario(result.user);
+                window.location.href = 'index.html';
+            } catch (error) {
+                loadingOverlay.style.display = 'none';
+                googleBtn.disabled = false;
+                errorDiv.textContent = '❌ Error al registrarse con Google';
+                errorDiv.style.display = 'block';
+                setTimeout(() => errorDiv.style.display = 'none', 5000);
+            }
+        }
+        
+        registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorDiv = document.getElementById('errorMessage');
             
             errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            if (!nombre || !email || !password) {
+                errorDiv.textContent = '❌ Por favor, completa todos los campos';
+                errorDiv.style.display = 'block';
+                return;
+            }
             
             if (password !== confirmPassword) {
                 errorDiv.textContent = '❌ Las contraseñas no coinciden';
@@ -128,19 +403,42 @@
                 return;
             }
             
-            const result = registerUser(
-                document.getElementById('nombre').value,
-                document.getElementById('email').value,
-                password
-            );
-            
-            if (result.success) {
-                window.location.href = 'login.html';
-            } else {
-                errorDiv.textContent = '❌ Error al registrar. El email puede existir.';
+            if (password.length < 6) {
+                errorDiv.textContent = '❌ La contraseña debe tener al menos 6 caracteres';
                 errorDiv.style.display = 'block';
+                return;
             }
+            
+            let users = JSON.parse(localStorage.getItem('aprobadoya_usuarios') || '[]');
+            
+            if (users.some(u => u.email === email)) {
+                errorDiv.textContent = '❌ Ya existe una cuenta con este email';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            const newUser = {
+                id: 'user_' + Date.now(),
+                nombre: nombre,
+                email: email,
+                password: btoa(password),
+                avatar: '🚗',
+                fechaRegistro: new Date().toISOString().split('T')[0]
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('aprobadoya_usuarios', JSON.stringify(users));
+            localStorage.setItem('aprobadoya_user_actual', newUser.id);
+            
+            successDiv.textContent = '✅ ¡Cuenta creada con éxito! Redirigiendo...';
+            successDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
         });
+        
+        googleBtn.addEventListener('click', registerWithGoogle);
     </script>
 </body>
 </html>

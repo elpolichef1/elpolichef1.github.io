@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Temas Oficiales DGT | AprobadoYa</title>
     <meta name="description" content="Los 20 temas oficiales de la DGT para preparar el examen de conducir. Estudia normas, señales, circulación y más.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <style>
@@ -217,30 +216,30 @@
 </head>
 <body>
     <header>
-    <div class="container">
-        <div class="logo">
-            <i class="fas fa-check-circle"></i>
-            <h1>Aprobado<span>Ya</span></h1>
-        </div>
-        <div class="nav-container">
-            <div class="nav-wrapper">
-                <nav id="navMenu">
-                    <ul>
-                        <li><a href="../index.html">Inicio</a></li>
-                        <li><a href="index.html" class="active">Temas</a></li>
-                        <li><a href="../test/index.html">Test</a></li>
-                        <li><a href="../simulacro/index.html">Simulacro</a></li>
-                        <li><a href="../videos/index.html">Videos</a></li>
-                        <li><a href="../ranking/index.html">Ranking</a></li>
-                        <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
-                    </ul>
-                </nav>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
             </div>
+            <div class="nav-container">
+                <div class="nav-wrapper">
+                    <nav id="navMenu">
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="index.html" class="active">Temas</a></li>
+                            <li><a href="../test/index.html">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../videos/index.html">Videos</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
-        <div class="user-zone" id="userZone"></div>
-        <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
-    </div>
-</header>
+    </header>
 
     <div class="page-header">
         <div class="container">
@@ -303,7 +302,6 @@
     </footer>
 
     <script src="../js/auth.js"></script>
-    <script src="../js/main.js"></script>
     <script>
         // ==================== DATOS DE LOS TEMAS ====================
         const temas = [
@@ -331,12 +329,12 @@
 
         // ==================== FUNCIONES DE PROGRESO ====================
         function cargarProgreso() {
-            const progreso = localStorage.getItem('aprobadoya_progreso');
+            const progreso = localStorage.getItem('aprobadoya_progreso_temas');
             return progreso ? JSON.parse(progreso) : {};
         }
 
         function guardarProgreso(progreso) {
-            localStorage.setItem('aprobadoya_progreso', JSON.stringify(progreso));
+            localStorage.setItem('aprobadoya_progreso_temas', JSON.stringify(progreso));
         }
 
         function marcarEstudiado(numero) {
@@ -355,13 +353,17 @@
 
         function actualizarProgresoGlobal() {
             const porcentaje = calcularProgresoGlobal();
-            document.getElementById('globalProgressPercent').textContent = `${porcentaje}%`;
-            document.getElementById('globalProgressFill').style.width = `${porcentaje}%`;
+            const percentElement = document.getElementById('globalProgressPercent');
+            const fillElement = document.getElementById('globalProgressFill');
+            if (percentElement) percentElement.textContent = `${porcentaje}%`;
+            if (fillElement) fillElement.style.width = `${porcentaje}%`;
         }
 
         // ==================== RENDERIZAR TEMAS ====================
         function renderizarTemas() {
             const grid = document.getElementById('temasGrid');
+            if (!grid) return;
+            
             const progreso = cargarProgreso();
             
             grid.innerHTML = temas.map(tema => {
@@ -400,22 +402,11 @@
             }).join('');
         }
 
-        // ==================== ZONA DE USUARIO ====================
-        function renderUserZone() {
-            const currentUser = getCurrentUser();
-            const userZone = document.getElementById('userZone');
-            
-            if (currentUser) {
-                userZone.innerHTML = `
-                    <div class="user-menu" style="display: flex; align-items: center; gap: 15px;">
-                        <span style="color: white;"><i class="fas fa-user-circle"></i> ${currentUser.nombre}</span>
-                        <a href="../perfil/index.html" class="btn-login" style="background: #fbbf24; color: #1a472a; padding: 6px 15px; border-radius: 50px; font-size: 0.85rem;">Mi perfil</a>
-                        <button onclick="logoutUser()" class="btn-login" style="background: transparent; border: 1px solid #fbbf24; color: #fbbf24; padding: 6px 15px; border-radius: 50px; font-size: 0.85rem; cursor: pointer;">Cerrar sesión</button>
-                    </div>
-                `;
-            } else {
-                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
-            }
+        // ==================== ACTUALIZAR TODOS LOS DATOS ====================
+        function updateAllUserData() {
+            renderizarTemas();
+            actualizarProgresoGlobal();
+            renderUserZone();
         }
 
         // ==================== INICIALIZACIÓN ====================
@@ -424,9 +415,13 @@
             renderizarTemas();
             actualizarProgresoGlobal();
             
-            // Inicializar carrusel de menú
-            if (typeof initNavCarousel === 'function') {
-                initNavCarousel();
+            // Menú móvil
+            const menuBtn = document.getElementById('menuMobileBtn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', () => {
+                    const wrapper = document.querySelector('.nav-wrapper');
+                    if (wrapper) wrapper.classList.toggle('active');
+                });
             }
         });
     </script>

@@ -1,209 +1,239 @@
-// ==================== SISTEMA DE AUTENTICACIÓN ====================
+// ============================================
+// SISTEMA CENTRAL DE AUTENTICACIÓN Y USUARIO
+// ============================================
 
-// Registro de usuario
-function registerUser(nombre, email, password) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Verificar si el email ya existe
-    if (users.find(u => u.email === email)) {
-        return { success: false, message: 'El email ya está registrado' };
-    }
-    
-    const newUser = {
-        id: Date.now(),
-        nombre: nombre,
-        email: email,
-        password: password,
-        avatar: "🚗",
-        fechaRegistro: new Date().toLocaleDateString(),
-        tests: []
-    };
-    
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    return { success: true };
-}
+const STORAGE_USERS = 'aprobadoya_usuarios';
+const STORAGE_TESTS = 'aprobadoya_tests_usuario';
+const CURRENT_USER_KEY = 'aprobadoya_user_actual';
+const USER_UPDATED_EVENT = 'userUpdated';
+const USER_UPDATE_FLAG = 'user_update_flag';
 
-// Login de usuario
-function loginUser(email, password) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        localStorage.setItem('isLoggedIn', 'true');
-        return { success: true };
-    }
-    
-    return { success: false };
-}
-
-// ==================== FUNCIONES PARA GOOGLE ====================
-
-// Verificar si el usuario actual es de Google
-function esUsuarioGoogle() {
-    const user = localStorage.getItem('usuario_apruebaloya');
-    if (!user) return false;
-    try {
-        const userData = JSON.parse(user);
-        return userData.provider === 'google';
-    } catch(e) {
-        return false;
+// Disparar evento de actualización
+function dispatchUserUpdatedEvent() {
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(USER_UPDATED_EVENT));
+        localStorage.setItem(USER_UPDATE_FLAG, Date.now().toString());
     }
 }
 
-// Obtener usuario actual (compatible con Google y sistema normal)
+// Obtener usuario actual
 function getCurrentUser() {
-    // Primero revisar si hay usuario de Google
-    const googleUser = localStorage.getItem('usuario_apruebaloya');
-    if (googleUser) {
-        try {
-            const userData = JSON.parse(googleUser);
-            if (userData.autenticado) {
-                return {
-                    nombre: userData.nombre,
-                    email: userData.email,
-                    avatar: userData.foto ? '👤' : (localStorage.getItem('userAvatar') || "🚗"),
-                    foto: userData.foto,
-                    fechaRegistro: localStorage.getItem('userFechaRegistro') || new Date().toLocaleDateString(),
-                    provider: 'google'
-                };
-            }
-        } catch(e) {}
+    const users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
+    const currentId = localStorage.getItem(CURRENT_USER_KEY);
+    if (currentId) {
+        const found = users.find(u => u.id === currentId);
+        if (found) return found;
     }
-    
-    // Si no hay usuario de Google, usar tu sistema actual
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-        try {
-            return JSON.parse(currentUser);
-        } catch(e) {}
+    // ✅ NO devolver ningún usuario por defecto
+    return null;
+}
+
+// Actualizar usuario
+function updateUser(userId, updates) {
+    const users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
+    const index = users.findIndex(u => u.id === userId);
+    if (index !== -1) {
+        users[index] = { ...users[index], ...updates };
+        localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+        dispatchUserUpdatedEvent();
+        return users[index];
     }
     return null;
 }
 
-// Función para cerrar sesión (compatible con Google y sistema normal)
-function logoutUser() {
-    // Limpiar datos de Google
-    localStorage.removeItem('usuario_apruebaloya');
-    localStorage.removeItem('userAvatar');
-    localStorage.removeItem('userFechaRegistro');
-    
-    // Limpiar datos del sistema normal
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('isLoggedIn');
-    
-    // Redirigir al login
-    window.location.href = 'login.html';
-}
-
-// Verificar autenticación (protege páginas)
-function requireAuth() {
-    const user = getCurrentUser();
-    if (!user) {
-        window.location.href = 'login.html';
-        return false;
-    }
-    return true;
-}
-
-// Actualizar avatar del usuario
+// Actualizar avatar
 function updateUserAvatar(avatar) {
-    // Para usuario de Google
-    const googleUser = localStorage.getItem('usuario_apruebaloya');
-    if (googleUser) {
-        try {
-            const userData = JSON.parse(googleUser);
-            userData.avatar = avatar;
-            localStorage.setItem('usuario_apruebaloya', JSON.stringify(userData));
-        } catch(e) {}
-    }
-    
-    // Para usuario normal
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = getCurrentUser();
     if (currentUser) {
-        try {
-            const user = JSON.parse(currentUser);
-            user.avatar = avatar;
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            
-            // Actualizar en el array de users
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const index = users.findIndex(u => u.email === user.email);
-            if (index !== -1) {
-                users[index].avatar = avatar;
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-        } catch(e) {}
+        updateUser(currentUser.id, { avatar: avatar });
+        return true;
     }
-    
-    localStorage.setItem('userAvatar', avatar);
+    return false;
 }
 
-// ==================== ESTADÍSTICAS ====================
+// Actualizar nombre
+function updateUserName(nuevoNombre) {
+    const currentUser = getCurrentUser();
+    if (currentUser && nuevoNombre && nuevoNombre.trim().length > 0) {
+        updateUser(currentUser.id, { nombre: nuevoNombre.trim() });
+        return true;
+    }
+    return false;
+}
 
-function obtenerEstadisticasCompletas() {
-    const tests = JSON.parse(localStorage.getItem('testResults') || '[]');
-    const totalTests = tests.length;
-    const testsAprobados = tests.filter(t => (t.aciertos/t.total)*100 >= 90).length;
-    const totalAciertos = tests.reduce((sum, t) => sum + t.aciertos, 0);
-    const mejorResultado = tests.length > 0 ? Math.max(...tests.map(t => Math.round((t.aciertos/t.total)*100))) : 0;
-    
-    const testsPorTipo = {
-        'test-rapido': tests.filter(t => t.tipo === 'test-rapido').length,
-        'test-completo': tests.filter(t => t.tipo === 'test-completo').length,
-        'test-por-temas': tests.filter(t => t.tipo === 'test-por-temas').length,
-        'test-examen': tests.filter(t => t.tipo === 'test-examen').length
-    };
-    
-    const testsRecientes = tests.slice(-10).reverse();
-    const tasaAprobados = totalTests > 0 ? Math.round((testsAprobados / totalTests) * 100) : 0;
-    
+// Cerrar sesión
+function logoutUser() {
+    localStorage.removeItem(CURRENT_USER_KEY);
+    dispatchUserUpdatedEvent();
+    setTimeout(() => {
+        window.location.reload();
+    }, 100);
+}
+
+// Calcular estadísticas de un usuario basado en sus tests
+function calcularEstadisticasUsuario(userId) {
+    const testsKey = `${STORAGE_TESTS}_${userId}`;
+    const tests = JSON.parse(localStorage.getItem(testsKey) || '[]');
+
+    if (tests.length === 0) {
+        return {
+            totalTests: 0,
+            totalAciertos: 0,
+            totalPreguntas: 0,
+            mejorResultado: 0,
+            mediaAciertos: 0,
+            tasaAprobados: 0
+        };
+    }
+
+    let totalAciertos = 0;
+    let totalPreguntas = 0;
+    let mejorPorcentaje = 0;
+    let aprobadosCount = 0;
+
+    for (const test of tests) {
+        totalAciertos += test.aciertos;
+        totalPreguntas += test.total;
+        const porcentaje = Math.round((test.aciertos / test.total) * 100);
+        if (porcentaje > mejorPorcentaje) mejorPorcentaje = porcentaje;
+        if (porcentaje >= 90) aprobadosCount++;
+    }
+
+    const mediaAciertos = totalPreguntas > 0 ? Math.round((totalAciertos / totalPreguntas) * 100) : 0;
+    const tasaAprobados = tests.length > 0 ? Math.round((aprobadosCount / tests.length) * 100) : 0;
+
     return {
-        totalTests,
-        testsAprobados,
+        totalTests: tests.length,
         totalAciertos,
-        mejorResultado,
-        testsPorTipo,
-        testsRecientes,
+        totalPreguntas,
+        mejorResultado: mejorPorcentaje,
+        mediaAciertos,
         tasaAprobados
     };
 }
 
-// Guardar resultado de un test
-function guardarResultadoTest(tipo, tema, aciertos, total, fecha) {
-    const tests = JSON.parse(localStorage.getItem('testResults') || '[]');
-    tests.push({
-        tipo: tipo,
-        tema: tema,
-        aciertos: aciertos,
-        total: total,
-        fecha: fecha || new Date().toISOString()
+// Obtener ranking completo
+function getRankingCompleto() {
+    const users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
+    const usersConStats = users.map(user => {
+        const stats = calcularEstadisticasUsuario(user.id);
+        return {
+            ...user,
+            ...stats
+        };
     });
-    localStorage.setItem('testResults', JSON.stringify(tests));
+    return usersConStats.sort((a, b) => b.mediaAciertos - a.mediaAciertos);
 }
 
-// ==================== UTILIDADES ====================
-
-// Renderizar zona de usuario en el header (llamar en cada página)
+// Renderizar zona de usuario en el header
 function renderUserZone() {
-    const user = getCurrentUser();
     const userZone = document.getElementById('userZone');
-    
     if (!userZone) return;
     
-    if (user) {
-        const avatar = user.avatar || (user.foto ? '👤' : "🚗");
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+        const avatar = currentUser.avatar || "🚗";
+        const nombreCorto = currentUser.nombre.split(' ')[0];
         userZone.innerHTML = `
             <div class="user-menu">
-                <div class="user-avatar">${avatar}</div>
-                <span class="user-name">${user.nombre}</span>
-                <a href="perfil/index.html" class="btn-profile">Mi perfil</a>
+                <div class="user-avatar" id="headerUserAvatar">${avatar}</div>
+                <span class="user-name" id="headerUserName">${escapeHtml(nombreCorto)}</span>
+                <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
                 <button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button>
             </div>
         `;
     } else {
-        userZone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+        userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
     }
 }
+
+// Función auxiliar para escapar HTML
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// ✅ INICIALIZACIÓN - SIN USUARIOS POR DEFECTO
+function inicializarDatosGlobales() {
+    // Solo crear datos si no existe el storage y si hay usuarios registrados
+    // NO crear usuarios de demostración automáticamente
+    
+    // Si quieres mantener usuarios que ya se registraron, no los borres
+    // Esta función ya no crea usuarios por defecto
+}
+
+// Configurar listeners
+function setupGlobalListeners() {
+    if (typeof window !== 'undefined') {
+        window.addEventListener(USER_UPDATED_EVENT, function() {
+            renderUserZone();
+            if (typeof window.refreshRanking === 'function') {
+                window.refreshRanking();
+            }
+            if (typeof window.refreshProfileData === 'function') {
+                window.refreshProfileData();
+            }
+            if (typeof window.updateAllUserData === 'function') {
+                window.updateAllUserData();
+            }
+        });
+        
+        window.addEventListener('storage', function(e) {
+            if (e.key === STORAGE_USERS || e.key === USER_UPDATE_FLAG) {
+                renderUserZone();
+                if (typeof window.refreshRanking === 'function') {
+                    window.refreshRanking();
+                }
+                if (typeof window.refreshProfileData === 'function') {
+                    window.refreshProfileData();
+                }
+                if (typeof window.updateAllUserData === 'function') {
+                    window.updateAllUserData();
+                }
+            }
+        });
+    }
+}
+
+// ✅ LIMPIAR USUARIOS POR DEFECTO (OPCIONAL)
+// Si ya tienes usuarios creados y quieres borrarlos, ejecuta esto:
+function limpiarUsuariosPorDefecto() {
+    const users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
+    // Filtrar para eliminar usuarios de demostración como "Ana García"
+    const usuariosFiltrados = users.filter(u => 
+        u.email !== 'ana@email.com' && 
+        u.email !== 'demo@aprobadoya.com' &&
+        u.id !== 'user_ana' &&
+        u.id !== 'user_demo'
+    );
+    localStorage.setItem(STORAGE_USERS, JSON.stringify(usuariosFiltrados));
+    
+    // Si el usuario actual es uno de los eliminados, cerrar sesión
+    const currentId = localStorage.getItem(CURRENT_USER_KEY);
+    if (currentId && !usuariosFiltrados.find(u => u.id === currentId)) {
+        localStorage.removeItem(CURRENT_USER_KEY);
+    }
+}
+
+// Exponer funciones globales
+window.getCurrentUser = getCurrentUser;
+window.updateUserAvatar = updateUserAvatar;
+window.updateUserName = updateUserName;
+window.logoutUser = logoutUser;
+window.getRankingCompleto = getRankingCompleto;
+window.calcularEstadisticasUsuario = calcularEstadisticasUsuario;
+window.renderUserZone = renderUserZone;
+window.limpiarUsuariosPorDefecto = limpiarUsuariosPorDefecto;
+
+// Inicializar (sin crear usuarios por defecto)
+inicializarDatosGlobales();
+setupGlobalListeners();
+
+// ✅ OPCIONAL: Ejecuta esto UNA VEZ para limpiar usuarios existentes
+// Descomenta la siguiente línea, recarga la página, y luego vuelve a comentarla
+// limpiarUsuariosPorDefecto();

@@ -4,17 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Mi Perfil | AprobadoYa - Estadísticas por Temas</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: #f0f5f3;
             color: #0f2b2d;
             line-height: 1.5;
         }
+
         header {
             background: #0a2f2a;
             box-shadow: 0 8px 24px rgba(0,0,0,0.08);
@@ -22,11 +27,13 @@
             top: 0;
             z-index: 100;
         }
+
         .container {
             max-width: 1300px;
             margin: 0 auto;
             padding: 0 28px;
         }
+
         header .container {
             display: flex;
             justify-content: space-between;
@@ -34,14 +41,53 @@
             padding: 12px 28px;
             flex-wrap: wrap;
         }
-        .logo { display: flex; align-items: center; gap: 10px; }
-        .logo i { font-size: 2rem; color: #f5b042; }
-        .logo h1 { font-size: 1.7rem; font-weight: 800; color: white; }
-        .logo span { color: #f5b042; }
-        nav ul { display: flex; list-style: none; gap: 32px; }
-        nav ul li a { text-decoration: none; color: #eef2f5; font-weight: 500; transition: 0.2s; font-size: 0.95rem; }
-        nav ul li a:hover { color: #f5b042; }
-        .user-zone { display: flex; align-items: center; }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: #f5b042;
+        }
+
+        .logo h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .logo span {
+            color: #f5b042;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #eef2f5;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        nav ul li a:hover {
+            color: #f5b042;
+        }
+
+        .user-zone {
+            display: flex;
+            align-items: center;
+        }
+
         .user-menu {
             display: flex;
             align-items: center;
@@ -50,9 +96,18 @@
             padding: 6px 20px;
             border-radius: 60px;
         }
-        .user-avatar { font-size: 1.6rem; }
-        .user-name { color: white; font-weight: 500; }
-        .btn-profile, .btn-logout {
+
+        .user-avatar {
+            font-size: 1.6rem;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        .btn-profile,
+        .btn-logout {
             background: #f5b042;
             border: none;
             padding: 6px 16px;
@@ -61,8 +116,14 @@
             font-size: 0.75rem;
             cursor: pointer;
             color: #0a2f2a;
+            transition: all 0.2s;
         }
-        .btn-logout { background: #e2e8f0; color: #1e293b; }
+
+        .btn-logout {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
         .btn-login {
             background: #f5b042;
             padding: 8px 24px;
@@ -70,8 +131,18 @@
             color: #0a2f2a;
             font-weight: 600;
             text-decoration: none;
+            cursor: pointer;
         }
-        .menu-mobile { display: none; background: none; border: none; font-size: 1.8rem; color: white; cursor: pointer; }
+
+        .menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+        }
+
         .page-header {
             background: linear-gradient(125deg, #0f3b2c 0%, #1b5a44 100%);
             padding: 36px 0;
@@ -80,23 +151,39 @@
             border-bottom-right-radius: 38px;
             margin-bottom: 48px;
         }
-        .page-header h1 { font-size: 2.2rem; font-weight: 800; color: white; }
-        .page-header h1 i { color: #f5b042; margin-right: 12px; }
-        .page-header p { color: #e0f0e8; margin-top: 6px; }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .page-header h1 i {
+            color: #f5b042;
+            margin-right: 12px;
+        }
+
+        .page-header p {
+            color: #e0f0e8;
+            margin-top: 6px;
+        }
+
         .profile-container {
             display: grid;
             grid-template-columns: 320px 1fr;
             gap: 36px;
             margin-bottom: 70px;
         }
+
         .profile-sidebar {
             background: white;
             border-radius: 36px;
             padding: 32px 24px;
             text-align: center;
-            box-shadow: 0 25px 40px -16px rgba(0,0,0,0.12);
-            border: 1px solid rgba(245,176,66,0.25);
+            box-shadow: 0 25px 40px -16px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(245, 176, 66, 0.25);
         }
+
         .profile-avatar {
             width: 130px;
             height: 130px;
@@ -108,18 +195,72 @@
             margin: 0 auto 20px;
             font-size: 4rem;
             cursor: pointer;
-            box-shadow: 0 15px 25px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.12);
+            transition: all 0.2s;
         }
-        .profile-name { font-size: 1.55rem; font-weight: 800; margin-bottom: 6px; color: #0a2f2a; }
-        .profile-email { color: #5b6e6b; font-size: 0.85rem; margin-bottom: 24px; }
+
+        .profile-avatar:hover {
+            transform: scale(1.02);
+        }
+
+        .profile-name-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .profile-name {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #0a2f2a;
+        }
+
+        .btn-edit-name {
+            background: none;
+            border: none;
+            color: #f5b042;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: 0.2s;
+        }
+
+        .btn-edit-name:hover {
+            transform: scale(1.1);
+            color: #f59e0b;
+        }
+
+        .profile-email {
+            color: #5b6e6b;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+
         .profile-stats-mini {
             background: #fefaf2;
             padding: 20px;
             border-radius: 28px;
             text-align: left;
         }
-        .profile-stats-mini p { margin: 12px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; color: #2c4b41; font-weight: 500; }
-        .profile-stats-mini i { width: 28px; color: #f5b042; }
+
+        .profile-stats-mini p {
+            margin: 12px 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #2c4b41;
+            font-weight: 500;
+        }
+
+        .profile-stats-mini i {
+            width: 28px;
+            color: #f5b042;
+        }
+
         .avatar-selector {
             display: flex;
             flex-wrap: wrap;
@@ -132,6 +273,7 @@
             background: #f9fafb;
             border-radius: 40px;
         }
+
         .avatar-option {
             width: 52px;
             height: 52px;
@@ -143,8 +285,16 @@
             font-size: 2rem;
             cursor: pointer;
             border: 2px solid transparent;
+            transition: 0.1s;
         }
-        .avatar-option.selected, .avatar-option:hover { border-color: #f5b042; background: #fff0db; transform: scale(1.05); }
+
+        .avatar-option.selected,
+        .avatar-option:hover {
+            border-color: #f5b042;
+            background: #fff0db;
+            transform: scale(1.05);
+        }
+
         .btn-editar {
             background: none;
             border: 1px solid #e2e8f0;
@@ -154,13 +304,20 @@
             margin-top: 18px;
             color: #f5b042;
             cursor: pointer;
+            transition: 0.2s;
         }
+
+        .btn-editar:hover {
+            background: #fef3e2;
+        }
+
         .profile-main {
             background: white;
             border-radius: 36px;
             padding: 32px 34px;
-            box-shadow: 0 25px 40px -16px rgba(0,0,0,0.08);
+            box-shadow: 0 25px 40px -16px rgba(0, 0, 0, 0.08);
         }
+
         .section-title {
             font-size: 1.45rem;
             font-weight: 700;
@@ -172,27 +329,45 @@
             gap: 14px;
             color: #1f3e38;
         }
-        .section-title i { color: #f5b042; font-size: 1.5rem; }
+
+        .section-title i {
+            color: #f5b042;
+            font-size: 1.5rem;
+        }
+
         .graficos-dobles {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 32px;
             margin-bottom: 42px;
         }
+
         .grafico-card {
             background: #fefcf8;
             border-radius: 32px;
             padding: 20px 12px;
             text-align: center;
         }
-        .grafico-card h4 { font-weight: 700; margin-bottom: 16px; color: #2b5a4b; }
-        canvas { max-width: 100%; height: auto; background: transparent; }
+
+        .grafico-card h4 {
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #2b5a4b;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            background: transparent;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 22px;
             margin-bottom: 42px;
         }
+
         .stat-card {
             background: linear-gradient(135deg, #fefaf5, #ffffff);
             padding: 20px 12px;
@@ -200,14 +375,27 @@
             text-align: center;
             border: 1px solid #ffe6bf;
         }
-        .stat-number { font-size: 2.5rem; font-weight: 800; color: #f5b042; }
-        .stat-label { font-size: 0.8rem; font-weight: 600; color: #557a6f; margin-top: 8px; }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f5b042;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #557a6f;
+            margin-top: 8px;
+        }
+
         .tests-por-tema {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
             margin-bottom: 42px;
         }
+
         .tema-card {
             background: #faf9f5;
             padding: 16px 8px;
@@ -215,12 +403,47 @@
             text-align: center;
             border: 1px solid #f5e5cf;
         }
-        .tema-numero { font-size: 2rem; font-weight: 800; color: #f5b042; }
-        .tema-label { font-size: 0.8rem; font-weight: 600; color: #3d6b5e; margin-top: 6px; }
-        .progress-item { margin-bottom: 28px; }
-        .progress-header { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 10px; font-size: 0.9rem; }
-        .progress-bar { height: 14px; background: #e9ecef; border-radius: 30px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #f5b042, #f7c56e); border-radius: 30px; width: 0%; transition: width 0.5s ease; }
+
+        .tema-numero {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f5b042;
+        }
+
+        .tema-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #3d6b5e;
+            margin-top: 6px;
+        }
+
+        .progress-item {
+            margin-bottom: 28px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 14px;
+            background: #e9ecef;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f5b042, #f7c56e);
+            border-radius: 30px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
         .tests-recientes {
             max-height: 340px;
             overflow-y: auto;
@@ -228,6 +451,7 @@
             background: #fefcf8;
             padding: 8px;
         }
+
         .test-item {
             display: flex;
             justify-content: space-between;
@@ -237,10 +461,32 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        .test-item.aprobado { border-left: 6px solid #2b9b5e; background: #f6fffa; border-radius: 20px; margin: 6px 0; }
-        .test-item.suspendido { border-left: 6px solid #e86a6a; background: #fff9f7; border-radius: 20px; }
-        .test-tipo { font-weight: 700; color: #1f3e38; }
-        .test-fecha { font-size: 0.7rem; color: #8ba39b; display: block; margin-top: 4px; }
+
+        .test-item.aprobado {
+            border-left: 6px solid #2b9b5e;
+            background: #f6fffa;
+            border-radius: 20px;
+            margin: 6px 0;
+        }
+
+        .test-item.suspendido {
+            border-left: 6px solid #e86a6a;
+            background: #fff9f7;
+            border-radius: 20px;
+        }
+
+        .test-tipo {
+            font-weight: 700;
+            color: #1f3e38;
+        }
+
+        .test-fecha {
+            font-size: 0.7rem;
+            color: #8ba39b;
+            display: block;
+            margin-top: 4px;
+        }
+
         .btn-recargar {
             background: #f0f3f2;
             border: none;
@@ -250,8 +496,128 @@
             margin-top: 28px;
             cursor: pointer;
             color: #2c5e4f;
+            transition: 0.2s;
         }
-        .empty-tests { text-align: center; padding: 45px 20px; color: #8ba39b; }
+
+        .btn-recargar:hover {
+            background: #e2e8f0;
+        }
+
+        .empty-tests {
+            text-align: center;
+            padding: 45px 20px;
+            color: #8ba39b;
+        }
+
+        /* Toast de notificación */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #0a2f2a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .toast-notification i {
+            color: #f5b042;
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal de edición de nombre */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .modal-content h3 {
+            color: #0a2f2a;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 20px;
+            transition: 0.2s;
+        }
+
+        .modal-content input:focus {
+            outline: none;
+            border-color: #f5b042;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-buttons button {
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .btn-save {
+            background: #f5b042;
+            color: #0a2f2a;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-save:hover,
+        .btn-cancel:hover {
+            transform: scale(0.96);
+        }
+
         footer {
             background: #0f2a22;
             color: #cbdcd6;
@@ -259,198 +625,241 @@
             padding: 40px 0 24px;
             border-radius: 40px 40px 0 0;
         }
-        @media (max-width: 1000px) {
-            .profile-container { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: repeat(2,1fr); }
-            .graficos-dobles { grid-template-columns: 1fr; gap: 24px; }
-            nav ul { gap: 18px; flex-wrap: wrap; justify-content: center; }
-            .menu-mobile { display: block; }
-            .nav-wrapper { display: none; }
-            .nav-wrapper.active { display: block; width: 100%; margin-top: 16px; }
-            header .container { flex-wrap: wrap; }
+
+        .footer-col h4 {
+            color: #f5b042;
+            margin-bottom: 15px;
         }
+
+        .footer-col p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 25px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 1000px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .graficos-dobles {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            nav ul {
+                gap: 18px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .menu-mobile {
+                display: block;
+            }
+
+            .nav-wrapper {
+                display: none;
+            }
+
+            .nav-wrapper.active {
+                display: block;
+                width: 100%;
+                margin-top: 16px;
+            }
+
+            header .container {
+                flex-wrap: wrap;
+            }
+        }
+
         @media (max-width: 560px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .tests-por-tema { grid-template-columns: 1fr; }
-            .profile-main { padding: 24px 20px; }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tests-por-tema {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-main {
+                padding: 24px 20px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <div class="nav-container"><div class="nav-wrapper" id="navWrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="logo" onclick="window.location.href='../index.html'">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper" id="navWrapper">
+                    <nav>
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="../temas/index.html">Temas</a></li>
+                            <li><a href="../test/index.html">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
             <div class="user-zone" id="userZone"></div>
             <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
     </header>
+
     <div class="page-header">
         <div class="container">
-            <h1><i class="fas fa-chart-line"></i> Mi Perfil</h1>
+            <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
             <p>Visualiza tu progreso, estadísticas y domina el carnet</p>
         </div>
     </div>
+
     <main>
         <div class="container" id="profileContent"></div>
     </main>
+
+    <!-- Modal para editar nombre -->
+    <div id="editNameModal" class="modal-overlay">
+        <div class="modal-content">
+            <i class="fas fa-user-edit" style="font-size: 2.5rem; color: #f5b042; margin-bottom: 10px;"></i>
+            <h3>Editar nombre</h3>
+            <input type="text" id="editNameInput" placeholder="Tu nombre completo" maxlength="50">
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="guardarNombre()">Guardar</button>
+                <button class="btn-cancel" onclick="cerrarModalNombre()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
-            <div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p></div>
-            <div class="footer-bottom" style="margin-top:20px;"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div>
+            <div class="footer-col">
+                <h4>AprobadoYa</h4>
+                <p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+            </div>
         </div>
     </footer>
 
+    <script src="../js/auth.js"></script>
     <script>
-        // SISTEMA DE USUARIO - POL BENITEZ
-        const STORAGE_USERS = 'aprobadoya_users_final';
-        const STORAGE_TESTS = 'aprobadoya_tests_por_temas';
-        const CURRENT_USER_ID_KEY = 'aprobadoya_current_user_final';
+        const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
 
-        function inicializarDatosCorrectos() {
-            if (!localStorage.getItem(STORAGE_USERS)) {
-                const usuarioReal = {
-                    id: 'user_pol_final',
-                    nombre: 'Pol Benitez Casacuberta',
-                    email: 'polbenitez2005@gmail.com',
-                    avatar: '🚗',
-                    fechaRegistro: '5/4/2026'
-                };
-                localStorage.setItem(STORAGE_USERS, JSON.stringify([usuarioReal]));
-                localStorage.setItem(CURRENT_USER_ID_KEY, 'user_pol_final');
-                
-                // Tests SOLO por temas (como pide el usuario: "tests por temas")
-                const testsPorTemas = [
-                    { id: 'tema1', tipo: 'test-por-temas', tema: 'Señales de tráfico', aciertos: 18, total: 30, fecha: '2026-04-01' },
-                    { id: 'tema2', tipo: 'test-por-temas', tema: 'Normas de circulación', aciertos: 25, total: 30, fecha: '2026-04-02' },
-                    { id: 'tema3', tipo: 'test-por-temas', tema: 'Seguridad vial', aciertos: 12, total: 30, fecha: '2026-04-03' },
-                    { id: 'tema4', tipo: 'test-por-temas', tema: 'Señales de tráfico', aciertos: 28, total: 30, fecha: '2026-04-04' },
-                    { id: 'tema5', tipo: 'test-por-temas', tema: 'Normas de circulación', aciertos: 20, total: 30, fecha: '2026-04-05' },
-                    { id: 'tema6', tipo: 'test-por-temas', tema: 'Mecánica básica', aciertos: 15, total: 30, fecha: '2026-04-05' }
-                ];
-                localStorage.setItem(STORAGE_TESTS, JSON.stringify(testsPorTemas));
-            } else {
-                const users = JSON.parse(localStorage.getItem(STORAGE_USERS));
-                const polUser = users.find(u => u.email === 'polbenitez2005@gmail.com');
-                if (polUser && !localStorage.getItem(CURRENT_USER_ID_KEY)) {
-                    localStorage.setItem(CURRENT_USER_ID_KEY, polUser.id);
-                }
-            }
+        let chartPie = null;
+        let chartBar = null;
+
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
         }
 
-        function getCurrentUser() {
-            const users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
-            const currentId = localStorage.getItem(CURRENT_USER_ID_KEY);
-            if (currentId) {
-                const found = users.find(u => u.id === currentId);
-                if (found) return found;
-            }
-            return users[0] || null;
+        function obtenerEstadisticasUsuario(userId) {
+            return calcularEstadisticasUsuario(userId);
         }
-
-        function updateUserAvatar(avatar) {
-            const users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '[]');
-            const currentId = localStorage.getItem(CURRENT_USER_ID_KEY);
-            const idx = users.findIndex(u => u.id === currentId);
-            if (idx !== -1) {
-                users[idx].avatar = avatar;
-                localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
-            }
-        }
-
-        // Estadísticas enfocadas SOLO en tests por temas
-        function obtenerEstadisticasPorTemas() {
-            const tests = JSON.parse(localStorage.getItem(STORAGE_TESTS) || '[]');
-            // Filtrar solo tests de tipo 'test-por-temas'
-            const testsTemas = tests.filter(t => t.tipo === 'test-por-temas');
-            const totalTests = testsTemas.length;
-            let totalAciertos = 0, totalPreguntas = 0;
-            let mejorPorcentaje = 0;
-            
-            // Agrupar por tema para mostrar desglose
-            const temasMap = new Map(); // tema -> { count, aciertosSum, preguntasSum }
-            for (let t of testsTemas) {
-                const temaNombre = t.tema || 'Sin tema';
-                const pct = (t.aciertos / t.total) * 100;
-                totalAciertos += t.aciertos;
-                totalPreguntas += t.total;
-                if (pct > mejorPorcentaje) mejorPorcentaje = pct;
-                
-                if (!temasMap.has(temaNombre)) {
-                    temasMap.set(temaNombre, { count: 0, aciertos: 0, preguntas: 0 });
-                }
-                const temaData = temasMap.get(temaNombre);
-                temaData.count++;
-                temaData.aciertos += t.aciertos;
-                temaData.preguntas += t.total;
-            }
-            
-            const porcentajeGlobal = totalPreguntas > 0 ? Math.round((totalAciertos / totalPreguntas) * 100) : 0;
-            const tasaAprobados = testsTemas.length > 0 
-                ? Math.round((testsTemas.filter(t => (t.aciertos/t.total)*100 >= 90).length / testsTemas.length) * 100) 
-                : 0;
-            
-            // Convertir mapa a array ordenado por cantidad de tests
-            const temasArray = Array.from(temasMap.entries()).map(([nombre, data]) => ({
-                tema: nombre,
-                cantidad: data.count,
-                porcentajeAciertos: data.preguntas > 0 ? Math.round((data.aciertos / data.preguntas) * 100) : 0
-            })).sort((a,b) => b.cantidad - a.cantidad);
-            
-            const testsRecientes = [...testsTemas].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).slice(0,8);
-            
-            return {
-                totalTests,
-                totalAciertos,
-                totalPreguntas,
-                mejorResultado: Math.round(mejorPorcentaje),
-                porcentajeGlobal,
-                tasaAprobados,
-                temasPorCantidad: temasArray,
-                testsRecientes
-            };
-        }
-
-        function logoutUser() { 
-            localStorage.removeItem(CURRENT_USER_ID_KEY); 
-            window.location.reload(); 
-        }
-
-        inicializarDatosCorrectos();
-
-        let chartPie = null, chartBar = null;
 
         function renderProfile() {
             const currentUser = getCurrentUser();
             const container = document.getElementById('profileContent');
+
             if (!currentUser) {
-                container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-id-card" style="font-size:3.5rem; color:#f5b042;"></i><h3 style="margin:15px 0">Accede a tu cuenta</h3><a href="../login.html" class="btn-primary" style="background:#f5b042; padding:12px 32px; border-radius:60px; display:inline-block;">Iniciar sesión</a></div>`;
+                container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-id-card" style="font-size:3.5rem; color:#f5b042;"></i><h3 style="margin:15px 0">Accede a tu cuenta</h3><button onclick="window.location.href='../login.html'" style="background:#f5b042; padding:12px 32px; border-radius:60px; border:none; font-weight:600; cursor:pointer;">Iniciar sesión</button></div>`;
                 return;
             }
-            const stats = obtenerEstadisticasPorTemas();
+
+            const stats = obtenerEstadisticasUsuario(currentUser.id);
             const avatar = currentUser.avatar || "🚗";
-            const porcentajeGlobal = stats?.porcentajeGlobal || 0;
+            const porcentajeGlobal = stats?.mediaAciertos || 0;
 
-            // Generar HTML de tarjetas por tema
-            const temasHtml = stats.temasPorCantidad.map(tema => `
-                <div class="tema-card">
-                    <div class="tema-numero">${tema.cantidad}</div>
-                    <div class="tema-label">📘 ${tema.tema}</div>
-                    <div style="font-size:0.7rem; margin-top:6px; color:#7f8c8d;">Aciertos: ${tema.porcentajeAciertos}%</div>
-                </div>
-            `).join('');
+            // Agrupar tests por tema para el desglose
+            const testsKey = `${STORAGE_TESTS}_${currentUser.id}`;
+            const tests = JSON.parse(localStorage.getItem(testsKey) || '[]');
+            const temasMap = new Map();
             
-            const noTemasHtml = '<div class="empty-tests" style="grid-column:1/-1;"><i class="fas fa-folder-open"></i><p>No hay tests por temas aún. ¡Comienza a practicar por temas!</p></div>';
+            for (const test of tests) {
+                const tema = test.tema || 'General';
+                if (!temasMap.has(tema)) {
+                    temasMap.set(tema, { count: 0, aciertos: 0, preguntas: 0 });
+                }
+                const temaData = temasMap.get(tema);
+                temaData.count++;
+                temaData.aciertos += test.aciertos;
+                temaData.preguntas += test.total;
+            }
+            
+            const temasArray = Array.from(temasMap.entries()).map(([nombre, data]) => ({
+                tema: nombre,
+                cantidad: data.count,
+                porcentajeAciertos: data.preguntas > 0 ? Math.round((data.aciertos / data.preguntas) * 100) : 0
+            })).sort((a, b) => b.cantidad - a.cantidad);
 
+            const temasHtml = temasArray.length > 0
+                ? temasArray.map(tema => `
+                    <div class="tema-card">
+                        <div class="tema-numero">${tema.cantidad}</div>
+                        <div class="tema-label">📘 ${tema.tema}</div>
+                        <div style="font-size:0.7rem; margin-top:6px; color:#7f8c8d;">Aciertos: ${tema.porcentajeAciertos}%</div>
+                    </div>
+                `).join('')
+                : '<div class="empty-tests" style="grid-column:1/-1;"><i class="fas fa-folder-open"></i><p>No hay tests por temas aún. ¡Comienza a practicar por temas!</p></div>';
+
+            // Tests recientes
+            const testsRecientes = [...tests].sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).slice(0, 8);
+            
             container.innerHTML = `
                 <div class="profile-container">
                     <div class="profile-sidebar">
                         <div class="profile-avatar" onclick="toggleAvatarSelector()">${avatar}</div>
-                        <div class="profile-name">${currentUser.nombre}</div>
+                        <div class="profile-name-container">
+                            <div class="profile-name" id="profileNameDisplay">${escapeHtml(currentUser.nombre)}</div>
+                            <button class="btn-edit-name" onclick="abrirModalEditarNombre()">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </div>
                         <div class="profile-email">${currentUser.email}</div>
                         <div class="profile-stats-mini">
                             <p><i class="fas fa-calendar-alt"></i> Miembro desde: ${currentUser.fechaRegistro}</p>
-                            <p><i class="fas fa-clipboard-list"></i> Tests por temas: ${stats?.totalTests || 0}</p>
+                            <p><i class="fas fa-clipboard-list"></i> Tests realizados: ${stats.totalTests}</p>
                             <p><i class="fas fa-chart-simple"></i> Media de aciertos: ${porcentajeGlobal}%</p>
                         </div>
                         <div id="avatarSelector" class="avatar-selector" style="display: none;">
@@ -466,125 +875,161 @@
                         </div>
                         <div class="section-title"><i class="fas fa-chart-line"></i> Mis Estadísticas</div>
                         <div class="stats-grid">
-                            <div class="stat-card"><div class="stat-number">${stats?.totalTests || 0}</div><div class="stat-label">Tests por temas</div></div>
-                            <div class="stat-card"><div class="stat-number">${stats?.totalAciertos || 0}</div><div class="stat-label">Aciertos totales</div></div>
-                            <div class="stat-card"><div class="stat-number">${stats?.totalPreguntas || 0}</div><div class="stat-label">Preguntas contestadas</div></div>
-                            <div class="stat-card"><div class="stat-number">${stats?.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats.totalTests}</div><div class="stat-label">Tests realizados</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats.totalAciertos}</div><div class="stat-label">Aciertos totales</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats.totalPreguntas}</div><div class="stat-label">Preguntas contestadas</div></div>
+                            <div class="stat-card"><div class="stat-number">${stats.mejorResultado}%</div><div class="stat-label">Mejor resultado</div></div>
                         </div>
                         <div class="section-title"><i class="fas fa-layer-group"></i> Tests por Temas (desglose)</div>
-                        <div class="tests-por-tema">
-                            ${stats.temasPorCantidad.length > 0 ? temasHtml : noTemasHtml}
-                        </div>
+                        <div class="tests-por-tema">${temasHtml}</div>
                         <div class="section-title"><i class="fas fa-chart-simple"></i> Mi Progreso</div>
-                        <div class="progress-item"><div class="progress-header"><span>🏁 Tests por temas realizados (meta 50)</span><span id="testsCount">0/50</span></div><div class="progress-bar"><div class="progress-fill" id="testsFill"></div></div></div>
-                        <div class="progress-item"><div class="progress-header"><span>✅ Tasa de aprobados (≥90% por test)</span><span id="tasaAprobados">0%</span></div><div class="progress-bar"><div class="progress-fill" id="tasaFill"></div></div></div>
-                        <div class="section-title"><i class="fas fa-history"></i> Tests Recientes por Tema</div>
+                        <div class="progress-item">
+                            <div class="progress-header"><span>🏁 Tests realizados (meta 50)</span><span id="testsCount">${stats.totalTests}/50</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="testsFill" style="width: ${Math.min((stats.totalTests / 50) * 100, 100)}%"></div></div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header"><span>✅ Tasa de aprobados (≥90%)</span><span id="tasaAprobados">${stats.tasaAprobados}%</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="tasaFill" style="width: ${stats.tasaAprobados}%"></div></div>
+                        </div>
+                        <div class="section-title"><i class="fas fa-history"></i> Tests Recientes</div>
                         <div id="recentTestsList" class="tests-recientes"></div>
                         <button class="btn-recargar" onclick="recargarEstadisticas()"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</button>
                     </div>
                 </div>
             `;
 
-            // Actualizar barras de progreso
-            const totalTestsNum = stats?.totalTests || 0;
-            const pctTests = Math.min(Math.round((totalTestsNum / 50) * 100), 100);
-            const testsFillElem = document.getElementById('testsFill');
-            const testsCountElem = document.getElementById('testsCount');
-            if (testsFillElem) testsFillElem.style.width = `${pctTests}%`;
-            if (testsCountElem) testsCountElem.innerHTML = `${totalTestsNum}/50 (${pctTests}%)`;
-            
-            const tasa = stats?.tasaAprobados || 0;
-            const tasaFillElem = document.getElementById('tasaFill');
-            const tasaSpan = document.getElementById('tasaAprobados');
-            if (tasaFillElem) tasaFillElem.style.width = `${tasa}%`;
-            if (tasaSpan) tasaSpan.innerHTML = `${tasa}%`;
-
-            // Historial reciente (solo tests por temas)
+            // Historial reciente
             const recentDiv = document.getElementById('recentTestsList');
-            const recientes = stats?.testsRecientes || [];
-            if (recientes.length === 0) {
-                if (recentDiv) recentDiv.innerHTML = '<div class="empty-tests"><i class="fas fa-folder-open"></i><p>No hay tests recientes por temas. ¡Empieza a practicar!</p></div>';
+            if (testsRecientes.length === 0) {
+                recentDiv.innerHTML = '<div class="empty-tests"><i class="fas fa-folder-open"></i><p>No hay tests recientes. ¡Empieza a practicar!</p></div>';
             } else {
-                if (recentDiv) {
-                    recentDiv.innerHTML = recientes.map(test => {
-                        const fecha = new Date(test.fecha).toLocaleDateString('es-ES');
-                        const porcentaje = test.total > 0 ? Math.round((test.aciertos / test.total) * 100) : 0;
-                        const aprobado = porcentaje >= 90;
-                        const temaMostrar = test.tema || 'General';
-                        return `<div class="test-item ${aprobado ? 'aprobado' : 'suspendido'}">
-                                    <div>
-                                        <span class="test-tipo">📚 Tema: ${temaMostrar}</span>
-                                        <div class="test-fecha">${fecha}</div>
-                                    </div>
-                                    <div>
-                                        <strong>${test.aciertos}/${test.total}</strong> (${porcentaje}%) 
-                                        ${aprobado ? '✅ Aprobado' : '❌ Suspendido'}
-                                    </div>
-                                </div>`;
-                    }).join('');
-                }
+                recentDiv.innerHTML = testsRecientes.map(test => {
+                    const fecha = new Date(test.fecha).toLocaleDateString('es-ES');
+                    const porcentaje = test.total > 0 ? Math.round((test.aciertos / test.total) * 100) : 0;
+                    const aprobado = porcentaje >= 90;
+                    return `<div class="test-item ${aprobado ? 'aprobado' : 'suspendido'}">
+                                <div>
+                                    <span class="test-tipo">📚 ${test.tema || 'General'}</span>
+                                    <div class="test-fecha">${fecha}</div>
+                                </div>
+                                <div>
+                                    <strong>${test.aciertos}/${test.total}</strong> (${porcentaje}%) 
+                                    ${aprobado ? '✅ Aprobado' : '❌ Suspendido'}
+                                </div>
+                            </div>`;
+                }).join('');
             }
 
-            // Gráficos actualizados con datos SOLO de temas
+            // Gráficos
             if (chartPie) chartPie.destroy();
             if (chartBar) chartBar.destroy();
-            
+
             const aciertosVal = stats.totalAciertos || 0;
             const fallosVal = (stats.totalPreguntas || 0) - aciertosVal;
             const ctxPie = document.getElementById('graficoPastel')?.getContext('2d');
             if (ctxPie) {
                 chartPie = new Chart(ctxPie, {
                     type: 'doughnut',
-                    data: { labels: ['Aciertos', 'Fallos'], datasets: [{ data: [aciertosVal, Math.max(0,fallosVal)], backgroundColor: ['#f5b042', '#e2cfb3'], borderWidth: 0, hoverOffset: 10 }] },
+                    data: { labels: ['Aciertos', 'Fallos'], datasets: [{ data: [aciertosVal, Math.max(0, fallosVal)], backgroundColor: ['#f5b042', '#e2cfb3'], borderWidth: 0, hoverOffset: 10 }] },
                     options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
                 });
             }
-            
-            // Gráfico de barras: cantidad de tests por cada tema
-            const temasLabels = stats.temasPorCantidad.map(t => t.tema.length > 18 ? t.tema.substring(0,15)+'…' : t.tema);
-            const temasCantidades = stats.temasPorCantidad.map(t => t.cantidad);
+
+            const temasLabels = temasArray.map(t => t.tema.length > 18 ? t.tema.substring(0, 15) + '…' : t.tema);
+            const temasCantidades = temasArray.map(t => t.cantidad);
             const ctxBar = document.getElementById('graficoBarras')?.getContext('2d');
             if (ctxBar) {
                 chartBar = new Chart(ctxBar, {
                     type: 'bar',
-                    data: { 
-                        labels: temasLabels.length ? temasLabels : ['Sin datos'], 
-                        datasets: [{ label: 'Tests realizados', data: temasLabels.length ? temasCantidades : [0], backgroundColor: '#f5b042', borderRadius: 14, barPercentage: 0.7 }] 
-                    },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: true, 
-                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw} tests` } } }, 
-                        scales: { y: { beginAtZero: true, grid: { color: '#ece0d0' }, title: { display: true, text: 'Cantidad de tests' }, ticks: { stepSize: 1 } } }
-                    }
+                    data: { labels: temasLabels.length ? temasLabels : ['Sin datos'], datasets: [{ label: 'Tests realizados', data: temasLabels.length ? temasCantidades : [0], backgroundColor: '#f5b042', borderRadius: 14, barPercentage: 0.7 }] },
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Cantidad de tests' }, ticks: { stepSize: 1 } } } }
                 });
             }
         }
 
-        const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
-        function toggleAvatarSelector() { const sel = document.getElementById('avatarSelector'); if(sel) sel.style.display = sel.style.display === 'none' ? 'flex' : 'none'; }
-        function cambiarAvatar(avatar) { updateUserAvatar(avatar); renderProfile(); renderUserZone(); }
-        function recargarEstadisticas() { renderProfile(); }
-        
-        function renderUserZone() {
-            const u = getCurrentUser();
-            const z = document.getElementById('userZone');
-            if(z) {
-                if(u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre.split(' ')[0]}</span><a href="index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
-                else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function toggleAvatarSelector() {
+            const sel = document.getElementById('avatarSelector');
+            if (sel) sel.style.display = sel.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function cambiarAvatar(avatar) {
+            updateUserAvatar(avatar);
+            renderProfile();
+            renderUserZone();
+            showToast('Avatar actualizado correctamente');
+        }
+
+        function abrirModalEditarNombre() {
+            const currentUser = getCurrentUser();
+            const modal = document.getElementById('editNameModal');
+            const input = document.getElementById('editNameInput');
+            if (input && currentUser) input.value = currentUser.nombre;
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function cerrarModalNombre() {
+            const modal = document.getElementById('editNameModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function guardarNombre() {
+            const input = document.getElementById('editNameInput');
+            if (input && input.value.trim()) {
+                updateUserName(input.value);
+                renderProfile();
+                renderUserZone();
+                cerrarModalNombre();
+                showToast('Nombre actualizado correctamente');
+                // Forzar actualización en otras páginas
+                localStorage.setItem('user_update_flag', Date.now().toString());
             }
         }
-        
+
+        function recargarEstadisticas() {
+            renderProfile();
+            showToast('Estadísticas actualizadas');
+        }
+
+        // Escuchar cambios de usuario globales
+        window.addEventListener('userUpdated', function() {
+            renderProfile();
+            renderUserZone();
+        });
+
+        // Exponer funciones globales
         window.toggleAvatarSelector = toggleAvatarSelector;
         window.cambiarAvatar = cambiarAvatar;
         window.recargarEstadisticas = recargarEstadisticas;
-        window.logoutUser = logoutUser;
-        
-        document.getElementById('menuMobileBtn')?.addEventListener('click',()=>{
-            const wrap = document.getElementById('navWrapper');
-            if(wrap) wrap.classList.toggle('active');
+        window.abrirModalEditarNombre = abrirModalEditarNombre;
+        window.cerrarModalNombre = cerrarModalNombre;
+        window.guardarNombre = guardarNombre;
+        window.refreshProfileData = renderProfile;
+
+        // Menú móvil
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.getElementById('navWrapper');
+            if (wrapper) wrapper.classList.toggle('active');
         });
-        
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('editNameModal');
+            if (event.target === modal) {
+                cerrarModalNombre();
+            }
+        };
+
+        // Inicializar
         renderUserZone();
         renderProfile();
     </script>
