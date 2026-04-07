@@ -18,10 +18,7 @@
             margin: 0 auto;
             padding: 20px;
         }
-        .game-header {
-            text-align: center;
-            padding: 20px 0;
-        }
+        .game-header { text-align: center; padding: 20px 0; }
         .game-header h1 { font-size: 2rem; }
         .game-header h1 i { color: #fbbf24; }
         
@@ -30,7 +27,6 @@
             border-radius: 30px;
             padding: 20px;
             margin-bottom: 30px;
-            border: 1px solid rgba(251,191,36,0.3);
         }
         .track {
             position: relative;
@@ -40,14 +36,12 @@
             overflow: hidden;
             margin-bottom: 15px;
         }
-        .track:last-child { margin-bottom: 0; }
         .car {
             position: absolute;
             bottom: 10px;
             left: 0%;
             font-size: 2.5rem;
             transition: left 0.3s ease;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
             z-index: 10;
         }
         .finish-line {
@@ -76,15 +70,8 @@
             padding: 15px 25px;
             margin-bottom: 30px;
         }
-        .score-item {
-            text-align: center;
-            flex: 1;
-        }
-        .score-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #fbbf24;
-        }
+        .score-item { text-align: center; flex: 1; }
+        .score-value { font-size: 1.5rem; font-weight: 800; color: #fbbf24; }
         
         .question-card {
             background: white;
@@ -96,12 +83,8 @@
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 25px;
-            line-height: 1.5;
         }
-        .options {
-            display: grid;
-            gap: 12px;
-        }
+        .options { display: grid; gap: 12px; }
         .option-btn {
             display: flex;
             align-items: center;
@@ -111,18 +94,9 @@
             border: 2px solid #e2e8f0;
             border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s;
         }
-        .option-btn:hover:not(.disabled) {
-            background: #fef3c7;
-            border-color: #fbbf24;
-            transform: translateX(8px);
-        }
-        .option-prefix {
-            font-weight: 800;
-            color: #fbbf24;
-            width: 35px;
-        }
+        .option-btn:hover { background: #fef3c7; border-color: #fbbf24; }
+        .option-prefix { font-weight: 800; color: #fbbf24; width: 35px; }
         .disabled { opacity: 0.5; cursor: not-allowed; }
         .correct { background: #d1fae5; border-color: #10b981; }
         .incorrect { background: #fee2e2; border-color: #ef4444; }
@@ -131,10 +105,9 @@
             padding: 15px;
             border-radius: 15px;
             display: none;
-            font-weight: 500;
         }
-        .result-message.correct { background: #d1fae5; color: #065f46; display: block; border-left: 4px solid #10b981; }
-        .result-message.wrong { background: #fee2e2; color: #991b1b; display: block; border-left: 4px solid #ef4444; }
+        .result-message.correct { background: #d1fae5; color: #065f46; display: block; }
+        .result-message.wrong { background: #fee2e2; color: #991b1b; display: block; }
         
         .waiting-message {
             text-align: center;
@@ -160,14 +133,6 @@
             color: #1a472a;
             border-radius: 50px;
             margin-bottom: 20px;
-            font-weight: bold;
-        }
-        
-        @media (max-width: 768px) {
-            .container { padding: 15px; }
-            .car { font-size: 2rem; bottom: 8px; }
-            .track { height: 80px; }
-            .question-text { font-size: 1rem; }
         }
     </style>
 </head>
@@ -176,7 +141,6 @@
         <div class="game-header">
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
         </div>
-
         <div id="gameContent">
             <div class="waiting-message">
                 <div class="spinner"></div>
@@ -186,7 +150,7 @@
     </div>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot, collection, query, where, getDocs } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         import { preguntasDGT } from '../../test/data/preguntas.js';
         
@@ -194,7 +158,6 @@
         let currentUser = null;
         let salaData = null;
         let esJugador1 = false;
-        let preguntaActual = null;
         let respuestaSeleccionada = false;
         let gameActivo = true;
         let unsubscribe = null;
@@ -215,7 +178,6 @@
                 puntuacion1: 0,
                 puntuacion2: 0
             });
-            renderizarJuego();
         }
         
         async function responder(respuesta) {
@@ -229,22 +191,6 @@
             const pregunta = salaData.preguntas[salaData.turno];
             const esCorrecto = (respuesta === pregunta.correcta);
             
-            const opciones = document.querySelectorAll('.option-btn');
-            opciones.forEach((btn, idx) => {
-                btn.classList.add('disabled');
-                if (idx === pregunta.correcta) btn.classList.add('correct');
-                if (idx === respuesta && respuesta !== pregunta.correcta) btn.classList.add('incorrect');
-            });
-            
-            const feedbackDiv = document.getElementById('feedback');
-            if (feedbackDiv) {
-                feedbackDiv.className = esCorrecto ? 'result-message correct' : 'result-message wrong';
-                feedbackDiv.innerHTML = esCorrecto ? 
-                    `<i class="fas fa-check-circle"></i> ¡Correcto! +1 punto` : 
-                    `<i class="fas fa-times-circle"></i> Incorrecto. La respuesta era: ${String.fromCharCode(65 + pregunta.correcta)}`;
-                feedbackDiv.style.display = 'block';
-            }
-            
             const nuevaPuntuacion1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
             const nuevaPuntuacion2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
             const nuevoTurno = salaData.turno + 1;
@@ -257,57 +203,45 @@
             
             if (nuevoTurno >= salaData.preguntas.length) {
                 setTimeout(() => finalizarJuego(), 1500);
-            } else {
-                setTimeout(() => {
-                    respuestaSeleccionada = false;
-                    renderizarJuego();
-                }, 2000);
             }
         }
         
         function renderizarJuego() {
             const container = document.getElementById('gameContent');
-            const jugador1Nombre = salaData.jugador1Nombre || "Jugador 1";
-            const jugador2Nombre = salaData.jugador2Nombre || "Jugador 2";
             const puntos1 = salaData.puntuacion1 || 0;
             const puntos2 = salaData.puntuacion2 || 0;
             const totalPreguntas = salaData.preguntas.length;
             const preguntaIdx = salaData.turno;
-            const juegoTerminado = preguntaIdx >= totalPreguntas;
             
-            const avance1 = (puntos1 / totalPreguntas) * 100;
-            const avance2 = (puntos2 / totalPreguntas) * 100;
-            
-            if (juegoTerminado) {
+            if (preguntaIdx >= totalPreguntas) {
                 finalizarJuego();
                 return;
             }
             
             const pregunta = salaData.preguntas[preguntaIdx];
             const esMiTurno = (salaData.turno === (esJugador1 ? 0 : 1));
+            const avance1 = (puntos1 / totalPreguntas) * 100;
+            const avance2 = (puntos2 / totalPreguntas) * 100;
             
             container.innerHTML = `
                 <div class="race-track">
                     <div class="track">
-                        <div class="player-name">🏎️ ${jugador1Nombre}</div>
+                        <div class="player-name">🏎️ ${salaData.jugador1Nombre}</div>
                         <div class="car" style="left: ${Math.min(avance1, 98)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
-                        <div class="player-name">🏎️ ${jugador2Nombre}</div>
+                        <div class="player-name">🏎️ ${salaData.jugador2Nombre}</div>
                         <div class="car" style="left: ${Math.min(avance2, 98)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
-                
                 <div class="score-board">
-                    <div class="score-item"><div class="score-value">${puntos1}</div><div>${jugador1Nombre}</div></div>
+                    <div class="score-item"><div class="score-value">${puntos1}</div><div>${salaData.jugador1Nombre}</div></div>
                     <div class="score-item"><div class="score-value">${preguntaIdx + 1}/${totalPreguntas}</div><div>📝 Pregunta</div></div>
-                    <div class="score-item"><div class="score-value">${puntos2}</div><div>${jugador2Nombre}</div></div>
+                    <div class="score-item"><div class="score-value">${puntos2}</div><div>${salaData.jugador2Nombre}</div></div>
                 </div>
-                
                 ${!esMiTurno ? `<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> Esperando respuesta del oponente...</div>` : ''}
-                
                 <div class="question-card">
                     <div class="question-text">${pregunta.texto}</div>
                     <div class="options" id="optionsContainer">
@@ -331,10 +265,6 @@
                         }
                     });
                 });
-            } else if (!esMiTurno) {
-                document.querySelectorAll('.option-btn').forEach(btn => {
-                    btn.classList.add('disabled');
-                });
             }
         }
         
@@ -352,8 +282,8 @@
                     <h2>🏆 ¡PARTIDA FINALIZADA! 🏆</h2>
                     <p><strong>${salaData.jugador1Nombre}</strong>: ${puntos1} puntos</p>
                     <p><strong>${salaData.jugador2Nombre}</strong>: ${puntos2} puntos</p>
-                    <h3 style="margin: 20px 0;">${ganador === "Empate" ? "¡EMPATE!" : `¡${esGanador ? "HAS GANADO" : "HA GANADO"} ${ganador}!`}</h3>
-                    <button onclick="window.location.href='lobby.html'" style="background: #fbbf24; color: #1a472a; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; margin-top: 20px;"><i class="fas fa-redo"></i> Jugar de nuevo</button>
+                    <h3>${ganador === "Empate" ? "¡EMPATE!" : `¡${esGanador ? "HAS GANADO" : "HA GANADO"} ${ganador}!`}</h3>
+                    <button onclick="window.location.href='lobby.html'" style="background: #fbbf24; color: #1a472a; border: none; padding: 12px 30px; border-radius: 50px; cursor: pointer; margin-top: 20px;">Jugar de nuevo</button>
                     <a href="../index.html" style="display: inline-block; margin-left: 10px; background: rgba(255,255,255,0.2); color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none;">Volver al menú</a>
                 </div>
             `;
@@ -364,7 +294,6 @@
             localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats));
             
             if (unsubscribe) unsubscribe();
-            await updateDoc(doc(db, "partidas_multijugador", salaId), { estado: "terminado" });
         }
         
         async function cargarPartida() {
@@ -379,30 +308,19 @@
             
             if (salaData.estado === "esperando") {
                 const container = document.getElementById('gameContent');
-                container.innerHTML = `
-                    <div class="waiting-message">
-                        <div class="spinner"></div>
-                        <p>Esperando a que se una otro jugador...</p>
-                        <p>Código de partida: <strong style="color: #fbbf24;">${salaData.codigo || '---'}</strong></p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="waiting-message"><div class="spinner"></div><p>Esperando a que se una otro jugador...</p></div>`;
             } else if (salaData.estado === "en_curso") {
-                if (!salaData.preguntas || salaData.preguntas.length === 0) {
+                if (!salaData.preguntas) {
                     await iniciarPartida();
-                } else {
-                    renderizarJuego();
                 }
+                renderizarJuego();
             }
             
             unsubscribe = onSnapshot(salaRef, (doc) => {
                 if (doc.exists()) {
                     salaData = doc.data();
-                    if (salaData.estado === "en_curso" && gameActivo) {
-                        if (!salaData.preguntas || salaData.preguntas.length === 0) {
-                            iniciarPartida();
-                        } else {
-                            renderizarJuego();
-                        }
+                    if (salaData.estado === "en_curso" && gameActivo && salaData.preguntas) {
+                        renderizarJuego();
                     }
                 }
             });
@@ -415,15 +333,12 @@
                 return;
             }
             currentUser = user;
-            
             const urlParams = new URLSearchParams(window.location.search);
             salaId = urlParams.get('sala');
-            
             if (!salaId) {
                 window.location.href = 'lobby.html';
                 return;
             }
-            
             await cargarPartida();
         });
     </script>

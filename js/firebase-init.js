@@ -20,7 +20,8 @@ import {
     orderBy,
     updateDoc,
     arrayUnion,
-    deleteDoc
+    deleteDoc,
+    where
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -43,5 +44,5 @@ export {
     signInWithPopup, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, sendPasswordResetEmail,
     signOut, onAuthStateChanged,
-    doc, setDoc, getDoc, getDocs, collection, query, orderBy, updateDoc, arrayUnion, deleteDoc
+    doc, setDoc, getDoc, getDocs, collection, query, orderBy, updateDoc, arrayUnion, deleteDoc, where
 };
