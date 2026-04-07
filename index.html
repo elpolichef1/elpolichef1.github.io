@@ -329,7 +329,7 @@
     </footer>
 
    <script type="module">
-    import { auth, onAuthStateChanged, signOut, db, collection, getDocs, doc, getDoc } from './js/firebase-init.js';
+    import { getCurrentUser, logoutUser, initAuthListener, renderUserZone } from '../js/global-auth.js';
     
     // Elementos DOM
     const userZone = document.getElementById('userZone');

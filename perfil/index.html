@@ -718,8 +718,9 @@
     </footer>
 
     <script type="module">
-        import { auth, onAuthStateChanged, signOut, db, doc, getDoc, updateDoc } from '../js/firebase-init.js';
-        
+    import { db, doc, getDoc, updateDoc } from '../js/firebase-init.js';
+    import { getCurrentUser, logoutUser, renderUserZone } from '../js/global-auth.js';
+
         const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
         
         let chartPie = null;
