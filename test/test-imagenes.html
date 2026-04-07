@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Test de Señales | AprobadoYa</title>
+    <title>Test con Imágenes | AprobadoYa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -166,23 +166,15 @@
         .pregunta-imagen {
             text-align: center;
             margin: 15px 0;
-            background: #e2e8f0;
-            padding: 20px;
+            background: #f1f5f9;
+            padding: 15px;
             border-radius: 16px;
-            display: inline-block;
-            width: 100%;
         }
-        .senal-emojis {
-            font-size: 4rem;
-            display: inline-block;
-            background: white;
-            padding: 15px 25px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .senal-emojis span {
-            font-size: 3rem;
-            margin: 0 5px;
+        .senal-img {
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 8px;
+            object-fit: contain;
         }
         .opciones {
             list-style: none;
@@ -263,8 +255,7 @@
         }
         @media (max-width: 768px) {
             .test-header { flex-direction: column; text-align: center; }
-            .senal-emojis { font-size: 2.5rem; }
-            .senal-emojis span { font-size: 2rem; }
+            .senal-img { max-width: 80px; }
             .menu-mobile { display: block; }
             .nav-wrapper { display: none; }
             .nav-wrapper.active { display: block; width: 100%; margin-top: 15px; }
@@ -300,8 +291,8 @@
 
     <div class="page-header">
         <div class="container">
-            <h1><i class="fas fa-traffic-light"></i> Test de Señales de Tráfico</h1>
-            <p>10 preguntas con representaciones visuales de señales</p>
+            <h1><i class="fas fa-image"></i> Test con Imágenes</h1>
+            <p>10 preguntas con señales de tráfico reales</p>
         </div>
     </div>
 
@@ -332,97 +323,87 @@
         import { auth, onAuthStateChanged } from '../js/firebase-init.js';
         import { renderUserZone } from '../js/global-auth.js';
         
-        // ==================== PREGUNTAS CON EMOJIS (100% FUNCIONALES) ====================
+        // ==================== PREGUNTAS CON IMÁGENES (IMÁGENES FUNCIONALES) ====================
         const preguntas = [
             {
                 id: 1,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🛑",
-                emojiDescripcion: "Octógono rojo con la palabra STOP",
-                opciones: ["Ceda el paso", "STOP - Detención obligatoria", "Prohibido el paso", "Prioridad"],
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Spain_traffic_signal_r2.svg/200px-Spain_traffic_signal_r2.svg.png",
+                opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"],
                 correcta: 1,
-                explicacion: "La señal de STOP es un octógono rojo que obliga a detenerse completamente antes de continuar."
+                explicacion: "La señal de CEDA EL PASO obliga a ceder el paso a los vehículos que circulan por la vía prioritaria."
             },
             {
                 id: 2,
                 texto: "¿Qué indica esta señal?",
-                emoji: "⚠️",
-                emojiDescripcion: "Triángulo rojo con signo de exclamación",
-                opciones: ["Prohibido el paso", "Peligro", "Ceda el paso", "Dirección obligatoria"],
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Spain_traffic_signal_r1.svg/200px-Spain_traffic_signal_r1.svg.png",
+                opciones: ["Ceda el paso", "STOP", "Prohibido el paso", "Peligro"],
                 correcta: 1,
-                explicacion: "Las señales triangulares con borde rojo indican ADVERTENCIA DE PELIGRO."
+                explicacion: "La señal de STOP obliga a detenerse completamente antes de continuar."
             },
             {
                 id: 3,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🚫",
-                emojiDescripcion: "Círculo rojo con una línea diagonal",
-                opciones: ["Prohibición", "Obligación", "Peligro", "Información"],
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Spain_traffic_signal_r301.svg/200px-Spain_traffic_signal_r301.svg.png",
+                opciones: ["Velocidad máxima", "Velocidad mínima", "Fin de velocidad máxima", "Recomendación de velocidad"],
                 correcta: 0,
-                explicacion: "Las señales circulares con fondo blanco y borde rojo indican PROHIBICIÓN."
+                explicacion: "Indica la velocidad máxima permitida en km/h."
             },
             {
                 id: 4,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🔵",
-                emojiDescripcion: "Círculo azul",
-                opciones: ["Prohibición", "Peligro", "Obligación o dirección", "Información"],
-                correcta: 2,
-                explicacion: "Las señales circulares de color azul indican OBLIGACIÓN o DIRECCIÓN OBLIGATORIA."
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Spain_traffic_signal_p1a.svg/200px-Spain_traffic_signal_p1a.svg.png",
+                opciones: ["Curva peligrosa", "Intersección", "Ceda el paso", "Prohibido adelantar"],
+                correcta: 0,
+                explicacion: "Advierte de una curva peligrosa hacia la derecha."
             },
             {
                 id: 5,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🔄",
-                emojiDescripcion: "Flecha circular",
-                opciones: ["Prohibido girar", "Sentido obligatorio", "Rotonda", "Ceda el paso"],
-                correcta: 2,
-                explicacion: "Indica la proximidad de una GLORIETA o ROTONDA."
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Spain_traffic_signal_p3.svg/200px-Spain_traffic_signal_p3.svg.png",
+                opciones: ["Paso de peatones", "Prohibido el paso", "Zona escolar", "Peligro por niños"],
+                correcta: 0,
+                explicacion: "Indica la proximidad de un paso de peatones."
             },
             {
                 id: 6,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🚗➡️",
-                emojiDescripcion: "Coche con flecha hacia la derecha",
-                opciones: ["Prohibido circular", "Dirección obligatoria", "Carril exclusivo", "Adelantamiento permitido"],
-                correcta: 1,
-                explicacion: "Indica la DIRECCIÓN OBLIGATORIA que deben seguir los vehículos."
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Spain_traffic_signal_r101.svg/200px-Spain_traffic_signal_r101.svg.png",
+                opciones: ["Prohibido adelantar", "Prohibido estacionar", "Prohibido girar", "Prohibido el paso"],
+                correcta: 0,
+                explicacion: "Prohíbe el adelantamiento a vehículos de más de 3.500 kg."
             },
             {
                 id: 7,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🚶‍♂️",
-                emojiDescripcion: "Peatón caminando",
-                opciones: ["Paso de peatones", "Zona peatonal", "Prohibido el paso a peatones", "Carril bici"],
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Spain_traffic_signal_p20.svg/200px-Spain_traffic_signal_p20.svg.png",
+                opciones: ["Semáforo", "Paso a nivel", "Peatones", "Obras"],
                 correcta: 0,
-                explicacion: "Indica la proximidad de un PASO DE PEATONES."
+                explicacion: "Advierte de la proximidad de un semáforo."
             },
             {
                 id: 8,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🚲",
-                emojiDescripcion: "Bicicleta",
-                opciones: ["Prohibido circular en bicicleta", "Carril bici", "Senda ciclista", "Las dos últimas son correctas"],
-                correcta: 3,
-                explicacion: "Indica una VÍA CICLISTA o CARRIL BICI."
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Spain_traffic_signal_r400.svg/200px-Spain_traffic_signal_r400.svg.png",
+                opciones: ["Prohibido estacionar", "Prohibido parar", "Zona de carga", "Estacionamiento regulado"],
+                correcta: 0,
+                explicacion: "Prohíbe el estacionamiento, pero permite paradas breves."
             },
             {
                 id: 9,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🅿️",
-                emojiDescripcion: "Letra P mayúscula",
-                opciones: ["Prohibido estacionar", "Estacionamiento", "Parada de autobús", "Zona de carga"],
-                correcta: 1,
-                explicacion: "Indica ZONA DE ESTACIONAMIENTO permitido."
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Spain_traffic_signal_p17.svg/200px-Spain_traffic_signal_p17.svg.png",
+                opciones: ["Animales sueltos", "Ciclistas", "Peatones", "Obras"],
+                correcta: 0,
+                explicacion: "Advierte de peligro por posible presencia de animales sueltos."
             },
             {
                 id: 10,
                 texto: "¿Qué indica esta señal?",
-                emoji: "🏥",
-                emojiDescripcion: "Cruz blanca sobre fondo azul",
-                opciones: ["Hospital", "Farmacia", "Primeros auxilios", "Cruz Roja"],
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Spain_traffic_signal_r305.svg/200px-Spain_traffic_signal_r305.svg.png",
+                opciones: ["Fin de velocidad mínima", "Fin de velocidad máxima", "Fin de prohibición", "Fin de túnel"],
                 correcta: 0,
-                explicacion: "Indica la proximidad de un HOSPITAL o centro sanitario."
+                explicacion: "Indica el final de la velocidad mínima obligatoria."
             }
         ];
 
@@ -480,12 +461,11 @@
                 <div class="pregunta-card">
                     <div class="pregunta-numero">Pregunta ${idx + 1}</div>
                     <div class="pregunta-texto">${pregunta.texto}</div>
-                    <div class="pregunta-imagen">
-                        <div class="senal-emojis">
-                            <span>${pregunta.emoji}</span>
+                    ${pregunta.imagen ? `
+                        <div class="pregunta-imagen">
+                            <img src="${pregunta.imagen}" alt="Señal de tráfico" class="senal-img" loading="lazy" onerror="this.parentElement.style.display='none'">
                         </div>
-                        <p style="font-size: 0.7rem; color: #64748b; margin-top: 8px;">${pregunta.emojiDescripcion}</p>
-                    </div>
+                    ` : ''}
                     <div class="opciones">
                         ${pregunta.opciones.map((opcion, optIdx) => `
                             <label class="opcion" data-pregunta="${idx}">

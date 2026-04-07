@@ -249,9 +249,7 @@
 
     <script type="module">
         import { 
-            auth, 
-            signInWithPopup, 
-            googleProvider,
+            auth, signInWithPopup, googleProvider,
             createUserWithEmailAndPassword
         } from './js/firebase-init.js';
         import { guardarUsuarioFirestore } from './js/ranking-firebase.js';
@@ -267,12 +265,13 @@
             
             try {
                 const result = await signInWithPopup(auth, googleProvider);
-                await guardarUsuarioFirestore(result.user, nombre);                window.location.href = 'index.html';
+                await guardarUsuarioFirestore(result.user, result.user.displayName);
+                window.location.href = 'index.html';
             } catch (error) {
                 console.error(error);
                 loadingOverlay.style.display = 'none';
                 googleBtn.disabled = false;
-                errorDiv.textContent = '❌ Error al registrarse: ' + error.message;
+                errorDiv.textContent = '❌ Error: ' + error.message;
                 errorDiv.style.display = 'block';
                 setTimeout(() => errorDiv.style.display = 'none', 5000);
             }
@@ -292,7 +291,7 @@
             successDiv.style.display = 'none';
             
             if (!nombre || !email || !password) {
-                errorDiv.textContent = '❌ Por favor, completa todos los campos';
+                errorDiv.textContent = '❌ Completa todos los campos';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -313,18 +312,17 @@
                 const result = await createUserWithEmailAndPassword(auth, email, password);
                 await guardarUsuarioFirestore(result.user, nombre);
                 
-                successDiv.textContent = '✅ ¡Cuenta creada con éxito! Redirigiendo...';
+                successDiv.textContent = '✅ ¡Cuenta creada! Redirigiendo...';
                 successDiv.style.display = 'block';
                 
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500);
             } catch (error) {
-                console.error(error);
                 if (error.code === 'auth/email-already-in-use') {
                     errorDiv.textContent = '❌ Ya existe una cuenta con este email';
                 } else {
-                    errorDiv.textContent = '❌ Error al crear la cuenta: ' + error.message;
+                    errorDiv.textContent = '❌ Error: ' + error.message;
                 }
                 errorDiv.style.display = 'block';
             }

@@ -1,12 +1,341 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><title>Tema 12 - Vehículos especiales | DGT Academy</title><link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><link rel="stylesheet" href="../css/style.css"></head>
-<body>...
-<div class="tema-header"><div class="container"><div class="tema-badge">Tema 12</div><h1>Vehículos especiales y prioritarios</h1><p>Ambulancias, policía, bomberos y grúas</p></div></div>
-<main><div class="container"><div class="tema-contenido">
-    <h2>🚑 12.1 Vehículos prioritarios</h2><ul><li>Ambulancias, policía, bomberos, protección civil</li><li>En servicio urgente: pueden circular con preferencia</li><li>Deben usar señales acústicas y luminosas</li></ul>
-    <h2>🔄 12.2 Deber de los demás conductores</h2><p>Apartarse o detenerse para facilitar el paso.</p>
-    <div style="text-align:center;margin-top:40px"><a href="../test/test-por-temas.html?tema=12" class="btn-test">Test tema 12</a></div>
-    <div class="navegacion-temas"><a href="tema11.html" class="btn-volver">← Anterior</a><a href="tema13.html" class="btn-siguiente">Siguiente: Accidentes →</a></div>
-</div></div></main>
-<footer>...</footer>
-<script src="../js/main.js"></script></body></html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema 12 - Vehículos Especiales | AprobadoYa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f5f3;
+            color: #0f2b2d;
+            line-height: 1.6;
+        }
+        header {
+            background: #0a2f2a;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px;
+            flex-wrap: wrap;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo i { font-size: 2rem; color: #f5b042; }
+        .logo h1 { font-size: 1.7rem; font-weight: 800; color: white; }
+        .logo span { color: #f5b042; }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #eef2f5;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #f5b042; }
+        .user-zone { display: flex; align-items: center; }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255,255,255,0.12);
+            padding: 6px 20px;
+            border-radius: 60px;
+        }
+        .user-avatar { font-size: 1.6rem; }
+        .user-name { color: white; font-weight: 500; }
+        .btn-profile, .btn-logout {
+            background: #f5b042;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #0a2f2a;
+        }
+        .btn-logout { background: #e2e8f0; color: #1e293b; }
+        .btn-login {
+            background: #f5b042;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #0a2f2a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+        }
+        .page-header {
+            background: linear-gradient(125deg, #0f3b2c 0%, #1b5a44 100%);
+            padding: 40px 0;
+            text-align: center;
+            border-bottom-left-radius: 48px;
+            border-bottom-right-radius: 48px;
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 2rem; font-weight: 800; color: white; }
+        .page-header h1 i { color: #f5b042; margin-right: 12px; }
+        .page-header .tema-badge {
+            display: inline-block;
+            background: rgba(245,176,66,0.2);
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        .tema-content {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .tema-content h2 {
+            color: #1a472a;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-left: 4px solid #f5b042;
+            padding-left: 15px;
+        }
+        .tema-content h3 {
+            color: #1e293b;
+            margin: 25px 0 15px;
+            font-size: 1.2rem;
+        }
+        .tema-content p {
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        .info-box {
+            background: #fef3c7;
+            border-left: 4px solid #f5b042;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+        .vehiculo-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .vehiculo-icon {
+            width: 70px;
+            height: 70px;
+            background: #fef3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        .puntos-clave {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        .puntos-clave h4 {
+            color: #1a472a;
+            margin-bottom: 15px;
+        }
+        .puntos-clave ul {
+            list-style: none;
+        }
+        .puntos-clave li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .puntos-clave li i {
+            color: #10b981;
+        }
+        .btn-test {
+            display: inline-block;
+            background: linear-gradient(135deg, #f5b042, #f59e0b);
+            color: #1a472a;
+            padding: 12px 30px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245,176,66,0.3);
+        }
+        .btn-volver {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #1e293b;
+            padding: 10px 25px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-right: 15px;
+            transition: all 0.3s;
+        }
+        .btn-volver:hover {
+            background: #cbd5e1;
+        }
+        footer {
+            background: #0f2a22;
+            color: #cbdcd6;
+            margin-top: 40px;
+            padding: 40px 0 24px;
+            border-radius: 40px 40px 0 0;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.5rem; }
+            .tema-content { padding: 25px; }
+            .menu-mobile { display: block; }
+            .nav-wrapper { display: none; }
+            .nav-wrapper.active { display: block; width: 100%; margin-top: 16px; }
+            header .container { flex-wrap: wrap; }
+            nav ul { flex-wrap: wrap; justify-content: center; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo" onclick="window.location.href='../index.html'">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper" id="navWrapper">
+                    <nav>
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="index.html" class="active">Temas</a></li>
+                            <li><a href="../test/index.html">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-ambulance"></i> Tema 12: Vehículos Especiales</h1>
+            <div class="tema-badge"><i class="fas fa-star-of-life"></i> Vehículos prioritarios, especiales y de transporte escolar</div>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="tema-content">
+                <h2>🚨 Vehículos Prioritarios</h2>
+                <p>Tienen derecho a circular con prioridad y pueden saltarse normas de circulación bajo ciertas condiciones.</p>
+
+                <div class="vehiculo-card">
+                    <div class="vehiculo-icon"><i class="fas fa-ambulance"></i></div>
+                    <div><strong>Ambulancias:</strong> Transporte sanitario urgente. Deben llevar señal acústica y luminosa.</div>
+                </div>
+                <div class="vehiculo-card">
+                    <div class="vehiculo-icon"><i class="fas fa-fire-extinguisher"></i></div>
+                    <div><strong>Bomberos:</strong> Acuden a emergencias. El resto de vehículos debe apartarse.</div>
+                </div>
+                <div class="vehiculo-card">
+                    <div class="vehiculo-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div><strong>Policía / Guardia Civil:</strong> Pueden circular a mayor velocidad y saltarse semáforos en servicio urgente.</div>
+                </div>
+
+                <div class="info-box">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Normativa:</strong> Los conductores deben apartarse o detenerse para facilitar el paso de vehículos prioritarios con señales acústicas y luminosas activadas.
+                </div>
+
+                <h3>🚌 Vehículos de Transporte Escolar</h3>
+                <p>Los autobuses escolares tienen normativa específica:</p>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li>Deben llevar señal V-10 (triángulo naranja) cuando transporten menores</li>
+                    <li>Prohibido adelantar a un autobús escolar cuando está detenido para subir/bajar niños</li>
+                    <li>Llevan luces amarillas intermitentes durante las paradas</li>
+                </ul>
+
+                <div class="puntos-clave">
+                    <h4><i class="fas fa-key"></i> Puntos clave del Tema 12</h4>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Los vehículos prioritarios solo tienen prioridad con señales acústicas y luminosas</li>
+                        <li><i class="fas fa-check-circle"></i> Los VMP (Vehículos de Movilidad Personal) tienen limitación de velocidad a 25 km/h</li>
+                        <li><i class="fas fa-check-circle"></i> Los tractores agrícolas tienen limitación de velocidad a 40 km/h</li>
+                        <li><i class="fas fa-check-circle"></i> Los vehículos de transporte de mercancías peligrosas llevan placas ADR</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 30px;">
+                    <a href="index.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver a temas</a>
+                    <a href="../test/test-por-temas.html?tema=12" class="btn-test"><i class="fas fa-clipboard-list"></i> Test del tema 12</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) window.location.href = '../login.html';
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            document.querySelector('.nav-wrapper')?.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

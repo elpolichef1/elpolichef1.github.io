@@ -5,6 +5,7 @@ import {
     GoogleAuthProvider,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    sendPasswordResetEmail,
     signOut,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -17,12 +18,10 @@ import {
     collection,
     query,
     orderBy,
-    limit,
     updateDoc,
-    where
+    arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// 🔥 TU NUEVA CONFIGURACIÓN DE FIREBASE 🔥
 const firebaseConfig = {
     apiKey: "AIzaSyDoY5Zp_3z5_qVPOGzRzqayIok7XS5W8Nw",
     authDomain: "aprobadoya-final.firebaseapp.com",
@@ -33,22 +32,15 @@ const firebaseConfig = {
     measurementId: "G-P20F08W61Y"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Exportar todo
 export { 
-    app, 
-    auth, 
-    db, 
-    googleProvider,
-    signInWithPopup,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    doc, setDoc, getDoc, getDocs, collection, query, orderBy, limit, updateDoc, where
+    app, auth, db, googleProvider,
+    signInWithPopup, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, sendPasswordResetEmail,
+    signOut, onAuthStateChanged,
+    doc, setDoc, getDoc, getDocs, collection, query, orderBy, updateDoc, arrayUnion
 };

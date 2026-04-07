@@ -67,6 +67,8 @@
             align-items: center;
             gap: 10px;
             transition: all 0.3s;
+            border: none;
+            cursor: pointer;
         }
         
         .btn-volver:hover {
@@ -113,18 +115,27 @@
 <body>
     <header>
         <div class="container">
-            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <nav>
-                <ul>
-                    <li><a href="../index.html">Inicio</a></li>
-                    <li><a href="../temas/index.html">Temas</a></li>
-                    <li><a href="../test/index.html">Test</a></li>
-                    <li><a href="../simulacro/index.html">Simulacro</a></li>
-                    <li><a href="index.html" class="active">Videos</a></li>
-                    <li><a href="../ranking/index.html">Ranking</a></li>
-                </ul>
-            </nav>
+            <div class="logo">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper">
+                    <nav id="navMenu">
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="../temas/index.html">Temas</a></li>
+                            <li><a href="../test/index.html">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="index.html" class="active">Videos</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
             <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
     </header>
 
@@ -143,9 +154,9 @@
                 </div>
                 <h2>🔒 Sección en construcción</h2>
                 <p>Estamos preparando contenido educativo de alta calidad para ayudarte a aprobar el examen teórico.</p>
-                <a href="../index.html" class="btn-volver">
+                <button class="btn-volver" onclick="window.location.href='../index.html'">
                     <i class="fas fa-arrow-left"></i> Volver al inicio
-                </a>
+                </button>
             </div>
 
             <div class="feature-coming">
@@ -198,29 +209,21 @@
         </div>
     </footer>
 
-    <script src="../js/auth.js"></script>
-    <script>
-        // Renderizar zona de usuario
-        function renderUserZone() {
-            const currentUser = getCurrentUser();
-            const userZone = document.getElementById('userZone');
-            
-            if (currentUser) {
-                const avatar = currentUser.avatar || (currentUser.foto ? '👤' : "🚗");
-                userZone.innerHTML = `
-                    <div class="user-menu">
-                        <div class="user-avatar">${avatar}</div>
-                        <span class="user-name">${currentUser.nombre}</span>
-                        <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
-                        <button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button>
-                    </div>
-                `;
-            } else {
-                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../login.html';
             }
-        }
-
-        renderUserZone();
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.querySelector('.nav-wrapper');
+            if (wrapper) wrapper.classList.toggle('active');
+        });
     </script>
 </body>
 </html>

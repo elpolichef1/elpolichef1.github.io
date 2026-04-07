@@ -6,9 +6,7 @@
 
 const preguntasDGT = [
     // ==================== TEMA 1: NORMAS GENERALES (25 preguntas) ====================
-    { id: 1, tema: 1, texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1, explicacion: "En las intersecciones sin señalizar, la prioridad la tiene el vehículo que circula por la derecha." },
-    { id: 2, tema: 1, texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación y seguro", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV en vigor", "Permiso de conducir y seguro"], correcta: 2, explicacion: "Es obligatorio llevar el permiso de conducir, el permiso de circulación y la ITV en vigor." },
-    { id: 3, tema: 1, texto: "¿Cuál es la tasa máxima de alcoholemia permitida para conductores noveles?", opciones: ["0,5 gramos por litro de sangre", "0,3 gramos por litro de sangre", "0,25 gramos por litro de sangre", "0,0 gramos por litro de sangre"], correcta: 1, explicacion: "Para conductores noveles (primeros 2 años) y profesionales, el límite es de 0,3 g/l en sangre." },
+   
     { id: 4, tema: 1, texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "Usar el móvil al volante es una infracción grave: 200€ de multa y 3 puntos del carnet." },
     { id: 5, tema: 1, texto: "¿Durante cuánto tiempo es considerado conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "Se considera conductor novel durante los primeros 2 años desde la obtención del permiso." },
     { id: 6, tema: 1, texto: "¿Qué significa la señal de STOP?", opciones: ["Prohibido el paso", "Ceda el paso", "Detención obligatoria", "Prohibido estacionar"], correcta: 2, explicacion: "La señal de STOP indica detención obligatoria antes de continuar." },

@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        /* Estilos específicos para la página de temas */
         .page-header {
             text-align: center;
             padding: 60px 0;
@@ -42,7 +41,6 @@
             margin: 0 auto;
         }
         
-        /* Progreso general */
         .global-progress {
             background: white;
             border-radius: 25px;
@@ -89,7 +87,6 @@
             transition: width 0.5s ease;
         }
         
-        /* Grid de temas */
         .temas-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -97,7 +94,6 @@
             margin-bottom: 60px;
         }
         
-        /* Tarjeta de tema */
         .tema-card {
             background: white;
             border-radius: 20px;
@@ -229,7 +225,6 @@
                             <li><a href="index.html" class="active">Temas</a></li>
                             <li><a href="../test/index.html">Test</a></li>
                             <li><a href="../simulacro/index.html">Simulacro</a></li>
-                            <li><a href="../videos/index.html">Videos</a></li>
                             <li><a href="../ranking/index.html">Ranking</a></li>
                             <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
                         </ul>
@@ -250,7 +245,6 @@
 
     <main>
         <div class="container">
-            <!-- Progreso general -->
             <div class="global-progress">
                 <div class="progress-info">
                     <span><i class="fas fa-chart-line"></i> Progreso general de estudio</span>
@@ -264,7 +258,6 @@
                 </p>
             </div>
 
-            <!-- Grid de temas -->
             <div class="temas-grid" id="temasGrid"></div>
         </div>
     </main>
@@ -301,33 +294,35 @@
         </div>
     </footer>
 
-    <script src="../js/auth.js"></script>
-    <script>
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        
         // ==================== DATOS DE LOS TEMAS ====================
         const temas = [
-            { numero: 1, nombre: "Normas generales de circulación", descripcion: "Prioridades, normas básicas, obligaciones de conductores", preguntas: 25, icono: "📌", color: "#fbbf24", url: "tema1.html" },
-            { numero: 2, nombre: "Señales de tráfico", descripcion: "Verticales, horizontales, semáforos, agentes, balizamiento", preguntas: 30, icono: "🪧", color: "#f59e0b", url: "tema2.html" },
-            { numero: 3, nombre: "Circulación en vías urbanas e interurbanas", descripcion: "Velocidades, adelantamientos, posiciones en calzada", preguntas: 25, icono: "🛣️", color: "#fbbf24", url: "tema3.html" },
-            { numero: 4, nombre: "Maniobras", descripcion: "Incorporaciones, cambios de sentido, marcha atrás, estacionamiento", preguntas: 20, icono: "🔄", color: "#f59e0b", url: "tema4.html" },
-            { numero: 5, nombre: "Velocidad y distancia de seguridad", descripcion: "Límites de velocidad, distancias, factores que afectan", preguntas: 20, icono: "📊", color: "#fbbf24", url: "tema5.html" },
-            { numero: 6, nombre: "Conducción en condiciones adversas", descripcion: "Lluvia, niebla, hielo, nieve, noche, túneles", preguntas: 20, icono: "🌧️", color: "#f59e0b", url: "tema6.html" },
-            { numero: 7, nombre: "Vehículos", descripcion: "Documentación, ITV, mantenimiento, elementos de seguridad", preguntas: 20, icono: "🚗", color: "#fbbf24", url: "tema7.html" },
-            { numero: 8, nombre: "Conductores", descripcion: "Permisos, licencias, documentación, puntos del carnet", preguntas: 20, icono: "👤", color: "#f59e0b", url: "tema8.html" },
-            { numero: 9, nombre: "Alcoholemia y drogas", descripcion: "Efectos, límites, sanciones, controles", preguntas: 20, icono: "🍺", color: "#fbbf24", url: "tema9.html" },
-            { numero: 10, nombre: "Seguridad vial activa y pasiva", descripcion: "ABS, airbag, cinturón, SRI, sistemas de retención infantil", preguntas: 20, icono: "🛡️", color: "#f59e0b", url: "tema10.html" },
-            { numero: 11, nombre: "Transporte de mercancías y personas", descripcion: "Normativa específica, tacógrafo, limitadores", preguntas: 15, icono: "🚚", color: "#fbbf24", url: "tema11.html" },
-            { numero: 12, nombre: "Vehículos especiales y prioritarios", descripcion: "Ambulancias, policía, bomberos, grúas", preguntas: 15, icono: "🚑", color: "#f59e0b", url: "tema12.html" },
-            { numero: 13, nombre: "Accidentes de tráfico", descripcion: "Actuación, primeros auxilios, señalización", preguntas: 15, icono: "⚠️", color: "#fbbf24", url: "tema13.html" },
-            { numero: 14, nombre: "Factores de riesgo", descripcion: "Fatiga, sueño, distracciones, teléfono móvil", preguntas: 15, icono: "😴", color: "#f59e0b", url: "tema14.html" },
-            { numero: 15, nombre: "Medio ambiente", descripcion: "Contaminación, conducción eficiente, etiquetas ambientales", preguntas: 15, icono: "🌿", color: "#fbbf24", url: "tema15.html" },
-            { numero: 16, nombre: "Permiso de conducir por puntos", descripcion: "Sistema de puntos, pérdida, recuperación", preguntas: 15, icono: "⭐", color: "#f59e0b", url: "tema16.html" },
-            { numero: 17, nombre: "ITV y documentación del vehículo", descripcion: "Frecuencia, procedimiento, inspecciones", preguntas: 15, icono: "🔧", color: "#fbbf24", url: "tema17.html" },
-            { numero: 18, nombre: "Seguros de automóvil", descripcion: "Obligatoriedad, coberturas, partes amistosos", preguntas: 15, icono: "📋", color: "#f59e0b", url: "tema18.html" },
-            { numero: 19, nombre: "Movilidad y nuevas tecnologías", descripcion: "Vehículos eléctricos, ZBE, VMP, car sharing", preguntas: 15, icono: "🔌", color: "#fbbf24", url: "tema19.html" },
-            { numero: 20, nombre: "Legislación específica", descripcion: "Normas autonómicas, nuevas actualizaciones DGT", preguntas: 15, icono: "📜", color: "#f59e0b", url: "tema20.html" }
+            { numero: 1, nombre: "Normas generales de circulación", descripcion: "Prioridades, normas básicas, obligaciones de conductores", preguntas: 25, icono: "📌", url: "tema1.html" },
+            { numero: 2, nombre: "Señales de tráfico", descripcion: "Verticales, horizontales, semáforos, agentes, balizamiento", preguntas: 30, icono: "🪧", url: "tema2.html" },
+            { numero: 3, nombre: "Circulación en vías urbanas e interurbanas", descripcion: "Velocidades, adelantamientos, posiciones en calzada", preguntas: 25, icono: "🛣️", url: "tema3.html" },
+            { numero: 4, nombre: "Maniobras", descripcion: "Incorporaciones, cambios de sentido, marcha atrás, estacionamiento", preguntas: 20, icono: "🔄", url: "tema4.html" },
+            { numero: 5, nombre: "Velocidad y distancia de seguridad", descripcion: "Límites de velocidad, distancias, factores que afectan", preguntas: 20, icono: "📊", url: "tema5.html" },
+            { numero: 6, nombre: "Conducción en condiciones adversas", descripcion: "Lluvia, niebla, hielo, nieve, noche, túneles", preguntas: 20, icono: "🌧️", url: "tema6.html" },
+            { numero: 7, nombre: "Vehículos", descripcion: "Documentación, ITV, mantenimiento, elementos de seguridad", preguntas: 20, icono: "🚗", url: "tema7.html" },
+            { numero: 8, nombre: "Conductores", descripcion: "Permisos, licencias, documentación, puntos del carnet", preguntas: 20, icono: "👤", url: "tema8.html" },
+            { numero: 9, nombre: "Alcoholemia y drogas", descripcion: "Efectos, límites, sanciones, controles", preguntas: 20, icono: "🍺", url: "tema9.html" },
+            { numero: 10, nombre: "Seguridad vial activa y pasiva", descripcion: "ABS, airbag, cinturón, SRI, sistemas de retención infantil", preguntas: 20, icono: "🛡️", url: "tema10.html" },
+            { numero: 11, nombre: "Transporte de mercancías y personas", descripcion: "Normativa específica, tacógrafo, limitadores", preguntas: 15, icono: "🚚", url: "tema11.html" },
+            { numero: 12, nombre: "Vehículos especiales y prioritarios", descripcion: "Ambulancias, policía, bomberos, grúas", preguntas: 15, icono: "🚑", url: "tema12.html" },
+            { numero: 13, nombre: "Accidentes de tráfico", descripcion: "Actuación, primeros auxilios, señalización", preguntas: 15, icono: "⚠️", url: "tema13.html" },
+            { numero: 14, nombre: "Factores de riesgo", descripcion: "Fatiga, sueño, distracciones, teléfono móvil", preguntas: 15, icono: "😴", url: "tema14.html" },
+            { numero: 15, nombre: "Medio ambiente", descripcion: "Contaminación, conducción eficiente, etiquetas ambientales", preguntas: 15, icono: "🌿", url: "tema15.html" },
+            { numero: 16, nombre: "Permiso de conducir por puntos", descripcion: "Sistema de puntos, pérdida, recuperación", preguntas: 15, icono: "⭐", url: "tema16.html" },
+            { numero: 17, nombre: "ITV y documentación del vehículo", descripcion: "Frecuencia, procedimiento, inspecciones", preguntas: 15, icono: "🔧", url: "tema17.html" },
+            { numero: 18, nombre: "Seguros de automóvil", descripcion: "Obligatoriedad, coberturas, partes amistosos", preguntas: 15, icono: "📋", url: "tema18.html" },
+            { numero: 19, nombre: "Movilidad y nuevas tecnologías", descripcion: "Vehículos eléctricos, ZBE, VMP, car sharing", preguntas: 15, icono: "🔌", url: "tema19.html" },
+            { numero: 20, nombre: "Legislación específica", descripcion: "Normas autonómicas, nuevas actualizaciones DGT", preguntas: 15, icono: "📜", url: "tema20.html" }
         ];
 
-        // ==================== FUNCIONES DE PROGRESO ====================
+        // Funciones de progreso (usando localStorage para temas)
         function cargarProgreso() {
             const progreso = localStorage.getItem('aprobadoya_progreso_temas');
             return progreso ? JSON.parse(progreso) : {};
@@ -337,13 +332,13 @@
             localStorage.setItem('aprobadoya_progreso_temas', JSON.stringify(progreso));
         }
 
-        function marcarEstudiado(numero) {
+        window.marcarEstudiado = function(numero) {
             const progreso = cargarProgreso();
             progreso[numero] = !progreso[numero];
             guardarProgreso(progreso);
             renderizarTemas();
             actualizarProgresoGlobal();
-        }
+        };
 
         function calcularProgresoGlobal() {
             const progreso = cargarProgreso();
@@ -359,7 +354,6 @@
             if (fillElement) fillElement.style.width = `${porcentaje}%`;
         }
 
-        // ==================== RENDERIZAR TEMAS ====================
         function renderizarTemas() {
             const grid = document.getElementById('temasGrid');
             if (!grid) return;
@@ -402,27 +396,22 @@
             }).join('');
         }
 
-        // ==================== ACTUALIZAR TODOS LOS DATOS ====================
-        function updateAllUserData() {
-            renderizarTemas();
-            actualizarProgresoGlobal();
+        // Inicializar cuando cambia el usuario
+        onAuthStateChanged(auth, (user) => {
             renderUserZone();
-        }
-
-        // ==================== INICIALIZACIÓN ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            renderUserZone();
-            renderizarTemas();
-            actualizarProgresoGlobal();
-            
-            // Menú móvil
-            const menuBtn = document.getElementById('menuMobileBtn');
-            if (menuBtn) {
-                menuBtn.addEventListener('click', () => {
-                    const wrapper = document.querySelector('.nav-wrapper');
-                    if (wrapper) wrapper.classList.toggle('active');
-                });
+            if (!user) {
+                window.location.href = '../login.html';
             }
+        });
+        
+        // Inicializar
+        renderizarTemas();
+        actualizarProgresoGlobal();
+        
+        // Menú móvil
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.querySelector('.nav-wrapper');
+            if (wrapper) wrapper.classList.toggle('active');
         });
     </script>
 </body>

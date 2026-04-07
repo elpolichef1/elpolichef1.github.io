@@ -8,6 +8,7 @@ import { auth, onAuthStateChanged, signOut, db, doc, getDoc } from './firebase-i
 // Variable global del usuario actual
 let currentUserGlobal = null;
 let userDataGlobal = null;
+let callbacks = [];
 
 // Función para obtener el usuario actual (síncrona)
 export function getCurrentUser() {
@@ -27,6 +28,8 @@ export async function logoutUser() {
 
 // Función para obtener nombre del usuario desde Firestore
 async function obtenerNombreUsuario(user) {
+    if (!user) return null;
+    
     try {
         const userRef = doc(db, "usuarios", user.uid);
         const userDoc = await getDoc(userRef);
@@ -42,6 +45,8 @@ async function obtenerNombreUsuario(user) {
 
 // Inicializar listener de autenticación
 export function initAuthListener(callback) {
+    if (callback) callbacks.push(callback);
+    
     onAuthStateChanged(auth, async (user) => {
         currentUserGlobal = user;
         
@@ -58,7 +63,8 @@ export function initAuthListener(callback) {
             userDataGlobal = null;
         }
         
-        if (callback) callback(currentUserGlobal, userDataGlobal);
+        // Ejecutar todos los callbacks registrados
+        callbacks.forEach(cb => cb(currentUserGlobal, userDataGlobal));
     });
 }
 
@@ -68,15 +74,23 @@ export function renderUserZone() {
     if (!userZone) return;
     
     if (currentUserGlobal) {
-        const nombreMostrar = userDataGlobal?.nombre?.split(' ')[0] || currentUserGlobal.email?.split('@')[0] || 'Usuario';
+        // Usar el nombre de Firestore si está disponible, si no mostrar loading
+        const nombreMostrar = userDataGlobal?.nombre?.split(' ')[0] || '...';
         userZone.innerHTML = `
             <div class="user-menu">
                 <div class="user-avatar">🚗</div>
-                <span class="user-name">${escapeHtml(nombreMostrar)}</span>
+                <span class="user-name" id="headerUserName">${escapeHtml(nombreMostrar)}</span>
                 <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
                 <button id="globalLogoutBtn" class="btn-logout">Cerrar sesión</button>
             </div>
         `;
+        
+        // Si el nombre aún es '...', actualizarlo cuando esté disponible
+        if (nombreMostrar === '...' && userDataGlobal?.nombre) {
+            const nameSpan = document.getElementById('headerUserName');
+            if (nameSpan) nameSpan.textContent = userDataGlobal.nombre.split(' ')[0];
+        }
+        
         const logoutBtn = document.getElementById('globalLogoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => logoutUser());
@@ -96,6 +110,11 @@ function escapeHtml(str) {
     });
 }
 
+// Función para forzar actualización del header con el nombre correcto
+export function forceUpdateHeader() {
+    renderUserZone();
+}
+
 // Inicializar el listener automáticamente
 initAuthListener(() => {
     renderUserZone();
@@ -104,3 +123,4 @@ initAuthListener(() => {
 // Exponer funciones globalmente para que funcionen en cualquier script
 window.getCurrentUser = getCurrentUser;
 window.logoutUser = logoutUser;
+window.forceUpdateHeader = forceUpdateHeader;

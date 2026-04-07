@@ -40,7 +40,6 @@
             margin: 0 auto;
         }
         
-        /* Configuración del examen */
         .config-section {
             background: white;
             border-radius: 30px;
@@ -102,7 +101,6 @@
             box-shadow: 0 8px 20px rgba(251,191,36,0.3);
         }
         
-        /* Contenedor del examen */
         .exam-container {
             background: white;
             border-radius: 30px;
@@ -170,7 +168,6 @@
             50% { opacity: 0.9; transform: scale(1.02); }
         }
         
-        /* Preguntas */
         .pregunta {
             margin-bottom: 35px;
             padding-bottom: 25px;
@@ -383,7 +380,6 @@
                             <li><a href="../temas/index.html">Temas</a></li>
                             <li><a href="../test/index.html">Test</a></li>
                             <li><a href="index.html" class="active">Simulacro</a></li>
-                            <li><a href="../videos/index.html">Videos</a></li>
                             <li><a href="../ranking/index.html">Ranking</a></li>
                             <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
                         </ul>
@@ -404,7 +400,6 @@
 
     <main>
         <div class="container">
-            <!-- Configuración del examen -->
             <div class="config-section" id="configSection">
                 <div class="config-group">
                     <label><i class="fas fa-layer-group"></i> Número de preguntas:</label>
@@ -430,7 +425,6 @@
                 </button>
             </div>
 
-            <!-- Contenedor del examen -->
             <div class="exam-container" id="examContainer">
                 <div class="exam-header">
                     <div class="exam-info">
@@ -451,60 +445,70 @@
     <footer>
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>AprobadoYa</h4>
-                    <p>Tu plataforma para aprobar el carnet de conducir al primer intento. Aprende, practica y aprueba.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Enlaces rápidos</h4>
-                    <ul>
-                        <li><a href="../index.html">Inicio</a></li>
-                        <li><a href="../temas/index.html">Temas oficiales</a></li>
-                        <li><a href="../test/index.html">Tests DGT</a></li>
-                        <li><a href="index.html">Simulacro examen</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Información</h4>
-                    <ul>
-                        <li><a href="#">Sobre nosotros</a></li>
-                        <li><a href="#">Preguntas frecuentes</a></li>
-                        <li><a href="#">Contacto</a></li>
-                    </ul>
-                </div>
+                <div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p></div>
+                <div class="footer-col"><h4>Enlaces rápidos</h4><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html">Simulacro</a></li></ul></div>
+                <div class="footer-col"><h4>Información</h4><ul><li><a href="#">Sobre nosotros</a></li><li><a href="#">Preguntas frecuentes</a></li><li><a href="#">Contacto</a></li></ul></div>
             </div>
-            <div class="footer-bottom">
-                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
-                <p style="font-size: 0.7rem; margin-top: 5px;">Plataforma educativa independiente. No oficial de la DGT.</p>
-            </div>
+            <div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div>
         </div>
     </footer>
 
-    <script src="../js/auth.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="../test/data/preguntas.js"></script>
-    <script>
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut, db, doc, updateDoc, getDoc } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        
         let preguntasActuales = [];
         let respuestasUsuario = [];
         let tiempoRestante = 30 * 60;
         let timerInterval;
         let examenActivo = false;
         let examenFinalizado = false;
-
+        
+        // Preguntas de ejemplo (en un proyecto real, vendrían de un archivo)
+        const preguntasDGT = [
+            { id: 1, texto: "¿Cuál es la velocidad máxima en una autovía para un turismo?", opciones: ["90 km/h", "100 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "En autovías y autopistas, la velocidad máxima para turismos es de 120 km/h." },
+            { id: 2, texto: "¿Qué significa una señal de STOP?", opciones: ["Ceder el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de STOP obliga a detenerse completamente antes de continuar." },
+            { id: 3, texto: "¿Cuál es la tasa máxima de alcohol permitida para conductores noveles?", opciones: ["0.0 g/l", "0.3 g/l", "0.5 g/l", "0.8 g/l"], correcta: 0, explicacion: "Los conductores noveles tienen tolerancia 0 de alcohol." }
+        ];
+        
+        async function actualizarEstadisticasFirestore(userId, aciertos, total) {
+            try {
+                const userRef = doc(db, "usuarios", userId);
+                const userDoc = await getDoc(userRef);
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    const nuevosTests = (userData.testsRealizados || 0) + 1;
+                    const nuevosAciertos = (userData.totalAciertos || 0) + aciertos;
+                    const nuevasPreguntas = (userData.totalPreguntas || 0) + total;
+                    const nuevaMedia = Math.round((nuevosAciertos / nuevasPreguntas) * 100);
+                    const nuevoMejor = Math.max(userData.mejorResultado || 0, Math.round((aciertos / total) * 100));
+                    
+                    await updateDoc(userRef, {
+                        testsRealizados: nuevosTests,
+                        totalAciertos: nuevosAciertos,
+                        totalPreguntas: nuevasPreguntas,
+                        mediaAciertos: nuevaMedia,
+                        mejorResultado: nuevoMejor
+                    });
+                }
+            } catch (error) {
+                console.error("Error al actualizar estadísticas:", error);
+            }
+        }
+        
         function iniciarExamen() {
             const numPreguntas = parseInt(document.getElementById('numPreguntas').value);
             const tiempoMinutos = parseInt(document.getElementById('tiempoLimite').value);
             
-            // Seleccionar preguntas aleatorias
             const todas = [...preguntasDGT];
             for (let i = todas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [todas[i], todas[j]] = [todas[j], todas[i]];
             }
-            preguntasActuales = todas.slice(0, numPreguntas);
-            respuestasUsuario = new Array(numPreguntas).fill(null);
+            preguntasActuales = todas.slice(0, Math.min(numPreguntas, todas.length));
+            respuestasUsuario = new Array(preguntasActuales.length).fill(null);
             
-            // Configurar tiempo
             if (tiempoMinutos > 0) {
                 tiempoRestante = tiempoMinutos * 60;
                 iniciarTemporizador();
@@ -521,11 +525,9 @@
             document.getElementById('examContainer').style.display = 'block';
             examenActivo = true;
             examenFinalizado = false;
-            
-            // Scroll al inicio del examen
             document.getElementById('examContainer').scrollIntoView({ behavior: 'smooth' });
         }
-
+        
         function iniciarTemporizador() {
             if (timerInterval) clearInterval(timerInterval);
             const timerElement = document.getElementById('timer');
@@ -549,7 +551,7 @@
                 }
             }, 1000);
         }
-
+        
         function renderizarPreguntas() {
             const container = document.getElementById('preguntasContainer');
             container.innerHTML = preguntasActuales.map((p, idx) => `
@@ -570,32 +572,27 @@
                 </div>
             `).join('');
             
-            // Añadir event listeners para las opciones
             document.querySelectorAll('.opcion input').forEach(input => {
                 input.addEventListener('change', (e) => {
                     const preguntaIndex = parseInt(e.target.name.split('_')[1]);
                     const valor = parseInt(e.target.value);
                     respuestasUsuario[preguntaIndex] = valor;
-                    
-                    // Actualizar contador de respondidas
                     const respondidas = respuestasUsuario.filter(r => r !== null).length;
                     document.getElementById('respondidas').textContent = respondidas;
                 });
             });
         }
-
-        function mostrarExplicacion(preguntaIndex) {
+        
+        window.mostrarExplicacion = function(preguntaIndex) {
             if (examenFinalizado) {
                 const explicacionDiv = document.getElementById(`explicacion_${preguntaIndex}`);
-                if (explicacionDiv) {
-                    explicacionDiv.classList.toggle('mostrar');
-                }
+                if (explicacionDiv) explicacionDiv.classList.toggle('mostrar');
             } else {
                 alert('Las explicaciones solo están disponibles después de finalizar el examen.');
             }
-        }
-
-        function finalizarExamen() {
+        };
+        
+        async function finalizarExamen() {
             if (examenFinalizado) return;
             examenFinalizado = true;
             examenActivo = false;
@@ -604,28 +601,19 @@
             let aciertos = 0;
             const total = preguntasActuales.length;
             
-            // Calcular aciertos y marcar respuestas
             preguntasActuales.forEach((pregunta, idx) => {
                 const respuesta = respuestasUsuario[idx];
                 const esCorrecto = (respuesta === pregunta.correcta);
                 if (esCorrecto) aciertos++;
                 
-                // Marcar visualmente la pregunta
                 const preguntaDiv = document.querySelector(`.pregunta[data-id="${pregunta.id}"]`);
-                if (preguntaDiv) {
-                    preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
-                }
+                if (preguntaDiv) preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
                 
-                // Marcar opciones correctas/incorrectas
                 const opciones = document.querySelectorAll(`.pregunta[data-id="${pregunta.id}"] .opcion`);
                 opciones.forEach((opcion, optIdx) => {
                     opcion.classList.add('disabled');
-                    if (optIdx === pregunta.correcta) {
-                        opcion.classList.add('correcta-respuesta');
-                    }
-                    if (respuesta === optIdx && respuesta !== pregunta.correcta) {
-                        opcion.classList.add('incorrecta-respuesta');
-                    }
+                    if (optIdx === pregunta.correcta) opcion.classList.add('correcta-respuesta');
+                    if (respuesta === optIdx && respuesta !== pregunta.correcta) opcion.classList.add('incorrecta-respuesta');
                 });
             });
             
@@ -638,102 +626,54 @@
                 <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}"></i>
                 <h3>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h3>
                 <div class="resultado-stats">
-                    <div class="resultado-stat">
-                        <div class="resultado-stat-number">${aciertos}/${total}</div>
-                        <div>Aciertos</div>
-                    </div>
-                    <div class="resultado-stat">
-                        <div class="resultado-stat-number">${porcentaje}%</div>
-                        <div>Porcentaje</div>
-                    </div>
-                    <div class="resultado-stat">
-                        <div class="resultado-stat-number">${aprobado ? 'APTO' : 'NO APTO'}</div>
-                        <div>Resultado</div>
-                    </div>
+                    <div class="resultado-stat"><div class="resultado-stat-number">${aciertos}/${total}</div><div>Aciertos</div></div>
+                    <div class="resultado-stat"><div class="resultado-stat-number">${porcentaje}%</div><div>Porcentaje</div></div>
+                    <div class="resultado-stat"><div class="resultado-stat-number">${aprobado ? 'APTO' : 'NO APTO'}</div><div>Resultado</div></div>
                 </div>
-                <p>${aprobado ? '¡Estás preparado para el examen oficial! Sigue practicando para mantener el nivel.' : 'Repasa los temas donde has fallado y vuelve a intentarlo. ¡Lo conseguirás!'}</p>
-                <button class="btn-reiniciar" onclick="reiniciarExamen()">
-                    <i class="fas fa-redo"></i> Nuevo simulacro
-                </button>
-                <button class="btn-reiniciar" onclick="verSoluciones()" style="background: #f1f5f9; color: #1e293b; margin-left: 10px;">
-                    <i class="fas fa-eye"></i> Ver soluciones
-                </button>
+                <p>${aprobado ? '¡Estás preparado para el examen oficial!' : 'Repasa los temas donde has fallado y vuelve a intentarlo.'}</p>
+                <button class="btn-reiniciar" onclick="reiniciarExamen()"><i class="fas fa-redo"></i> Nuevo simulacro</button>
+                <button class="btn-reiniciar" onclick="verSoluciones()" style="background: #f1f5f9; color: #1e293b; margin-left: 10px;"><i class="fas fa-eye"></i> Ver soluciones</button>
             `;
             resultadoDiv.style.display = 'block';
             
-            // Guardar resultado
-            const resultados = JSON.parse(localStorage.getItem('dgt_tests') || '[]');
-            resultados.push({
-                tipo: 'simulacro',
-                aciertos: aciertos,
-                total: total,
-                fecha: new Date().toISOString()
-            });
-            localStorage.setItem('dgt_tests', JSON.stringify(resultados));
-            
-            // Actualizar estadísticas del usuario
-            const currentUser = getCurrentUser();
-            if (currentUser) {
-                updateUserStats(currentUser.id, aciertos, total);
-            }
+            const user = auth.currentUser;
+            if (user) await actualizarEstadisticasFirestore(user.uid, aciertos, total);
         }
         
-        function verSoluciones() {
-            // Mostrar todas las explicaciones
+        window.verSoluciones = function() {
             for (let i = 0; i < preguntasActuales.length; i++) {
                 const explicacionDiv = document.getElementById(`explicacion_${i}`);
-                if (explicacionDiv) {
-                    explicacionDiv.classList.add('mostrar');
-                }
+                if (explicacionDiv) explicacionDiv.classList.add('mostrar');
             }
-        }
-
-        function reiniciarExamen() {
-            // Resetear todo
+        };
+        
+        window.reiniciarExamen = function() {
             preguntasActuales = [];
             respuestasUsuario = [];
             examenActivo = false;
             examenFinalizado = false;
             if (timerInterval) clearInterval(timerInterval);
-            
-            // Mostrar configuración
             document.getElementById('configSection').style.display = 'flex';
             document.getElementById('examContainer').style.display = 'none';
             document.getElementById('resultado').style.display = 'none';
-            
-            // Scroll al inicio
             document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function renderUserZone() {
-            const currentUser = getCurrentUser();
-            const userZone = document.getElementById('userZone');
-            
-            if (currentUser) {
-                const avatar = currentUser.avatar || "🚗";
-                userZone.innerHTML = `
-                    <div class="user-menu">
-                        <div class="user-avatar">${avatar}</div>
-                        <span class="user-name">${currentUser.nombre}</span>
-                        <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
-                        <button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button>
-                    </div>
-                `;
-            } else {
-                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
-            }
-        }
-
+        };
+        
         document.getElementById('btnIniciar').addEventListener('click', iniciarExamen);
         document.getElementById('btnEnviar').addEventListener('click', () => {
-            if (examenActivo && !examenFinalizado) {
-                if (confirm('¿Seguro que quieres finalizar el examen?')) {
-                    finalizarExamen();
-                }
+            if (examenActivo && !examenFinalizado && confirm('¿Seguro que quieres finalizar el examen?')) {
+                finalizarExamen();
             }
         });
         
-        renderUserZone();
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) window.location.href = '../login.html';
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            document.querySelector('.nav-wrapper')?.classList.toggle('active');
+        });
     </script>
 </body>
 </html>

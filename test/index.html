@@ -236,7 +236,6 @@
                             <li><a href="../temas/index.html">Temas</a></li>
                             <li><a href="index.html" class="active">Test</a></li>
                             <li><a href="../simulacro/index.html">Simulacro</a></li>
-                            <li><a href="../videos/index.html">Videos</a></li>
                             <li><a href="../ranking/index.html">Ranking</a></li>
                             <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
                         </ul>
@@ -329,47 +328,43 @@
         </div>
     </footer>
 
-    <script src="../js/auth.js"></script>
-    <script src="../js/main.js"></script>
-    <script>
-        // ==================== PROTECCIÓN ====================
-        if (!requireAuth()) {
-            // Redirigido al login
-        }
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut, db, doc, getDoc } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
         
-        function cargarEstadisticas() {
-            const stats = obtenerEstadisticasCompletas();
-            
-            if (stats) {
-                document.getElementById('totalTests').textContent = stats.totalTests || 0;
-                document.getElementById('testsAprobados').textContent = stats.testsAprobados || 0;
-                document.getElementById('tasaAprobados').textContent = `${stats.tasaAprobados || 0}%`;
-                document.getElementById('mejorResultado').textContent = `${stats.mejorResultado || 0}%`;
+        // Función para obtener estadísticas del usuario desde Firestore
+        async function cargarEstadisticas(user) {
+            try {
+                const userRef = doc(db, "usuarios", user.uid);
+                const userDoc = await getDoc(userRef);
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    document.getElementById('totalTests').textContent = userData.testsRealizados || 0;
+                    document.getElementById('testsAprobados').textContent = userData.testsAprobados || 0;
+                    document.getElementById('tasaAprobados').textContent = `${userData.mediaAciertos || 0}%`;
+                    document.getElementById('mejorResultado').textContent = `${userData.mejorResultado || 0}%`;
+                }
+            } catch (error) {
+                console.error("Error al cargar estadísticas:", error);
             }
         }
         
-        function renderUserZone() {
-            const currentUser = getCurrentUser();
-            const userZone = document.getElementById('userZone');
-            
-            if (currentUser) {
-                const avatar = currentUser.avatar || "🚗";
-                userZone.innerHTML = `
-                    <div class="user-menu">
-                        <div class="user-avatar">${avatar}</div>
-                        <span class="user-name">${currentUser.nombre}</span>
-                        <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
-                        <button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button>
-                    </div>
-                `;
-            } else {
-                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
+        // Verificar autenticación
+        onAuthStateChanged(auth, (user) => {
             renderUserZone();
-            cargarEstadisticas();
+            
+            if (!user) {
+                window.location.href = '../login.html';
+            } else {
+                cargarEstadisticas(user);
+            }
+        });
+        
+        // Menú móvil
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.querySelector('.nav-wrapper');
+            if (wrapper) wrapper.classList.toggle('active');
         });
     </script>
 </body>

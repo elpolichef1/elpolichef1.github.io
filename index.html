@@ -276,6 +276,9 @@
                         <li><i class="fas fa-check-circle"></i> Simulacros de examen con temporizador</li>
                         <li><i class="fas fa-check-circle"></i> Seguimiento de tu progreso</li>
                         <li><i class="fas fa-check-circle"></i> Ranking y minijuegos educativos</li>
+                        <li><i class="fas fa-check-circle"></i> Tipos de Permisos</li>
+                        <li><i class="fas fa-check-circle"></i> Tabla de Multas</li>
+
                     </ul>
                 </div>
                 <div class="modal-botones">
@@ -313,6 +316,10 @@
                 <a href="javascript:void(0)" onclick="verificarAcceso('simulacro/index.html')" class="quick-card"><i class="fas fa-stopwatch"></i><h3>Simulacro de examen</h3><p>30 preguntas con temporizador</p></a>
                 <a href="javascript:void(0)" onclick="verificarAcceso('ranking/index.html')" class="quick-card"><i class="fas fa-trophy"></i><h3>Ranking de usuarios</h3><p>Compara tu progreso</p></a>
                 <a href="javascript:void(0)" onclick="verificarAcceso('mini-retos/index.html')" class="quick-card"><i class="fas fa-gamepad"></i><h3>Mini Retos</h3><p>¡Demuestra tus conocimientos!</p></a>
+                <a href="javascript:void(0)" onclick="verificarAcceso('permisos/index.html')" class="quick-card"><i class="fas fa-id-card"></i><h3>Tipos de Permisos</h3><p>Conoce todos los carnets de conducir</p></a>
+                <a href="javascript:void(0)" onclick="verificarAcceso('infracciones/index.html')" class="quick-card"><i class="fas fa-gavel"></i><h3>Tabla de Multas</h3><p>Infracciones, sanciones y pérdida de puntos</p></a>
+               
+
             </div>
         </div>
     </section>
@@ -328,16 +335,16 @@
         </div>
     </footer>
 
-   <script type="module">
-    import { getCurrentUser, logoutUser, initAuthListener, renderUserZone } from '../js/global-auth.js';
+ <script type="module">
+    import { auth, onAuthStateChanged, signOut, db, collection, getDocs, doc, getDoc } from './js/firebase-init.js';
+    import { renderUserZone, forceUpdateHeader } from './js/global-auth.js';
     
-    // Elementos DOM
-    const userZone = document.getElementById('userZone');
     const welcomeContainer = document.getElementById('welcomeBannerContainer');
     const modal = document.getElementById('modalBloqueo');
     
     // Función para obtener el nombre del usuario desde Firestore
     async function obtenerNombreUsuario(user) {
+        if (!user) return null;
         try {
             const userRef = doc(db, "usuarios", user.uid);
             const userDoc = await getDoc(userRef);
@@ -381,22 +388,11 @@
         if (modal) modal.classList.remove('active');
     };
     
-    // Actualizar interfaz según usuario
+    // Función para actualizar la interfaz del usuario
     async function updateUserInterface(user) {
         if (user) {
-            // Obtener el nombre completo desde Firestore
             const nombreCompleto = await obtenerNombreUsuario(user);
-            // Tomar solo el primer nombre para el header (opcional)
             const primerNombre = nombreCompleto.split(' ')[0];
-            
-            userZone.innerHTML = `
-                <div class="user-menu">
-                    <div class="user-avatar">🚗</div>
-                    <span class="user-name">${primerNombre}</span>
-                    <a href="perfil/index.html" class="btn-profile">Mi perfil</a>
-                    <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
-                </div>
-            `;
             
             welcomeContainer.innerHTML = `
                 <div class="welcome-banner">
@@ -408,21 +404,24 @@
                     <a href="test/index.html" class="btn-test">Empezar test <i class="fas fa-arrow-right"></i></a>
                 </div>
             `;
-            
-            document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-                await signOut(auth);
-                window.location.reload();
-            });
         } else {
-            userZone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
             welcomeContainer.innerHTML = '';
         }
     }
     
-    // Escuchar cambios de autenticación
-    onAuthStateChanged(auth, async (user) => {
-        await updateUserInterface(user);
-        contarUsuarios();
+    // Escuchar cambios de autenticación (SIN AWAIT DIRECTO)
+    onAuthStateChanged(auth, (user) => {
+        // Renderizar zona de usuario (header)
+        renderUserZone();
+        
+        // Llamar a la función asíncrona
+        updateUserInterface(user).catch(error => {
+            console.error("Error en updateUserInterface:", error);
+        });
+        
+        contarUsuarios().catch(error => {
+            console.error("Error en contarUsuarios:", error);
+        });
     });
     
     // Cerrar modal al hacer clic fuera

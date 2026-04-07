@@ -142,8 +142,11 @@
         <button class="btn-reiniciar" id="reiniciarBtn"><i class="fas fa-redo"></i> Reiniciar juego</button>
     </div>
 
-    <script src="../js/auth.js"></script>
-    <script>
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut } from '../js/firebase-init.js';
+        
+        let currentUserId = null;
+        
         const señales = [
             { icono: "🛑", nombre: "STOP" }, { icono: "⚠️", nombre: "Peligro" }, { icono: "🚫", nombre: "Prohibido" },
             { icono: "➡️", nombre: "Dirección obligatoria" }, { icono: "🅿️", nombre: "Estacionamiento" }, { icono: "🚸", nombre: "Paso de peatones" },
@@ -172,7 +175,16 @@
         function actualizarPuntuacion() { puntuacion = calcularPuntuacion(); document.getElementById('puntuacion').textContent = puntuacion; }
 
         function renderGrid() {
-            document.getElementById('memoryGrid').innerHTML = cartas.map((c, idx) => `<div class="memory-card ${c.emparejada ? 'matched' : ''} ${c.volteada ? 'flipped' : ''}" onclick="voltearCarta(${idx})">${c.volteada || c.emparejada ? c.icono : '❓'}</div>`).join('');
+            const grid = document.getElementById('memoryGrid');
+            if (!grid) return;
+            grid.innerHTML = cartas.map((c, idx) => `<div class="memory-card ${c.emparejada ? 'matched' : ''} ${c.volteada ? 'flipped' : ''}" data-idx="${idx}">${c.volteada || c.emparejada ? c.icono : '❓'}</div>`).join('');
+            
+            document.querySelectorAll('.memory-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const idx = parseInt(card.dataset.idx);
+                    if (!isNaN(idx)) voltearCarta(idx);
+                });
+            });
         }
 
         function voltearCarta(idx) {
@@ -186,8 +198,6 @@
             if (c1.señalId === c2.señalId) {
                 c1.emparejada = true; c2.emparejada = true; c1.volteada = false; c2.volteada = false; pares++;
                 document.getElementById('paresEncontrados').textContent = pares; actualizarPuntuacion();
-                document.querySelectorAll('.memory-card')[i1].classList.add('matched-animation');
-                document.querySelectorAll('.memory-card')[i2].classList.add('matched-animation');
                 setTimeout(() => { cartasVolteadas = []; renderGrid(); }, 300);
                 if (pares === señales.length) finalizarJuego(true);
             } else {
@@ -197,19 +207,87 @@
         }
 
         function finalizarJuego(victoria) {
-            juegoTerminado = true; clearInterval(timerInterval);
-            const puntosFinales = puntuacion; guardarPuntuacion(puntosFinales);
+            if (juegoTerminado) return;
+            juegoTerminado = true; 
+            clearInterval(timerInterval);
+            const puntosFinales = puntuacion;
+            
+            console.log("🎮 Finalizando juego. Puntos:", puntosFinales);
+            
+            // Guardar en localStorage
+            const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
+            const nuevoRegistro = {
+                id: Date.now(),
+                juego: "Memoria de señales",
+                puntuacion: puntosFinales,
+                fecha: new Date().toLocaleString(),
+                aciertos: pares,
+                total: señales.length,
+                racha: pares,
+                movimientos: movimientos,
+                tiempo: tiempo
+            };
+            
+            const historialActual = stats.historial || [];
+            stats.historial = [nuevoRegistro, ...historialActual].slice(0, 20);
+            stats.totalJuegos = (stats.totalJuegos || 0) + 1;
+            stats.totalPuntos = (stats.totalPuntos || 0) + puntosFinales;
+            stats.mejorRacha = Math.max(stats.mejorRacha || 0, pares);
+            
+            localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats));
+            
+            console.log("✅ Historial guardado en localStorage:", nuevoRegistro);
+            
+            // Mostrar mensaje de victoria
             const container = document.querySelector('.game-container');
-            const oldMsg = container.querySelector('.mensaje-victoria'); if (oldMsg) oldMsg.remove();
-            const msgDiv = document.createElement('div'); msgDiv.className = 'mensaje-victoria';
-            msgDiv.innerHTML = `<i class="fas fa-trophy" style="font-size: 3rem; color: #fbbf24;"></i><h2 style="color:#10b981;">🏆 ¡FELICIDADES! 🏆</h2><p>Has completado el juego de memoria</p><p><strong>🔄 Movimientos:</strong> ${movimientos}</p><p><strong>⏱️ Tiempo:</strong> ${Math.floor(tiempo / 60)}:${(tiempo % 60).toString().padStart(2, '0')}</p><p><strong>🏆 Puntuación:</strong> ${puntosFinales} pts</p><button onclick="reiniciarJuego()" style="background:#fbbf24; color:#1a472a; border:none; padding:10px 25px; border-radius:50px; margin-top:15px; cursor:pointer;"><i class="fas fa-redo"></i> Jugar de nuevo</button><a href="index.html" style="display:inline-block; margin-left:10px; background:#f1f5f9; color:#1e293b; padding:10px 25px; border-radius:50px; text-decoration:none;"><i class="fas fa-arrow-left"></i> Volver al menú</a>`;
+            const oldMsg = container.querySelector('.mensaje-victoria'); 
+            if (oldMsg) oldMsg.remove();
+            const msgDiv = document.createElement('div'); 
+            msgDiv.className = 'mensaje-victoria';
+            msgDiv.innerHTML = `<i class="fas fa-trophy" style="font-size: 3rem; color: #fbbf24;"></i>
+                <h2 style="color:#10b981;">🏆 ¡FELICIDADES! 🏆</h2>
+                <p>Has completado el juego de memoria</p>
+                <p><strong>🔄 Movimientos:</strong> ${movimientos}</p>
+                <p><strong>⏱️ Tiempo:</strong> ${Math.floor(tiempo / 60)}:${(tiempo % 60).toString().padStart(2, '0')}</p>
+                <p><strong>🏆 Puntuación:</strong> ${puntosFinales} pts</p>
+                <button onclick="window.location.reload()" style="background:#fbbf24; color:#1a472a; border:none; padding:10px 25px; border-radius:50px; margin-top:15px; cursor:pointer;"><i class="fas fa-redo"></i> Jugar de nuevo</button>
+                <a href="index.html" style="display:inline-block; margin-left:10px; background:#f1f5f9; color:#1e293b; padding:10px 25px; border-radius:50px; text-decoration:none;"><i class="fas fa-arrow-left"></i> Volver al menú</a>`;
             container.appendChild(msgDiv);
         }
 
-        function reiniciarJuego() { const oldMsg = document.querySelector('.mensaje-victoria'); if (oldMsg) oldMsg.remove(); initGame(); }
-        function guardarPuntuacion(p) { const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}'); stats.totalJuegos = (stats.totalJuegos || 0) + 1; stats.totalPuntos = (stats.totalPuntos || 0) + p; localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats)); }
-        function renderUserZone() { const u = getCurrentUser(); const z = document.getElementById('userZone'); if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`; else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`; }
-        renderUserZone(); document.getElementById('reiniciarBtn').addEventListener('click', reiniciarJuego); initGame();
+        function reiniciarJuego() { 
+            const oldMsg = document.querySelector('.mensaje-victoria'); 
+            if (oldMsg) oldMsg.remove(); 
+            initGame(); 
+        }
+        
+        function renderUserZone() {
+            const userZone = document.getElementById('userZone');
+            if (!userZone) return;
+            const user = auth.currentUser;
+            if (user) {
+                userZone.innerHTML = `<div class="user-menu"><div class="user-avatar">🚗</div><span class="user-name">${user.email.split('@')[0]}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button id="logoutBtn" class="btn-logout">Cerrar sesión</button></div>`;
+                document.getElementById('logoutBtn')?.addEventListener('click', async () => { await signOut(auth); window.location.href = '../index.html'; });
+            } else {
+                userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            }
+        }
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../login.html';
+            } else {
+                currentUserId = user.uid;
+                console.log("✅ Usuario autenticado:", currentUserId);
+                initGame();
+            }
+        });
+        
+        document.getElementById('reiniciarBtn').addEventListener('click', reiniciarJuego);
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            document.querySelector('.nav-wrapper')?.classList.toggle('active');
+        });
     </script>
 </body>
 </html>
