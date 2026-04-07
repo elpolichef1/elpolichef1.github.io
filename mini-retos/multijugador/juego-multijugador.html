@@ -168,6 +168,7 @@
         }
         
         async function iniciarPartida() {
+            console.log("Iniciando partida...");
             const preguntas = [];
             for (let i = 0; i < 10; i++) {
                 preguntas.push(obtenerPreguntaAleatoria());
@@ -190,6 +191,23 @@
             respuestaSeleccionada = true;
             const pregunta = salaData.preguntas[salaData.turno];
             const esCorrecto = (respuesta === pregunta.correcta);
+            
+            // Mostrar feedback visual
+            const opciones = document.querySelectorAll('.option-btn');
+            opciones.forEach((btn, idx) => {
+                btn.classList.add('disabled');
+                if (idx === pregunta.correcta) btn.classList.add('correct');
+                if (idx === respuesta && respuesta !== pregunta.correcta) btn.classList.add('incorrect');
+            });
+            
+            const feedbackDiv = document.getElementById('feedback');
+            if (feedbackDiv) {
+                feedbackDiv.className = esCorrecto ? 'result-message correct' : 'result-message wrong';
+                feedbackDiv.innerHTML = esCorrecto ? 
+                    `<i class="fas fa-check-circle"></i> ¡Correcto! +1 punto` : 
+                    `<i class="fas fa-times-circle"></i> Incorrecto. La respuesta era: ${String.fromCharCode(65 + pregunta.correcta)}`;
+                feedbackDiv.style.display = 'block';
+            }
             
             const nuevaPuntuacion1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
             const nuevaPuntuacion2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
@@ -265,6 +283,10 @@
                         }
                     });
                 });
+            } else if (!esMiTurno) {
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.classList.add('disabled');
+                });
             }
         }
         
@@ -306,6 +328,9 @@
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
             
+            console.log("Estado de la sala:", salaData.estado);
+            console.log("¿Es jugador 1?", esJugador1);
+            
             if (salaData.estado === "esperando") {
                 const container = document.getElementById('gameContent');
                 container.innerHTML = `<div class="waiting-message"><div class="spinner"></div><p>Esperando a que se una otro jugador...</p></div>`;
@@ -319,6 +344,7 @@
             unsubscribe = onSnapshot(salaRef, (doc) => {
                 if (doc.exists()) {
                     salaData = doc.data();
+                    console.log("Actualización en tiempo real:", salaData.estado);
                     if (salaData.estado === "en_curso" && gameActivo && salaData.preguntas) {
                         renderizarJuego();
                     }
