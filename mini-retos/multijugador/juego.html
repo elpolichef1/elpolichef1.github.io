@@ -161,7 +161,21 @@
     <script type="module">
         import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
-        import { preguntasMulti } from './preguntas-multi.js';
+        
+        // Preguntas directamente aquí para evitar problemas de importación
+        const preguntasMulti = [
+            { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
+            { texto: "¿Qué significa una señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1 },
+            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1 },
+            { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
+            { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1 },
+            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0 },
+            { texto: "¿Cuál es la tasa de alcohol máxima para conductores profesionales?", opciones: ["0,5 g/l", "0,3 g/l", "0,15 g/l", "0,0 g/l"], correcta: 1 },
+            { texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1 },
+            { texto: "¿Qué significa una señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1 },
+            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1 }
+        ];
+        
         let salaId = null;
         let currentUser = null;
         let salaData = null;
@@ -169,6 +183,7 @@
         let respuestaSeleccionada = false;
         let gameActivo = true;
         let unsubscribe = null;
+        let juegoIniciado = false;
         
         function obtenerPregunta() {
             return preguntasMulti[Math.floor(Math.random() * preguntasMulti.length)];
@@ -199,18 +214,21 @@
         
         async function iniciarJuego() {
             const preguntas = [];
-            for (let i = 0; i < 5; i++) preguntas.push(obtenerPregunta());
+            for (let i = 0; i < 5; i++) {
+                preguntas.push(obtenerPregunta());
+            }
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
                 preguntas: preguntas,
                 turno: 0,
                 puntuacion1: 0,
                 puntuacion2: 0
             });
+            console.log("Juego iniciado con 5 preguntas");
         }
         
         async function responder(respuesta) {
             if (!gameActivo || respuestaSeleccionada) return;
-            if (salaData.turno !== (esJugador1 ? 0 : 1)) return;
+            if (!salaData || salaData.turno !== (esJugador1 ? 0 : 1)) return;
             
             respuestaSeleccionada = true;
             const pregunta = salaData.preguntas[salaData.turno];
@@ -227,17 +245,25 @@
             });
             
             if (nuevoTurno >= salaData.preguntas.length) {
-                setTimeout(() => finalizarJuego(), 1000);
+                setTimeout(() => finalizarJuego(), 1500);
             }
         }
         
         function renderizarJuego() {
+            if (!salaData || !salaData.preguntas) {
+                console.log("Esperando datos del juego...");
+                return;
+            }
+            
             const p1 = salaData.puntuacion1 || 0;
             const p2 = salaData.puntuacion2 || 0;
             const total = salaData.preguntas.length;
             const turno = salaData.turno;
             
-            if (turno >= total) { finalizarJuego(); return; }
+            if (turno >= total) {
+                finalizarJuego();
+                return;
+            }
             
             const pregunta = salaData.preguntas[turno];
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
@@ -262,7 +288,7 @@
                     <div class="score-item"><div class="score-value">${turno+1}/${total}</div><div>Pregunta</div></div>
                     <div class="score-item"><div class="score-value">${p2}</div><div>${salaData.jugador2Nombre}</div></div>
                 </div>
-                ${!esMiTurno ? '<div class="turn-indicator">⏳ Esperando oponente...</div>' : ''}
+                ${!esMiTurno ? '<div class="turn-indicator">⏳ Esperando respuesta del oponente...</div>' : ''}
                 <div class="question-card">
                     <div class="question-text">${pregunta.texto}</div>
                     <div class="options" id="options">
@@ -308,22 +334,43 @@
         async function cargarPartida() {
             const salaRef = doc(db, "partidas_multijugador", salaId);
             const salaDoc = await getDoc(salaRef);
-            if (!salaDoc.exists()) { window.location.href = 'lobby.html'; return; }
+            if (!salaDoc.exists()) {
+                window.location.href = 'lobby.html';
+                return;
+            }
             
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
             
-            if (!salaData.preguntas) {
-                await iniciarJuego();
+            console.log("Estado de la sala:", salaData.estado);
+            console.log("¿Es jugador 1?", esJugador1);
+            
+            if (salaData.estado === "esperando") {
+                document.getElementById('gameContent').innerHTML = `<div class="waiting-message"><div class="spinner"></div><p>Esperando oponente...</p></div>`;
+            } else if (salaData.estado === "en_curso") {
+                if (!salaData.preguntas) {
+                    document.getElementById('gameContent').innerHTML = `<div class="waiting-message"><div class="spinner"></div><p>Iniciando juego...</p></div>`;
+                    await iniciarJuego();
+                    await mostrarCuentaAtras();
+                    // Recargar datos después de iniciar
+                    const updatedDoc = await getDoc(salaRef);
+                    salaData = updatedDoc.data();
+                    renderizarJuego();
+                } else {
+                    await mostrarCuentaAtras();
+                    renderizarJuego();
+                }
             }
             
-            await mostrarCuentaAtras();
-            renderizarJuego();
-            
             unsubscribe = onSnapshot(salaRef, (doc) => {
-                if (doc.exists() && doc.data().preguntas && gameActivo) {
-                    salaData = doc.data();
-                    renderizarJuego();
+                if (doc.exists()) {
+                    const newData = doc.data();
+                    if (newData.preguntas && (!salaData.preguntas || salaData.turno !== newData.turno)) {
+                        salaData = newData;
+                        if (salaData.preguntas && gameActivo) {
+                            renderizarJuego();
+                        }
+                    }
                 }
             });
         }
