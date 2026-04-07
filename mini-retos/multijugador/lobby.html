@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrera Multijugador | AprobadoYa</title>
+    <title>Lobby | Carrera Multijugador</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,8 +12,11 @@
             background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
             min-height: 100vh;
             color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .container { max-width: 500px; margin: 0 auto; padding: 40px 20px; }
+        .container { max-width: 500px; width: 90%; margin: 20px; }
         .card {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(12px);
@@ -60,42 +63,9 @@
             padding: 12px 20px;
             border-radius: 50px;
             cursor: pointer;
+            font-weight: bold;
         }
-        .waiting-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .waiting-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 40px;
-            padding: 40px;
-            text-align: center;
-        }
-        .waiting-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top-color: #fbbf24;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .codigo-grande {
-            font-size: 2rem;
-            letter-spacing: 5px;
-            color: #fbbf24;
-            margin: 20px 0;
-        }
+        .error { color: #f87171; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -105,27 +75,18 @@
             <button class="btn" id="btnAleatorio">🎲 Emparejamiento aleatorio</button>
             <button class="btn btn-outline" id="btnCrearPartida">➕ Crear partida privada</button>
             <div class="codigo-input">
-                <input type="text" id="codigoInput" placeholder="Código" maxlength="6">
+                <input type="text" id="codigoInput" placeholder="Código 6 dígitos" maxlength="6">
                 <button id="btnUnirse">Unirse</button>
             </div>
-        </div>
-    </div>
-
-    <div id="waitingScreen" class="waiting-screen">
-        <div class="waiting-card">
-            <div class="waiting-spinner"></div>
-            <h3>Esperando oponente...</h3>
-            <div class="codigo-grande" id="codigoDisplay">------</div>
-            <button id="btnCancelar" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 25px; border-radius: 50px;">Cancelar</button>
+            <div id="errorMsg" class="error"></div>
         </div>
     </div>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         let currentUser = null;
-        let unsubscribeActual = null;
         
         function generarCodigo() {
             return Math.floor(100000 + Math.random() * 900000).toString();
@@ -175,19 +136,6 @@
             return sala.id;
         }
         
-        function esperarOponente(salaId, codigo) {
-            document.getElementById('codigoDisplay').textContent = codigo;
-            document.getElementById('waitingScreen').style.display = 'flex';
-            
-            const salaRef = doc(db, "partidas_multijugador", salaId);
-            unsubscribeActual = onSnapshot(salaRef, (doc) => {
-                if (doc.exists() && doc.data().estado === "en_curso") {
-                    if (unsubscribeActual) unsubscribeActual();
-                    window.location.href = `juego-multijugador.html?sala=${salaId}`;
-                }
-            });
-        }
-        
         onAuthStateChanged(auth, (user) => {
             renderUserZone();
             if (!user) { window.location.href = '../../login.html'; return; }
@@ -198,31 +146,35 @@
             let salaId = await buscarSala();
             if (!salaId) {
                 const { salaId: nuevaSala, codigo } = await crearSala();
-                esperarOponente(nuevaSala, codigo);
+                localStorage.setItem('sala_actual', nuevaSala);
+                window.location.href = `espera.html?creador=true&sala=${nuevaSala}&codigo=${codigo}`;
             } else {
-                window.location.href = `juego-multijugador.html?sala=${salaId}`;
+                localStorage.setItem('sala_actual', salaId);
+                window.location.href = `juego.html?sala=${salaId}`;
             }
         });
         
         document.getElementById('btnCrearPartida').addEventListener('click', async () => {
             const { salaId, codigo } = await crearSala();
-            esperarOponente(salaId, codigo);
+            localStorage.setItem('sala_actual', salaId);
+            window.location.href = `espera.html?creador=true&sala=${salaId}&codigo=${codigo}`;
         });
         
         document.getElementById('btnUnirse').addEventListener('click', async () => {
             const codigo = document.getElementById('codigoInput').value.trim();
-            if (codigo.length !== 6) { alert("Código de 6 dígitos"); return; }
+            if (codigo.length !== 6) {
+                document.getElementById('errorMsg').textContent = "❌ Código de 6 dígitos";
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
             const salaId = await unirsePorCodigo(codigo);
             if (salaId) {
-                window.location.href = `juego-multijugador.html?sala=${salaId}`;
+                localStorage.setItem('sala_actual', salaId);
+                window.location.href = `juego.html?sala=${salaId}`;
             } else {
-                alert("Partida no encontrada");
+                document.getElementById('errorMsg').textContent = "❌ Partida no encontrada";
+                document.getElementById('errorMsg').style.display = 'block';
             }
-        });
-        
-        document.getElementById('btnCancelar').addEventListener('click', () => {
-            if (unsubscribeActual) unsubscribeActual();
-            document.getElementById('waitingScreen').style.display = 'none';
         });
     </script>
 </body>
