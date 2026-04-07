@@ -300,285 +300,152 @@
         </div>
     </div>
 
-    <script src="../js/auth.js"></script>
-    <script>
-        // Preguntas sobre Alcoholemia y Sanciones
-        const preguntasAlcoholemia = [
-            { texto: "¿Cuál es la tasa máxima de alcohol permitida para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "Los conductores noveles (primeros 2 años) tienen un límite de 0,3 g/l en sangre." },
-            { texto: "¿Cuál es la sanción por conducir con una tasa de alcohol superior a 0,60 mg/l en aire espirado?", opciones: ["200€ y 2 puntos", "500€ y 4 puntos", "1000€ y 6 puntos", "Delito penal con prisión"], correcta: 3, explicacion: "Superar 0,60 mg/l se considera delito penal con penas de prisión de 3 a 6 meses." },
-            { texto: "¿Cuántos puntos se restan por conducir con una tasa de alcohol entre 0,25 y 0,50 mg/l?", opciones: ["2 puntos", "4 puntos", "6 puntos", "8 puntos"], correcta: 1, explicacion: "Entre 0,25 y 0,50 mg/l: 500€ de multa y 4 puntos." },
-            { texto: "¿Qué sanción tiene negarse a realizar la prueba de alcoholemia?", opciones: ["500€ y 4 puntos", "1000€ y 6 puntos", "Delito penal con prisión", "Todas son correctas"], correcta: 3, explicacion: "Negarse a la prueba es delito penal con penas de prisión, multa y pérdida de puntos." },
-            { texto: "¿Qué tasa de alcohol máxima tienen los conductores profesionales?", opciones: ["0,5 g/l", "0,3 g/l", "0,15 g/l", "0,0 g/l"], correcta: 1, explicacion: "Los conductores profesionales tienen el límite reducido a 0,3 g/l." },
-            { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "Los conductores noveles disponen inicialmente de 8 puntos." },
-            { texto: "¿Qué sanción tiene conducir bajo efectos de drogas?", opciones: ["500€ y 4 puntos", "1000€ y 6 puntos", "200€ y 3 puntos", "Delito penal"], correcta: 1, explicacion: "Conducir bajo efectos de drogas: 1000€ de multa y 6 puntos." },
-            { texto: "¿Cuánto tiempo se considera conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "El período de conductor novel dura 2 años desde la obtención del permiso." },
-            { texto: "¿Qué sanción tiene superar la velocidad máxima en 30 km/h en vía urbana?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 2, explicacion: "Exceso de velocidad grave: 300€ de multa y 4 puntos." },
-            { texto: "¿Cuál es la tasa de alcohol máxima para conductores generales?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,8 g/l"], correcta: 0, explicacion: "La tasa máxima para conductores generales es 0,5 g/l en sangre." },
-            { texto: "¿Cuánto tarda el cuerpo humano en eliminar una cerveza?", opciones: ["30 minutos", "1 hora", "2 horas", "3 horas"], correcta: 1, explicacion: "El cuerpo elimina aproximadamente 0,15-0,20 g/l por hora." },
-            { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "Usar el móvil al volante: 200€ de multa y 3 puntos." },
-            { texto: "¿Qué cantidad de alcohol equivale a una tasa de 0,5 g/l?", opciones: ["1 cerveza", "2 cervezas", "3 cervezas", "Depende del peso"], correcta: 3, explicacion: "La tasa de alcohol depende del peso corporal, sexo y tiempo de ingesta." },
-            { texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1, explicacion: "No usar el cinturón: 200€ de multa y 3 puntos." },
-            { texto: "¿Cuántos puntos se pueden recuperar con cursos de sensibilización?", opciones: ["2 puntos", "4 puntos", "6 puntos", "Hasta 8 puntos"], correcta: 2, explicacion: "Se pueden recuperar hasta 6 puntos con cursos cada 2 años." }
-        ];
+    <script type="module">
+    import { auth, onAuthStateChanged, signOut } from '../js/firebase-init.js';
+    import { renderUserZone } from '../js/global-auth.js';
+    
+    let currentUserId = null;
+    
+    const preguntasAlcoholemia = [
+        { texto: "¿Cuál es la tasa máxima de alcohol permitida para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "Los conductores noveles (primeros 2 años) tienen un límite de 0,3 g/l en sangre." },
+        { texto: "¿Cuál es la sanción por conducir con una tasa de alcohol superior a 0,60 mg/l en aire espirado?", opciones: ["200€ y 2 puntos", "500€ y 4 puntos", "1000€ y 6 puntos", "Delito penal con prisión"], correcta: 3, explicacion: "Superar 0,60 mg/l se considera delito penal con penas de prisión de 3 a 6 meses." },
+        { texto: "¿Cuántos puntos se restan por conducir con una tasa de alcohol entre 0,25 y 0,50 mg/l?", opciones: ["2 puntos", "4 puntos", "6 puntos", "8 puntos"], correcta: 1, explicacion: "Entre 0,25 y 0,50 mg/l: 500€ de multa y 4 puntos." },
+        { texto: "¿Qué sanción tiene negarse a realizar la prueba de alcoholemia?", opciones: ["500€ y 4 puntos", "1000€ y 6 puntos", "Delito penal con prisión", "Todas son correctas"], correcta: 3, explicacion: "Negarse a la prueba es delito penal con penas de prisión, multa y pérdida de puntos." },
+        { texto: "¿Qué tasa de alcohol máxima tienen los conductores profesionales?", opciones: ["0,5 g/l", "0,3 g/l", "0,15 g/l", "0,0 g/l"], correcta: 1, explicacion: "Los conductores profesionales tienen el límite reducido a 0,3 g/l." },
+        { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "Los conductores noveles disponen inicialmente de 8 puntos." },
+        { texto: "¿Qué sanción tiene conducir bajo efectos de drogas?", opciones: ["500€ y 4 puntos", "1000€ y 6 puntos", "200€ y 3 puntos", "Delito penal"], correcta: 1, explicacion: "Conducir bajo efectos de drogas: 1000€ de multa y 6 puntos." },
+        { texto: "¿Cuánto tiempo se considera conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "El período de conductor novel dura 2 años desde la obtención del permiso." },
+        { texto: "¿Qué sanción tiene superar la velocidad máxima en 30 km/h en vía urbana?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 2, explicacion: "Exceso de velocidad grave: 300€ de multa y 4 puntos." },
+        { texto: "¿Cuál es la tasa de alcohol máxima para conductores generales?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,8 g/l"], correcta: 0, explicacion: "La tasa máxima para conductores generales es 0,5 g/l en sangre." },
+        { texto: "¿Cuánto tarda el cuerpo humano en eliminar una cerveza?", opciones: ["30 minutos", "1 hora", "2 horas", "3 horas"], correcta: 1, explicacion: "El cuerpo elimina aproximadamente 0,15-0,20 g/l por hora." },
+        { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "Usar el móvil al volante: 200€ de multa y 3 puntos." },
+        { texto: "¿Qué cantidad de alcohol equivale a una tasa de 0,5 g/l?", opciones: ["1 cerveza", "2 cervezas", "3 cervezas", "Depende del peso"], correcta: 3, explicacion: "La tasa de alcohol depende del peso corporal, sexo y tiempo de ingesta." },
+        { texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1, explicacion: "No usar el cinturón: 200€ de multa y 3 puntos." },
+        { texto: "¿Cuántos puntos se pueden recuperar con cursos de sensibilización?", opciones: ["2 puntos", "4 puntos", "6 puntos", "Hasta 8 puntos"], correcta: 2, explicacion: "Se pueden recuperar hasta 6 puntos con cursos cada 2 años." }
+    ];
 
-        let preguntasActuales = [];
-        let racha = 0;
-        let mejorRacha = 0;
-        let puntos = 0;
-        let preguntaActual = null;
-        let opcionSeleccionada = false;
-        let gameActivo = true;
-        let timerInterval;
-        let tiempoRestante = 30;
-        let indicePregunta = 0;
-        const TOTAL_PREGUNTAS = 15;
+    let preguntasActuales = [], racha = 0, mejorRacha = 0, puntos = 0, preguntaActual = null, opcionSeleccionada = false, gameActivo = true, timerInterval, tiempoRestante = 30, indicePregunta = 0;
+    const TOTAL_PREGUNTAS = 15;
 
-        function cargarMejorRacha() {
-            const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
-            mejorRacha = stats.mejorRachaAlcoholemia || 0;
-            document.getElementById('bestStreak').textContent = mejorRacha;
-        }
+    function cargarMejorRacha() {
+        const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
+        mejorRacha = stats.mejorRachaAlcoholemia || 0;
+        document.getElementById('bestStreak').textContent = mejorRacha;
+    }
 
-        function guardarMejorRacha() {
-            const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
-            stats.mejorRachaAlcoholemia = Math.max(stats.mejorRachaAlcoholemia || 0, racha);
-            localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats));
-        }
+    function guardarMejorRacha() {
+        const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
+        stats.mejorRachaAlcoholemia = Math.max(stats.mejorRachaAlcoholemia || 0, racha);
+        localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats));
+    }
 
-        function iniciarJuego() {
-            preguntasActuales = [...preguntasAlcoholemia];
-            for (let i = preguntasActuales.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [preguntasActuales[i], preguntasActuales[j]] = [preguntasActuales[j], preguntasActuales[i]];
-            }
-            document.getElementById('questionsLeft').textContent = TOTAL_PREGUNTAS;
-            
-            const markersContainer = document.getElementById('progressMarkers');
-            markersContainer.innerHTML = '';
-            for (let i = 0; i <= TOTAL_PREGUNTAS; i++) {
-                const marker = document.createElement('div');
-                marker.className = 'marker';
-                marker.style.left = `${(i / TOTAL_PREGUNTAS) * 100}%`;
-                markersContainer.appendChild(marker);
-            }
-            
-            cargarMejorRacha();
-            cargarPregunta();
-        }
+    function iniciarJuego() {
+        preguntasActuales = [...preguntasAlcoholemia];
+        for (let i = preguntasActuales.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [preguntasActuales[i], preguntasActuales[j]] = [preguntasActuales[j], preguntasActuales[i]]; }
+        document.getElementById('questionsLeft').textContent = TOTAL_PREGUNTAS;
+        const markersContainer = document.getElementById('progressMarkers');
+        markersContainer.innerHTML = '';
+        for (let i = 0; i <= TOTAL_PREGUNTAS; i++) { const marker = document.createElement('div'); marker.className = 'marker'; marker.style.left = `${(i / TOTAL_PREGUNTAS) * 100}%`; markersContainer.appendChild(marker); }
+        cargarMejorRacha();
+        cargarPregunta();
+    }
 
-        function cargarPregunta() {
-            if (indicePregunta >= TOTAL_PREGUNTAS) {
-                finalizarJuego(true);
-                return;
-            }
-            
-            preguntaActual = preguntasActuales[indicePregunta];
-            document.getElementById('questionText').textContent = preguntaActual.texto;
-            
-            const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = preguntaActual.opciones.map((opcion, idx) => `
-                <div class="option-btn" onclick="responder(${idx})">
-                    <span class="option-prefix">${String.fromCharCode(65 + idx)}.</span>
-                    <span>${opcion}</span>
-                </div>
-            `).join('');
-            
-            opcionSeleccionada = false;
-            document.getElementById('resultMessage').className = 'result-message';
-            document.getElementById('resultMessage').style.display = 'none';
-            document.getElementById('nextBtn').style.display = 'none';
-            iniciarTemporizador();
-        }
+    function cargarPregunta() {
+        if (indicePregunta >= TOTAL_PREGUNTAS) { finalizarJuego(true); return; }
+        preguntaActual = preguntasActuales[indicePregunta];
+        document.getElementById('questionText').textContent = preguntaActual.texto;
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = preguntaActual.opciones.map((opcion, idx) => `<div class="option-btn" onclick="responder(${idx})"><span class="option-prefix">${String.fromCharCode(65 + idx)}.</span><span>${opcion}</span></div>`).join('');
+        opcionSeleccionada = false;
+        document.getElementById('resultMessage').className = 'result-message';
+        document.getElementById('resultMessage').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        iniciarTemporizador();
+    }
 
-        function iniciarTemporizador() {
-            if (timerInterval) clearInterval(timerInterval);
-            tiempoRestante = 30;
-            const timerFill = document.getElementById('timerFill');
-            timerFill.style.width = '100%';
-            timerFill.style.transition = 'none';
-            setTimeout(() => { timerFill.style.transition = 'width 0.1s linear'; }, 10);
-            
-            timerInterval = setInterval(() => {
-                if (opcionSeleccionada || !gameActivo) return;
-                tiempoRestante--;
-                const porcentaje = (tiempoRestante / 30) * 100;
-                timerFill.style.width = `${Math.max(0, porcentaje)}%`;
-                
-                if (tiempoRestante <= 5) {
-                    timerFill.style.background = '#ef4444';
-                }
-                
-                if (tiempoRestante <= 0) {
-                    clearInterval(timerInterval);
-                    responder(-1);
-                }
-            }, 1000);
-        }
-
-        function responder(indice) {
+    function iniciarTemporizador() {
+        if (timerInterval) clearInterval(timerInterval);
+        tiempoRestante = 30;
+        const timerFill = document.getElementById('timerFill');
+        timerFill.style.width = '100%';
+        timerFill.style.transition = 'none';
+        setTimeout(() => { timerFill.style.transition = 'width 0.1s linear'; }, 10);
+        timerInterval = setInterval(() => {
             if (opcionSeleccionada || !gameActivo) return;
-            clearInterval(timerInterval);
-            opcionSeleccionada = true;
-            
-            const esCorrecto = (indice === preguntaActual.correcta);
-            const resultMessage = document.getElementById('resultMessage');
-            const carElement = document.getElementById('car');
-            
-            if (esCorrecto) {
-                racha++;
-                if (racha > mejorRacha) {
-                    mejorRacha = racha;
-                    guardarMejorRacha();
-                    document.getElementById('bestStreak').textContent = mejorRacha;
-                }
-                const puntosGanados = 10 + Math.floor(racha * 1.5) + Math.floor(tiempoRestante / 3);
-                puntos += puntosGanados;
-                const avance = (indicePregunta + 1) / TOTAL_PREGUNTAS * 100;
-                carElement.style.left = `${Math.min(avance, 98)}%`;
-                carElement.classList.add('celebration');
-                setTimeout(() => carElement.classList.remove('celebration'), 500);
-                
-                resultMessage.className = 'result-message correct';
-                resultMessage.innerHTML = `<i class="fas fa-check-circle"></i> ¡Correcto! +${puntosGanados} puntos | 🔥 Racha: ${racha}`;
-                resultMessage.style.display = 'block';
-            } else {
-                carElement.classList.add('car-shake');
-                setTimeout(() => carElement.classList.remove('car-shake'), 300);
-                
-                if (indice === -1) {
-                    resultMessage.className = 'result-message wrong';
-                    resultMessage.innerHTML = `<i class="fas fa-clock"></i> ⏰ ¡Tiempo agotado! La respuesta correcta era: ${String.fromCharCode(65 + preguntaActual.correcta)}. ${preguntaActual.explicacion}`;
-                } else {
-                    resultMessage.className = 'result-message wrong';
-                    resultMessage.innerHTML = `<i class="fas fa-times-circle"></i> ❌ Incorrecto. La respuesta correcta era: ${String.fromCharCode(65 + preguntaActual.correcta)}. ${preguntaActual.explicacion}`;
-                }
-                resultMessage.style.display = 'block';
-                gameActivo = false;
-                document.getElementById('nextBtn').style.display = 'none';
-                mostrarGameOver();
-                return;
-            }
-            
-            document.getElementById('currentStreak').textContent = racha;
-            document.getElementById('totalPoints').textContent = puntos;
-            document.getElementById('questionsLeft').textContent = TOTAL_PREGUNTAS - (indicePregunta + 1);
-            
-            document.getElementById('nextBtn').style.display = 'block';
-        }
+            tiempoRestante--;
+            const porcentaje = (tiempoRestante / 30) * 100;
+            timerFill.style.width = `${Math.max(0, porcentaje)}%`;
+            if (tiempoRestante <= 5) timerFill.style.background = '#ef4444';
+            if (tiempoRestante <= 0) { clearInterval(timerInterval); responder(-1); }
+        }, 1000);
+    }
 
-        function siguientePregunta() {
-            indicePregunta++;
-            cargarPregunta();
-        }
-
-        function finalizarJuego(victoria) {
+    window.responder = function(indice) {
+        if (opcionSeleccionada || !gameActivo) return;
+        clearInterval(timerInterval);
+        opcionSeleccionada = true;
+        const esCorrecto = (indice === preguntaActual.correcta);
+        const resultMessage = document.getElementById('resultMessage');
+        const carElement = document.getElementById('car');
+        if (esCorrecto) {
+            racha++;
+            if (racha > mejorRacha) { mejorRacha = racha; guardarMejorRacha(); document.getElementById('bestStreak').textContent = mejorRacha; }
+            const puntosGanados = 10 + Math.floor(racha * 1.5) + Math.floor(tiempoRestante / 3);
+            puntos += puntosGanados;
+            const avance = (indicePregunta + 1) / TOTAL_PREGUNTAS * 100;
+            carElement.style.left = `${Math.min(avance, 98)}%`;
+            carElement.classList.add('celebration');
+            setTimeout(() => carElement.classList.remove('celebration'), 500);
+            resultMessage.className = 'result-message correct';
+            resultMessage.innerHTML = `<i class="fas fa-check-circle"></i> ¡Correcto! +${puntosGanados} puntos | 🔥 Racha: ${racha}`;
+            resultMessage.style.display = 'block';
+        } else {
+            carElement.classList.add('car-shake');
+            setTimeout(() => carElement.classList.remove('car-shake'), 300);
+            if (indice === -1) { resultMessage.className = 'result-message wrong'; resultMessage.innerHTML = `<i class="fas fa-clock"></i> ⏰ ¡Tiempo agotado! La respuesta correcta era: ${String.fromCharCode(65 + preguntaActual.correcta)}. ${preguntaActual.explicacion}`; }
+            else { resultMessage.className = 'result-message wrong'; resultMessage.innerHTML = `<i class="fas fa-times-circle"></i> ❌ Incorrecto. La respuesta correcta era: ${String.fromCharCode(65 + preguntaActual.correcta)}. ${preguntaActual.explicacion}`; }
+            resultMessage.style.display = 'block';
             gameActivo = false;
-            clearInterval(timerInterval);
-            
-            const questionCard = document.getElementById('questionCard');
-            if (victoria) {
-                const bonus = racha >= 12 ? 200 : (racha >= 8 ? 100 : (racha >= 4 ? 50 : 0));
-                const totalPuntos = puntos + bonus;
-                document.getElementById('totalPoints').textContent = totalPuntos;
-                
-                questionCard.innerHTML = `
-                    <div class="game-over">
-                        <i class="fas fa-trophy" style="font-size: 4rem; color: #fbbf24;"></i>
-                        <h2 style="color: #10b981;">🏆 ¡VICTORIA! 🏆</h2>
-                        <p>✨ ¡Eres un experto en alcoholemia y sanciones! ✨</p>
-                        <div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;">
-                            <p><strong>🏆 Puntuación total:</strong> <span style="color: #fbbf24; font-size: 1.5rem;">${totalPuntos}</span> pts</p>
-                            <p><strong>🔥 Mejor racha:</strong> ${mejorRacha} aciertos seguidos</p>
-                            <p><strong>📊 Aciertos:</strong> ${indicePregunta}/${TOTAL_PREGUNTAS}</p>
-                            ${bonus > 0 ? `<p><i class="fas fa-star" style="color: #fbbf24;"></i> Bonus por racha: +${bonus} puntos</p>` : ''}
-                        </div>
-                        <button class="reset-btn" onclick="reiniciarJuego()"><i class="fas fa-redo"></i> Jugar de nuevo</button>
-                        <a href="index.html" class="reset-btn" style="display: inline-block; margin-left: 10px; background: #f1f5f9; color: #1e293b; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a>
-                    </div>
-                `;
-                guardarPuntuacion(totalPuntos);
-            } else {
-                guardarPuntuacion(puntos);
-            }
+            document.getElementById('nextBtn').style.display = 'none';
+            mostrarGameOver();
+            return;
         }
+        document.getElementById('currentStreak').textContent = racha;
+        document.getElementById('totalPoints').textContent = puntos;
+        document.getElementById('questionsLeft').textContent = TOTAL_PREGUNTAS - (indicePregunta + 1);
+        document.getElementById('nextBtn').style.display = 'block';
+    }
 
-        function mostrarGameOver() {
-            const questionCard = document.getElementById('questionCard');
-            const totalPuntos = puntos;
-            
-            questionCard.innerHTML = `
-                <div class="game-over">
-                    <i class="fas fa-times-circle" style="font-size: 4rem; color: #ef4444;"></i>
-                    <h2 style="color: #991b1b;">😢 GAME OVER</h2>
-                    <p>Has fallado en la pregunta ${indicePregunta + 1}</p>
-                    <div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;">
-                        <p><strong>🏆 Puntuación final:</strong> <span style="color: #fbbf24;">${totalPuntos}</span> pts</p>
-                        <p><strong>🔥 Racha máxima:</strong> ${mejorRacha} aciertos seguidos</p>
-                    </div>
-                    <button class="reset-btn" onclick="reiniciarJuego()"><i class="fas fa-redo"></i> Reintentar</button>
-                    <a href="index.html" class="reset-btn" style="display: inline-block; margin-left: 10px; background: #f1f5f9; color: #1e293b; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a>
-                </div>
-            `;
-        }
+    window.siguientePregunta = function() { indicePregunta++; cargarPregunta(); };
 
-        function reiniciarJuego() {
-            indicePregunta = 0;
-            racha = 0;
-            puntos = 0;
-            gameActivo = true;
-            opcionSeleccionada = false;
-            document.getElementById('currentStreak').textContent = racha;
-            document.getElementById('totalPoints').textContent = puntos;
-            
-            preguntasActuales = [...preguntasAlcoholemia];
-            for (let i = preguntasActuales.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [preguntasActuales[i], preguntasActuales[j]] = [preguntasActuales[j], preguntasActuales[i]];
-            }
-            document.getElementById('questionsLeft').textContent = TOTAL_PREGUNTAS;
-            document.getElementById('car').style.left = '0%';
-            
-            const questionCard = document.getElementById('questionCard');
-            questionCard.innerHTML = `
-                <div class="question-text" id="questionText"></div>
-                <div class="options" id="optionsContainer"></div>
-                <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
-                <div class="result-message" id="resultMessage"></div>
-                <button class="next-btn" id="nextBtn">🍺 Siguiente pregunta →</button>
-            `;
-            
-            document.getElementById('nextBtn').addEventListener('click', siguientePregunta);
-            cargarPregunta();
-        }
+    function finalizarJuego(victoria) {
+        gameActivo = false; clearInterval(timerInterval);
+        const questionCard = document.getElementById('questionCard');
+        if (victoria) {
+            const bonus = racha >= 12 ? 200 : (racha >= 8 ? 100 : (racha >= 4 ? 50 : 0));
+            const totalPuntos = puntos + bonus;
+            document.getElementById('totalPoints').textContent = totalPuntos;
+            questionCard.innerHTML = `<div class="game-over"><i class="fas fa-trophy" style="font-size: 4rem; color: #fbbf24;"></i><h2 style="color: #10b981;">🏆 ¡VICTORIA! 🏆</h2><p>✨ ¡Eres un experto en alcoholemia y sanciones! ✨</p><div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;"><p><strong>🏆 Puntuación total:</strong> <span style="color: #fbbf24; font-size: 1.5rem;">${totalPuntos}</span> pts</p><p><strong>🔥 Mejor racha:</strong> ${mejorRacha} aciertos seguidos</p><p><strong>📊 Aciertos:</strong> ${indicePregunta}/${TOTAL_PREGUNTAS}</p>${bonus > 0 ? `<p><i class="fas fa-star" style="color: #fbbf24;"></i> Bonus por racha: +${bonus} puntos</p>` : ''}</div><button class="reset-btn" onclick="reiniciarJuego()"><i class="fas fa-redo"></i> Jugar de nuevo</button><a href="index.html" class="reset-btn" style="display: inline-block; margin-left: 10px; background: #f1f5f9; color: #1e293b; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a></div>`;
+            guardarPuntuacion(totalPuntos);
+        } else { guardarPuntuacion(puntos); }
+    }
 
-        function guardarPuntuacion(puntos) {
-            const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
-            stats.totalJuegos = (stats.totalJuegos || 0) + 1;
-            stats.totalPuntos = (stats.totalPuntos || 0) + puntos;
-            stats.mejorRachaAlcoholemia = Math.max(stats.mejorRachaAlcoholemia || 0, racha);
-            localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats));
-        }
+    function mostrarGameOver() {
+        const questionCard = document.getElementById('questionCard');
+        const totalPuntos = puntos;
+        questionCard.innerHTML = `<div class="game-over"><i class="fas fa-times-circle" style="font-size: 4rem; color: #ef4444;"></i><h2 style="color: #991b1b;">😢 GAME OVER</h2><p>Has fallado en la pregunta ${indicePregunta + 1}</p><div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;"><p><strong>🏆 Puntuación final:</strong> <span style="color: #fbbf24;">${totalPuntos}</span> pts</p><p><strong>🔥 Racha máxima:</strong> ${mejorRacha} aciertos seguidos</p></div><button class="reset-btn" onclick="reiniciarJuego()"><i class="fas fa-redo"></i> Reintentar</button><a href="index.html" class="reset-btn" style="display: inline-block; margin-left: 10px; background: #f1f5f9; color: #1e293b; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a></div>`;
+    }
 
-        function renderUserZone() {
-            const u = getCurrentUser();
-            const z = document.getElementById('userZone');
-            if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
-            else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
-        }
+    window.reiniciarJuego = function() { location.reload(); };
+    function guardarPuntuacion(puntos) { const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}'); stats.totalJuegos = (stats.totalJuegos || 0) + 1; stats.totalPuntos = (stats.totalPuntos || 0) + puntos; stats.mejorRachaAlcoholemia = Math.max(stats.mejorRachaAlcoholemia || 0, racha); localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats)); }
 
+    onAuthStateChanged(auth, (user) => {
         renderUserZone();
-        document.getElementById('nextBtn').addEventListener('click', siguientePregunta);
-        iniciarJuego();
-
-        // Al finalizar el juego, guardar historial
-        import { guardarHistorialJuego } from '../js/ranking-firebase.js';
-
-// Cuando el juego termina (en finalizarJuego o mostrarGameOver)
-        await guardarHistorialJuego(userId, "Alcoholemia y Sanciones", totalPuntos, {
-             racha: mejorRacha,
-            aciertos: aciertos,
-            total: total
-        });
-    </script>
+        if (!user) { window.location.href = '../login.html'; }
+        else { currentUserId = user.uid; iniciarJuego(); }
+    });
+    document.getElementById('nextBtn').addEventListener('click', window.siguientePregunta);
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => { document.querySelector('.nav-wrapper')?.classList.toggle('active'); });
+</script>
 </body>
 </html>

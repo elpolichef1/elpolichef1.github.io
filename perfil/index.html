@@ -786,274 +786,254 @@
     </footer>
 
     <script type="module">
-        import { auth, onAuthStateChanged, signOut, db, doc, getDoc, updateDoc, deleteDoc } from '../js/firebase-init.js';
-        import { renderUserZone } from '../js/global-auth.js';
+    import { auth, onAuthStateChanged, signOut, db, doc, getDoc, updateDoc, deleteDoc, setDoc } from '../js/firebase-init.js';
+    import { renderUserZone, updateGlobalAvatar } from '../js/global-auth.js';
+    
+    const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
+    
+    let chartPie = null;
+    let chartBar = null;
+    let currentUserData = null;
+    
+    function showToast(message) {
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) existingToast.remove();
         
-        const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+        document.body.appendChild(toast);
         
-        let chartPie = null;
-        let chartBar = null;
-        let currentUserData = null;
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
+    
+    async function renderProfile(user) {
+        const container = document.getElementById('profileContent');
         
-        function showToast(message) {
-            const existingToast = document.querySelector('.toast-notification');
-            if (existingToast) existingToast.remove();
-            
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
+        if (!user) {
+            container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-id-card" style="font-size:3.5rem; color:#f5b042;"></i><h3 style="margin:15px 0">Accede a tu cuenta</h3><a href="../login.html" style="background:#f5b042; padding:12px 32px; border-radius:60px; border:none; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block;">Iniciar sesión</a></div>`;
+            return;
         }
         
-        async function renderProfile(user) {
-            const container = document.getElementById('profileContent');
+        try {
+            const userRef = doc(db, "usuarios", user.uid);
+            const userDoc = await getDoc(userRef);
             
-            if (!user) {
-                container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-id-card" style="font-size:3.5rem; color:#f5b042;"></i><h3 style="margin:15px 0">Accede a tu cuenta</h3><a href="../login.html" style="background:#f5b042; padding:12px 32px; border-radius:60px; border:none; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block;">Iniciar sesión</a></div>`;
-                return;
+            let userData = {};
+            if (userDoc.exists()) {
+                userData = userDoc.data();
+                currentUserData = userData;
+            } else {
+                userData = {
+                    nombre: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    avatar: "🚗",
+                    fechaRegistro: new Date().toISOString().split('T')[0],
+                    testsRealizados: 0,
+                    totalAciertos: 0,
+                    totalPreguntas: 0,
+                    mejorResultado: 0,
+                    mediaAciertos: 0
+                };
+                await setDoc(userRef, userData);
             }
             
-            try {
-                const userRef = doc(db, "usuarios", user.uid);
-                const userDoc = await getDoc(userRef);
-                
-                let userData = {};
-                if (userDoc.exists()) {
-                    userData = userDoc.data();
-                    currentUserData = userData;
-                } else {
-                    userData = {
-                        nombre: user.displayName || user.email.split('@')[0],
-                        email: user.email,
-                        avatar: "🚗",
-                        fechaRegistro: new Date().toISOString().split('T')[0],
-                        testsRealizados: 0,
-                        totalAciertos: 0,
-                        totalPreguntas: 0,
-                        mejorResultado: 0,
-                        mediaAciertos: 0
-                    };
-                    await setDoc(userRef, userData);
-                }
-                
-                const avatar = userData.avatar || "🚗";
-                const porcentajeGlobal = userData.mediaAciertos || 0;
-                
-                container.innerHTML = `
-                    <div class="profile-container">
-                        <div class="profile-sidebar">
-                            <div class="profile-avatar" id="profileAvatar">${avatar}</div>
-                            <div class="profile-name-container">
-                                <div class="profile-name" id="profileNameDisplay">${escapeHtml(userData.nombre)}</div>
-                                <button class="btn-edit-name" id="editNameBtn">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </button>
-                            </div>
-                            <div class="profile-email">${user.email}</div>
-                            <div class="profile-stats-mini">
-                                <p><i class="fas fa-calendar-alt"></i> Miembro desde: ${userData.fechaRegistro || new Date().toISOString().split('T')[0]}</p>
-                                <p><i class="fas fa-clipboard-list"></i> Tests realizados: ${userData.testsRealizados || 0}</p>
-                                <p><i class="fas fa-chart-simple"></i> Media de aciertos: ${porcentajeGlobal}%</p>
-                            </div>
-                            <div id="avatarSelector" class="avatar-selector" style="display: none;">
-                                ${avataresDisponibles.map(a => `<div class="avatar-option ${avatar === a ? 'selected' : ''}" data-avatar="${a}">${a}</div>`).join('')}
-                            </div>
-                            <button class="btn-editar" id="toggleAvatarBtn"><i class="fas fa-edit"></i> Cambiar avatar</button>
+            const avatar = userData.avatar || "🚗";
+            const porcentajeGlobal = userData.mediaAciertos || 0;
+            
+            container.innerHTML = `
+                <div class="profile-container">
+                    <div class="profile-sidebar">
+                        <div class="profile-avatar" id="profileAvatar">${avatar}</div>
+                        <div class="profile-name-container">
+                            <div class="profile-name" id="profileNameDisplay">${escapeHtml(userData.nombre)}</div>
+                            <button class="btn-edit-name" id="editNameBtn"><i class="fas fa-pencil-alt"></i></button>
                         </div>
-                        <div class="profile-main">
-                            <div class="section-title"><i class="fas fa-chart-pie"></i> Progreso global & Gráficos</div>
-                            <div class="graficos-dobles">
-                                <div class="grafico-card"><h4><i class="fas fa-percent"></i> Aciertos totales</h4><canvas id="graficoPastel" width="200" height="200"></canvas></div>
-                                <div class="grafico-card"><h4><i class="fas fa-chart-bar"></i> Tests realizados</h4><canvas id="graficoBarras" width="300" height="180"></canvas></div>
-                            </div>
-                            <div class="section-title"><i class="fas fa-chart-line"></i> Mis Estadísticas</div>
-                            <div class="stats-grid">
-                                <div class="stat-card"><div class="stat-number">${userData.testsRealizados || 0}</div><div class="stat-label">Tests realizados</div></div>
-                                <div class="stat-card"><div class="stat-number">${userData.totalAciertos || 0}</div><div class="stat-label">Aciertos totales</div></div>
-                                <div class="stat-card"><div class="stat-number">${userData.totalPreguntas || 0}</div><div class="stat-label">Preguntas contestadas</div></div>
-                                <div class="stat-card"><div class="stat-number">${userData.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
-                            </div>
-                            <div class="section-title"><i class="fas fa-chart-simple"></i> Mi Progreso</div>
-                            <div class="progress-item">
-                                <div class="progress-header"><span>🏁 Tests realizados (meta 50)</span><span id="testsCount">${userData.testsRealizados || 0}/50</span></div>
-                                <div class="progress-bar"><div class="progress-fill" id="testsFill" style="width: ${Math.min(((userData.testsRealizados || 0) / 50) * 100, 100)}%"></div></div>
-                            </div>
-                            <div class="btn-recargar" id="refreshStatsBtn"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</div>
-                            
-                            <!-- Botón Eliminar Cuenta -->
-                            <div class="delete-account-section">
-                                <button class="btn-delete-account" id="deleteAccountBtn">
-                                    <i class="fas fa-trash-alt"></i> Eliminar mi cuenta
-                                </button>
-                                <p class="delete-warning">
-                                    <i class="fas fa-exclamation-triangle"></i> Esta acción es irreversible. Se eliminarán todos tus datos.
-                                </p>
-                            </div>
+                        <div class="profile-email">${user.email}</div>
+                        <div class="profile-stats-mini">
+                            <p><i class="fas fa-calendar-alt"></i> Miembro desde: ${userData.fechaRegistro || new Date().toISOString().split('T')[0]}</p>
+                            <p><i class="fas fa-clipboard-list"></i> Tests realizados: ${userData.testsRealizados || 0}</p>
+                            <p><i class="fas fa-chart-simple"></i> Media de aciertos: ${porcentajeGlobal}%</p>
+                        </div>
+                        <div id="avatarSelector" class="avatar-selector" style="display: none;">
+                            ${avataresDisponibles.map(a => `<div class="avatar-option ${avatar === a ? 'selected' : ''}" data-avatar="${a}">${a}</div>`).join('')}
+                        </div>
+                        <button class="btn-editar" id="toggleAvatarBtn"><i class="fas fa-edit"></i> Cambiar avatar</button>
+                    </div>
+                    <div class="profile-main">
+                        <div class="section-title"><i class="fas fa-chart-pie"></i> Progreso global & Gráficos</div>
+                        <div class="graficos-dobles">
+                            <div class="grafico-card"><h4><i class="fas fa-percent"></i> Aciertos totales</h4><canvas id="graficoPastel" width="200" height="200"></canvas></div>
+                            <div class="grafico-card"><h4><i class="fas fa-chart-bar"></i> Tests realizados</h4><canvas id="graficoBarras" width="300" height="180"></canvas></div>
+                        </div>
+                        <div class="section-title"><i class="fas fa-chart-line"></i> Mis Estadísticas</div>
+                        <div class="stats-grid">
+                            <div class="stat-card"><div class="stat-number">${userData.testsRealizados || 0}</div><div class="stat-label">Tests realizados</div></div>
+                            <div class="stat-card"><div class="stat-number">${userData.totalAciertos || 0}</div><div class="stat-label">Aciertos totales</div></div>
+                            <div class="stat-card"><div class="stat-number">${userData.totalPreguntas || 0}</div><div class="stat-label">Preguntas contestadas</div></div>
+                            <div class="stat-card"><div class="stat-number">${userData.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
+                        </div>
+                        <div class="section-title"><i class="fas fa-chart-simple"></i> Mi Progreso</div>
+                        <div class="progress-item">
+                            <div class="progress-header"><span>🏁 Tests realizados (meta 50)</span><span id="testsCount">${userData.testsRealizados || 0}/50</span></div>
+                            <div class="progress-bar"><div class="progress-fill" id="testsFill" style="width: ${Math.min(((userData.testsRealizados || 0) / 50) * 100, 100)}%"></div></div>
+                        </div>
+                        <div class="btn-recargar" id="refreshStatsBtn"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</div>
+                        
+                        <div class="delete-account-section">
+                            <button class="btn-delete-account" id="deleteAccountBtn"><i class="fas fa-trash-alt"></i> Eliminar mi cuenta</button>
+                            <p class="delete-warning"><i class="fas fa-exclamation-triangle"></i> Esta acción es irreversible. Se eliminarán todos tus datos.</p>
                         </div>
                     </div>
-                `;
-                
-                // Gráficos
-                if (chartPie) chartPie.destroy();
-                if (chartBar) chartBar.destroy();
-                
-                const ctxPie = document.getElementById('graficoPastel')?.getContext('2d');
-                if (ctxPie) {
-                    chartPie = new Chart(ctxPie, {
-                        type: 'doughnut',
-                        data: { labels: ['Aciertos', 'Fallos'], datasets: [{ data: [userData.totalAciertos || 0, (userData.totalPreguntas || 0) - (userData.totalAciertos || 0)], backgroundColor: ['#f5b042', '#e2cfb3'], borderWidth: 0 }] },
-                        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-                    });
-                }
-                
-                const ctxBar = document.getElementById('graficoBarras')?.getContext('2d');
-                if (ctxBar) {
-                    chartBar = new Chart(ctxBar, {
-                        type: 'bar',
-                        data: { labels: ['Tests realizados'], datasets: [{ label: 'Cantidad', data: [userData.testsRealizados || 0], backgroundColor: '#f5b042', borderRadius: 14 }] },
-                        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-                    });
-                }
-                
-                // Eventos
-                document.getElementById('toggleAvatarBtn')?.addEventListener('click', () => {
-                    const selector = document.getElementById('avatarSelector');
-                    selector.style.display = selector.style.display === 'none' ? 'flex' : 'none';
+                </div>
+            `;
+            
+            // Gráficos
+            if (chartPie) chartPie.destroy();
+            if (chartBar) chartBar.destroy();
+            
+            const ctxPie = document.getElementById('graficoPastel')?.getContext('2d');
+            if (ctxPie) {
+                chartPie = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: { labels: ['Aciertos', 'Fallos'], datasets: [{ data: [userData.totalAciertos || 0, (userData.totalPreguntas || 0) - (userData.totalAciertos || 0)], backgroundColor: ['#f5b042', '#e2cfb3'], borderWidth: 0 }] },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
                 });
-                
-                document.querySelectorAll('.avatar-option').forEach(opt => {
-                    opt.addEventListener('click', async () => {
-                        const newAvatar = opt.dataset.avatar;
-                        const userRef = doc(db, "usuarios", user.uid);
-                        await updateDoc(userRef, { avatar: newAvatar });
-                        showToast('Avatar actualizado');
-                        renderProfile(user);
-                        renderUserZone();
-                    });
-                });
-                
-                document.getElementById('editNameBtn')?.addEventListener('click', () => {
-                    const modal = document.getElementById('editNameModal');
-                    const input = document.getElementById('editNameInput');
-                    input.value = userData.nombre;
-                    modal.style.display = 'flex';
-                });
-                
-                document.getElementById('saveNameBtn')?.addEventListener('click', async () => {
-                    const input = document.getElementById('editNameInput');
-                    const newName = input.value.trim();
-                    if (newName) {
-                        const userRef = doc(db, "usuarios", user.uid);
-                        await updateDoc(userRef, { nombre: newName });
-                        showToast('Nombre actualizado');
-                        renderProfile(user);
-                        renderUserZone();
-                    }
-                    document.getElementById('editNameModal').style.display = 'none';
-                });
-                
-                document.getElementById('cancelNameBtn')?.addEventListener('click', () => {
-                    document.getElementById('editNameModal').style.display = 'none';
-                });
-                
-                document.getElementById('refreshStatsBtn')?.addEventListener('click', () => {
-                    renderProfile(user);
-                    showToast('Estadísticas actualizadas');
-                });
-                
-                // Botón eliminar cuenta
-                document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
-                    const confirmar = confirm(
-                        "⚠️ ¿Estás SEGURO de que quieres eliminar tu cuenta?\n\n" +
-                        "Esta acción es IRREVERSIBLE y se eliminarán:\n" +
-                        "✓ Tu cuenta de usuario\n" +
-                        "✓ Todos tus datos personales\n" +
-                        "✓ Tu historial de tests y juegos\n" +
-                        "✓ Tu progreso y estadísticas\n\n" +
-                        "¿Estás seguro de continuar?"
-                    );
-                    
-                    if (!confirmar) return;
-                    
-                    const textoConfirmacion = prompt("Escribe 'ELIMINAR' para confirmar la eliminación de tu cuenta:");
-                    if (textoConfirmacion !== "ELIMINAR") {
-                        alert("❌ Confirmación incorrecta. No se ha eliminado la cuenta.");
-                        return;
-                    }
-                    
-                    const deleteBtn = document.getElementById('deleteAccountBtn');
-                    const originalText = deleteBtn.innerHTML;
-                    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando cuenta...';
-                    deleteBtn.disabled = true;
-                    
-                    try {
-                        const userRef = doc(db, "usuarios", user.uid);
-                        await deleteDoc(userRef);
-                        console.log("✅ Documento de Firestore eliminado");
-                        
-                        await user.delete();
-                        console.log("✅ Usuario de Firebase Auth eliminado");
-                        
-                        await signOut(auth);
-                        alert("✅ Tu cuenta ha sido eliminada correctamente. Sentimos verte partir.");
-                        window.location.href = '../index.html';
-                        
-                    } catch (error) {
-                        console.error("Error al eliminar cuenta:", error);
-                        let mensajeError = "❌ Error al eliminar la cuenta: ";
-                        if (error.code === 'auth/requires-recent-login') {
-                            mensajeError = "❌ Por seguridad, necesitas volver a iniciar sesión para eliminar tu cuenta. Por favor, cierra sesión y vuelve a iniciarla.";
-                        } else {
-                            mensajeError += error.message;
-                        }
-                        alert(mensajeError);
-                        deleteBtn.innerHTML = originalText;
-                        deleteBtn.disabled = false;
-                    }
-                });
-                
-            } catch (error) {
-                console.error("Error al cargar perfil:", error);
-                container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-exclamation-triangle" style="font-size:3.5rem; color:#dc2626;"></i><h3 style="margin:15px 0">Error al cargar el perfil</h3><p>${error.message}</p><a href="../index.html" style="background:#f5b042; padding:12px 32px; border-radius:60px; border:none; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; margin-top:20px;">Volver al inicio</a></div>`;
             }
-        }
-        
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
+            
+            const ctxBar = document.getElementById('graficoBarras')?.getContext('2d');
+            if (ctxBar) {
+                chartBar = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: { labels: ['Tests realizados'], datasets: [{ label: 'Cantidad', data: [userData.testsRealizados || 0], backgroundColor: '#f5b042', borderRadius: 14 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                });
+            }
+            
+            // Eventos
+            document.getElementById('toggleAvatarBtn')?.addEventListener('click', () => {
+                const selector = document.getElementById('avatarSelector');
+                selector.style.display = selector.style.display === 'none' ? 'flex' : 'none';
             });
+            
+            // CORREGIDO: Usar updateGlobalAvatar para que se actualice en todas las páginas
+            document.querySelectorAll('.avatar-option').forEach(opt => {
+                opt.addEventListener('click', async () => {
+                    const newAvatar = opt.dataset.avatar;
+                    await updateGlobalAvatar(newAvatar);
+                    showToast('Avatar actualizado');
+                    // Actualizar el avatar en el perfil localmente
+                    const profileAvatar = document.getElementById('profileAvatar');
+                    if (profileAvatar) profileAvatar.textContent = newAvatar;
+                    // Forzar actualización en otras páginas
+                    localStorage.setItem('user_update_flag', Date.now().toString());
+                });
+            });
+            
+            document.getElementById('editNameBtn')?.addEventListener('click', () => {
+                const modal = document.getElementById('editNameModal');
+                const input = document.getElementById('editNameInput');
+                input.value = userData.nombre;
+                modal.style.display = 'flex';
+            });
+            
+            document.getElementById('saveNameBtn')?.addEventListener('click', async () => {
+                const input = document.getElementById('editNameInput');
+                const newName = input.value.trim();
+                if (newName) {
+                    const userRef = doc(db, "usuarios", user.uid);
+                    await updateDoc(userRef, { nombre: newName });
+                    showToast('Nombre actualizado');
+                    renderProfile(user);
+                    renderUserZone();
+                }
+                document.getElementById('editNameModal').style.display = 'none';
+            });
+            
+            document.getElementById('cancelNameBtn')?.addEventListener('click', () => {
+                document.getElementById('editNameModal').style.display = 'none';
+            });
+            
+            document.getElementById('refreshStatsBtn')?.addEventListener('click', () => {
+                renderProfile(user);
+                showToast('Estadísticas actualizadas');
+            });
+            
+            document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
+                const confirmar = confirm("⚠️ ¿Estás SEGURO de que quieres eliminar tu cuenta?\n\nEsta acción es IRREVERSIBLE.\n\n¿Estás seguro de continuar?");
+                if (!confirmar) return;
+                
+                const textoConfirmacion = prompt("Escribe 'ELIMINAR' para confirmar la eliminación de tu cuenta:");
+                if (textoConfirmacion !== "ELIMINAR") {
+                    alert("❌ Confirmación incorrecta. No se ha eliminado la cuenta.");
+                    return;
+                }
+                
+                const deleteBtn = document.getElementById('deleteAccountBtn');
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando cuenta...';
+                deleteBtn.disabled = true;
+                
+                try {
+                    const userRef = doc(db, "usuarios", user.uid);
+                    await deleteDoc(userRef);
+                    await user.delete();
+                    await signOut(auth);
+                    alert("✅ Tu cuenta ha sido eliminada correctamente.");
+                    window.location.href = '../index.html';
+                } catch (error) {
+                    console.error("Error:", error);
+                    let mensajeError = "❌ Error al eliminar la cuenta: ";
+                    if (error.code === 'auth/requires-recent-login') {
+                        mensajeError = "❌ Por seguridad, necesitas volver a iniciar sesión para eliminar tu cuenta.";
+                    } else {
+                        mensajeError += error.message;
+                    }
+                    alert(mensajeError);
+                    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Eliminar mi cuenta';
+                    deleteBtn.disabled = false;
+                }
+            });
+            
+        } catch (error) {
+            console.error("Error:", error);
+            container.innerHTML = `<div style="text-align:center; background:white; border-radius:36px; padding:60px;"><i class="fas fa-exclamation-triangle" style="font-size:3.5rem; color:#dc2626;"></i><h3 style="margin:15px 0">Error al cargar el perfil</h3><p>${error.message}</p><a href="../index.html" style="background:#f5b042; padding:12px 32px; border-radius:60px; text-decoration:none; display:inline-block; margin-top:20px;">Volver al inicio</a></div>`;
         }
-        
-        onAuthStateChanged(auth, async (user) => {
-            renderUserZone();
-            if (!user) {
-                window.location.href = '../login.html';
-            } else {
-                await renderProfile(user);
-            }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
         });
-        
-        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-            const wrapper = document.getElementById('navWrapper');
-            if (wrapper) wrapper.classList.toggle('active');
-        });
-        
-        window.onclick = function(event) {
-            const modal = document.getElementById('editNameModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        };
-    </script>
+    }
+    
+    onAuthStateChanged(auth, async (user) => {
+        renderUserZone();
+        if (!user) {
+            window.location.href = '../login.html';
+        } else {
+            await renderProfile(user);
+        }
+    });
+    
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+        const wrapper = document.getElementById('navWrapper');
+        if (wrapper) wrapper.classList.toggle('active');
+    });
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('editNameModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+</script>
 </body>
 </html>
