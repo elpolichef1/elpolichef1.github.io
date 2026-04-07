@@ -1,7 +1,3 @@
-// ============================================
-// FIREBASE INICIALIZACIÓN
-// ============================================
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
     getAuth, 
@@ -26,15 +22,15 @@ import {
     where
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// TU CONFIGURACIÓN DE FIREBASE
+// 🔥 TU NUEVA CONFIGURACIÓN DE FIREBASE 🔥
 const firebaseConfig = {
-    apiKey: "AIzaSyC15mRJfoeD4F-5u32YyAhoQ8c0ZW9_O8s",
-    authDomain: "aprobadoya-login.firebaseapp.com",
-    projectId: "aprobadoya-login",
-    storageBucket: "aprobadoya-login.firebasestorage.app",
-    messagingSenderId: "786027866487",
-    appId: "1:786027866487:web:0e08ee55100e456c521972",
-    measurementId: "G-7DDRTDGEGY"
+    apiKey: "AIzaSyDoY5Zp_3z5_qVPOGzRzqayIok7XS5W8Nw",
+    authDomain: "aprobadoya-final.firebaseapp.com",
+    projectId: "aprobadoya-final",
+    storageBucket: "aprobadoya-final.firebasestorage.app",
+    messagingSenderId: "299130896445",
+    appId: "1:299130896445:web:984cfcd7efbf546deaea54",
+    measurementId: "G-P20F08W61Y"
 };
 
 // Inicializar Firebase
