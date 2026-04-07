@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Firestore</title>
+    <style>
+        body { font-family: monospace; background: #1a472a; color: white; padding: 20px; }
+        button { background: #fbbf24; color: #1a472a; border: none; padding: 12px 20px; margin: 8px; cursor: pointer; border-radius: 12px; font-weight: bold; }
+        pre { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 16px; overflow-x: auto; margin-top: 20px; }
+        .error { color: #f87171; }
+        .success { color: #a3e635; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test de Firestore</h1>
+    <button id="btnTest">📝 Test de escritura/lectura</button>
+    <button id="btnCrear">➕ Crear sala de prueba</button>
+    <button id="btnLeer">📖 Leer todas las salas</button>
+    <pre id="log">Esperando acción...</pre>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, getDocs } from '../../js/firebase-init.js';
+        
+        const log = document.getElementById('log');
+        function addLog(msg, isError = false) {
+            const prefix = isError ? '❌ ' : '✅ ';
+            log.innerHTML += `\n${new Date().toLocaleTimeString()} - ${prefix}${msg}`;
+            log.scrollTop = log.scrollHeight;
+            console.log(msg);
+        }
+        function clearLog() { log.innerHTML = "Esperando acción..."; }
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                addLog(`Usuario logueado: ${user.email}`);
+            } else {
+                addLog(`No hay usuario logueado`, true);
+            }
+        });
+        
+        document.getElementById('btnTest').addEventListener('click', async () => {
+            clearLog();
+            addLog("=== TEST DE CONEXIÓN ===");
+            try {
+                const testRef = doc(db, "test", "conexion");
+                await setDoc(testRef, { fecha: new Date().toISOString(), test: true });
+                addLog("Escritura en Firestore exitosa");
+                const testDoc = await getDoc(testRef);
+                addLog(`Lectura exitosa: ${JSON.stringify(testDoc.data())}`);
+            } catch (error) {
+                addLog(`ERROR: ${error.message}`, true);
+            }
+        });
+        
+        document.getElementById('btnCrear').addEventListener('click', async () => {
+            clearLog();
+            addLog("=== CREANDO SALA ===");
+            try {
+                const salaId = `sala_test_${Date.now()}`;
+                await setDoc(doc(db, "partidas_multijugador", salaId), {
+                    id: salaId, codigo: "123456", jugador1: "test", estado: "esperando"
+                });
+                addLog(`Sala creada: ${salaId}`);
+            } catch (error) {
+                addLog(`ERROR: ${error.message}`, true);
+            }
+        });
+        
+        document.getElementById('btnLeer').addEventListener('click', async () => {
+            clearLog();
+            addLog("=== LEYENDO SALAS ===");
+            try {
+                const snapshot = await getDocs(collection(db, "partidas_multijugador"));
+                addLog(`Total salas: ${snapshot.size}`);
+                snapshot.forEach((doc) => addLog(`- ${doc.id}: ${JSON.stringify(doc.data())}`));
+            } catch (error) {
+                addLog(`ERROR: ${error.message}`, true);
+            }
+        });
+    </script>
+</body>
+</html>
