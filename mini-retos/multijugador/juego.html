@@ -161,8 +161,7 @@
     <script type="module">
         import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
-        import { preguntasDGT } from '../../test/data/preguntas.js';
-        
+        import { preguntasMulti } from './preguntas-multi.js';
         let salaId = null;
         let currentUser = null;
         let salaData = null;
@@ -172,7 +171,7 @@
         let unsubscribe = null;
         
         function obtenerPregunta() {
-            return preguntasDGT[Math.floor(Math.random() * preguntasDGT.length)];
+            return preguntasMulti[Math.floor(Math.random() * preguntasMulti.length)];
         }
         
         function mostrarCuentaAtras() {
