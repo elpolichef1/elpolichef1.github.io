@@ -2,102 +2,195 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Carrera Multijugador | AprobadoYa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
             min-height: 100vh;
             color: white;
         }
+
         .container {
-            max-width: 600px;
+            max-width: 550px;
             margin: 0 auto;
             padding: 40px 20px;
         }
+
         .card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 32px;
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 45px 35px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
         }
-        h1 { font-size: 2rem; margin-bottom: 10px; }
-        h1 i { color: #fbbf24; margin-right: 10px; }
-        .subtitle { color: #e0f0e8; margin-bottom: 30px; }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff, #fbbf24);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #ffffff, #fbbf24);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+h1 i {
+    color: #fbbf24;
+    margin-right: 10px;
+}
+
+.subtitle {
+    color: #e0f0e8;
+    margin-bottom: 35px;
+    font-size: 0.95rem;
+}
+
+        .subtitle {
+            color: #e0f0e8;
+            margin-bottom: 35px;
+            font-size: 0.95rem;
+        }
+
         .btn {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #1a472a;
             border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            padding: 16px 30px;
+            border-radius: 60px;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             width: 100%;
             margin-bottom: 15px;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251,191,36,0.3); }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(251, 191, 36, 0.4);
+        }
+
         .btn-outline {
             background: transparent;
             border: 2px solid #fbbf24;
             color: #fbbf24;
         }
-        .btn-outline:hover { background: #fbbf24; color: #1a472a; }
+
+        .btn-outline:hover {
+            background: #fbbf24;
+            color: #1a472a;
+        }
+
         .codigo-container {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 25px;
             padding: 20px;
             margin: 20px 0;
+            backdrop-filter: blur(4px);
         }
+
+        .codigo-container p {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
         .codigo-input {
             display: flex;
             gap: 10px;
             margin-top: 15px;
         }
+
         .codigo-input input {
             flex: 1;
-            padding: 12px;
-            border-radius: 50px;
+            padding: 14px;
+            border-radius: 60px;
             border: none;
             font-size: 1rem;
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             font-weight: bold;
+            background: white;
         }
+
+        .codigo-input input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #fbbf24;
+        }
+
         .codigo-input button {
             background: #fbbf24;
             border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
+            padding: 14px 25px;
+            border-radius: 60px;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.3s;
         }
+
+        .codigo-input button:hover {
+            background: #f59e0b;
+            transform: scale(1.02);
+        }
+
         .divider {
             display: flex;
             align-items: center;
             margin: 25px 0;
             color: #94a3b8;
+            font-size: 0.8rem;
         }
-        .divider::before, .divider::after {
+
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .divider::before { margin-right: 15px; }
-        .divider::after { margin-left: 15px; }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
+
         .volver {
             display: inline-block;
             margin-top: 20px;
             color: #fbbf24;
             text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
         }
-        
+
+        .volver:hover {
+            color: white;
+        }
+
         /* Pantalla de espera */
         .waiting-screen {
             position: fixed;
@@ -105,60 +198,106 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
             z-index: 1000;
             display: none;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
+
         .waiting-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
             padding: 50px;
             text-align: center;
             max-width: 450px;
             width: 90%;
-            border: 1px solid rgba(251,191,36,0.3);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            animation: fadeInUp 0.4s ease;
         }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .waiting-spinner {
             width: 60px;
             height: 60px;
-            border: 4px solid rgba(255,255,255,0.3);
+            border: 4px solid rgba(255, 255, 255, 0.2);
             border-top-color: #fbbf24;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
-        .waiting-codigo {
-            background: rgba(0,0,0,0.5);
-            padding: 15px;
-            border-radius: 20px;
-            margin: 20px 0;
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
+
+        .waiting-codigo {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 30px;
+            margin: 25px 0;
+        }
+
         .waiting-codigo span {
-            font-size: 2rem;
-            letter-spacing: 5px;
-            font-weight: bold;
+            font-size: 2.2rem;
+            letter-spacing: 8px;
+            font-weight: 800;
             color: #fbbf24;
         }
+
         .btn-cancelar {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 12px 30px;
             border-radius: 50px;
             cursor: pointer;
             margin-top: 20px;
+            transition: 0.3s;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+        .btn-cancelar:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
-        .waiting-text {
+
+        .pulse-text {
             animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .card {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .waiting-codigo span {
+                font-size: 1.5rem;
+                letter-spacing: 4px;
+            }
         }
     </style>
 </head>
@@ -166,7 +305,7 @@
     <div class="container">
         <div class="card">
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
-            <p class="subtitle">¡Compite contra otro jugador en tiempo real!</p>
+            <p class="subtitle">🏁 ¡Compite contra otro jugador en tiempo real! 🏁</p>
 
             <button class="btn" id="btnAleatorio">
                 <i class="fas fa-random"></i> Emparejamiento aleatorio
@@ -176,7 +315,7 @@
 
             <div class="codigo-container">
                 <p><i class="fas fa-link"></i> Crear partida privada</p>
-                <button class="btn-outline" id="btnCrearPartida" style="margin-top: 10px;">
+                <button class="btn-outline" id="btnCrearPartida" style="margin-top: 5px;">
                     <i class="fas fa-plus-circle"></i> Crear partida
                 </button>
             </div>
@@ -184,7 +323,7 @@
             <div class="codigo-container">
                 <p><i class="fas fa-door-open"></i> Unirse con código</p>
                 <div class="codigo-input">
-                    <input type="text" id="codigoInput" placeholder="Código de 6 dígitos" maxlength="6">
+                    <input type="text" id="codigoInput" placeholder="Código 6 dígitos" maxlength="6" inputmode="numeric">
                     <button id="btnUnirse"><i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
@@ -199,10 +338,10 @@
             <div class="waiting-spinner"></div>
             <h2><i class="fas fa-users"></i> Esperando oponente...</h2>
             <div class="waiting-codigo">
-                <p>Código de la sala:</p>
+                <p style="margin-bottom: 8px;">📋 Código de la sala:</p>
                 <span id="waitingCodigo">------</span>
             </div>
-            <p class="waiting-text">Comparte este código con tu amigo para que se una</p>
+            <p class="pulse-text">🔗 Comparte este código con tu amigo</p>
             <button class="btn-cancelar" id="btnCancelarEspera">
                 <i class="fas fa-times"></i> Cancelar
             </button>
@@ -212,41 +351,18 @@
     <script type="module">
         import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
-        
+
         let currentUser = null;
-        let salaIdActual = null;
-        let esperaInterval = null;
-        
+        let unsubscribeActual = null;
+
         function generarCodigo() {
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
-        
-        function mostrarPantallaEspera(codigo) {
-            const screen = document.getElementById('waitingScreen');
-            document.getElementById('waitingCodigo').textContent = codigo;
-            screen.style.display = 'flex';
-        }
-        
-        function ocultarPantallaEspera() {
-            const screen = document.getElementById('waitingScreen');
-            screen.style.display = 'none';
-        }
-        
-        function cancelarEspera() {
-            if (esperaInterval) clearInterval(esperaInterval);
-            if (salaIdActual) {
-                // Eliminar la sala creada
-                const salaRef = doc(db, "partidas_multijugador", salaIdActual);
-                setDoc(salaRef, { estado: "cancelada" }).catch(console.error);
-            }
-            ocultarPantallaEspera();
-            salaIdActual = null;
-        }
-        
-        async function crearSalaEspera() {
+
+        async function crearSala() {
             const codigo = generarCodigo();
             const salaId = `sala_${Date.now()}`;
-            
+
             await setDoc(doc(db, "partidas_multijugador", salaId), {
                 id: salaId,
                 codigo: codigo,
@@ -259,12 +375,12 @@
             });
             return { salaId, codigo };
         }
-        
-        async function buscarSalaAleatoria() {
+
+        async function buscarSala() {
             const salasRef = collection(db, "partidas_multijugador");
             const q = query(salasRef, where("estado", "==", "esperando"), where("jugador1", "!=", currentUser.uid));
             const snapshot = await getDocs(q);
-            
+
             if (!snapshot.empty) {
                 const sala = snapshot.docs[0];
                 await updateDoc(sala.ref, {
@@ -276,14 +392,14 @@
             }
             return null;
         }
-        
+
         async function unirsePorCodigo(codigo) {
             const salasRef = collection(db, "partidas_multijugador");
             const q = query(salasRef, where("codigo", "==", codigo), where("estado", "==", "esperando"));
             const snapshot = await getDocs(q);
-            
+
             if (snapshot.empty) return null;
-            
+
             const sala = snapshot.docs[0];
             await updateDoc(sala.ref, {
                 jugador2: currentUser.uid,
@@ -292,41 +408,36 @@
             });
             return sala.id;
         }
-        
-        async function esperarOponente(salaId) {
-            mostrarPantallaEspera("---");
-            salaIdActual = salaId;
-            
-            // Obtener el código para mostrarlo
+
+        function mostrarEspera(codigo) {
+            document.getElementById('waitingCodigo').textContent = codigo;
+            document.getElementById('waitingScreen').style.display = 'flex';
+        }
+
+        function ocultarEspera() {
+            document.getElementById('waitingScreen').style.display = 'none';
+        }
+
+        async function esperarOponente(salaId, codigo) {
+            mostrarEspera(codigo);
+
             const salaRef = doc(db, "partidas_multijugador", salaId);
-            const salaDoc = await getDoc(salaRef);
-            if (salaDoc.exists()) {
-                const codigo = salaDoc.data().codigo;
-                document.getElementById('waitingCodigo').textContent = codigo;
-            }
-            
-            // Escuchar cambios en la sala
-            const unsubscribe = onSnapshot(salaRef, (doc) => {
-                if (doc.exists()) {
-                    const data = doc.data();
-                    if (data.estado === "en_curso") {
-                        unsubscribe();
-                        if (esperaInterval) clearInterval(esperaInterval);
-                        window.location.href = `juego-multijugador.html?sala=${salaId}`;
-                    }
+            unsubscribeActual = onSnapshot(salaRef, (doc) => {
+                if (doc.exists() && doc.data().estado === "en_curso") {
+                    if (unsubscribeActual) unsubscribeActual();
+                    window.location.href = `juego-multijugador.html?sala=${salaId}`;
                 }
             });
-            
-            // Timeout después de 60 segundos
+
             setTimeout(() => {
-                unsubscribe();
-                if (document.getElementById('waitingScreen').style.display === 'flex') {
-                    alert("⏰ Tiempo de espera agotado. No se encontró ningún oponente.");
-                    cancelarEspera();
+                if (unsubscribeActual) {
+                    unsubscribeActual();
+                    ocultarEspera();
+                    alert("⏰ Tiempo de espera agotado");
                 }
             }, 60000);
         }
-        
+
         onAuthStateChanged(auth, async (user) => {
             renderUserZone();
             if (!user) {
@@ -334,16 +445,14 @@
                 return;
             }
             currentUser = user;
-            console.log("Usuario logueado:", currentUser.email);
         });
-        
+
         document.getElementById('btnAleatorio').addEventListener('click', async () => {
             try {
-                let salaId = await buscarSalaAleatoria();
+                let salaId = await buscarSala();
                 if (!salaId) {
-                    const { salaId: nuevaSala, codigo } = await crearSalaEspera();
-                    salaId = nuevaSala;
-                    await esperarOponente(salaId);
+                    const { salaId: nuevaSala, codigo } = await crearSala();
+                    await esperarOponente(nuevaSala, codigo);
                 } else {
                     window.location.href = `juego-multijugador.html?sala=${salaId}`;
                 }
@@ -352,24 +461,23 @@
                 alert("Error: " + error.message);
             }
         });
-        
+
         document.getElementById('btnCrearPartida').addEventListener('click', async () => {
             try {
-                const { salaId, codigo } = await crearSalaEspera();
-                await esperarOponente(salaId);
+                const { salaId, codigo } = await crearSala();
+                await esperarOponente(salaId, codigo);
             } catch (error) {
                 console.error(error);
                 alert("Error: " + error.message);
             }
         });
-        
+
         document.getElementById('btnUnirse').addEventListener('click', async () => {
             const codigo = document.getElementById('codigoInput').value.trim();
             if (codigo.length !== 6) {
                 alert("❌ Introduce un código de 6 dígitos");
                 return;
             }
-            
             try {
                 const salaId = await unirsePorCodigo(codigo);
                 if (salaId) {
@@ -382,9 +490,10 @@
                 alert("Error: " + error.message);
             }
         });
-        
+
         document.getElementById('btnCancelarEspera').addEventListener('click', () => {
-            cancelarEspera();
+            if (unsubscribeActual) unsubscribeActual();
+            ocultarEspera();
         });
     </script>
 </body>
