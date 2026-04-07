@@ -97,10 +97,68 @@
             color: #fbbf24;
             text-decoration: none;
         }
-        @media (max-width: 768px) {
-            .container { padding: 20px; }
-            .card { padding: 25px; }
-            h1 { font-size: 1.5rem; }
+        
+        /* Pantalla de espera */
+        .waiting-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .waiting-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 50px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+        .waiting-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        .waiting-codigo {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+        .waiting-codigo span {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        .btn-cancelar {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .waiting-text {
+            animation: pulse 1.5s infinite;
         }
     </style>
 </head>
@@ -135,14 +193,54 @@
         </div>
     </div>
 
+    <!-- Pantalla de espera -->
+    <div id="waitingScreen" class="waiting-screen">
+        <div class="waiting-card">
+            <div class="waiting-spinner"></div>
+            <h2><i class="fas fa-users"></i> Esperando oponente...</h2>
+            <div class="waiting-codigo">
+                <p>Código de la sala:</p>
+                <span id="waitingCodigo">------</span>
+            </div>
+            <p class="waiting-text">Comparte este código con tu amigo para que se una</p>
+            <button class="btn-cancelar" id="btnCancelarEspera">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
+    </div>
+
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         let currentUser = null;
+        let salaIdActual = null;
+        let esperaInterval = null;
         
         function generarCodigo() {
             return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+        
+        function mostrarPantallaEspera(codigo) {
+            const screen = document.getElementById('waitingScreen');
+            document.getElementById('waitingCodigo').textContent = codigo;
+            screen.style.display = 'flex';
+        }
+        
+        function ocultarPantallaEspera() {
+            const screen = document.getElementById('waitingScreen');
+            screen.style.display = 'none';
+        }
+        
+        function cancelarEspera() {
+            if (esperaInterval) clearInterval(esperaInterval);
+            if (salaIdActual) {
+                // Eliminar la sala creada
+                const salaRef = doc(db, "partidas_multijugador", salaIdActual);
+                setDoc(salaRef, { estado: "cancelada" }).catch(console.error);
+            }
+            ocultarPantallaEspera();
+            salaIdActual = null;
         }
         
         async function crearSalaEspera() {
@@ -195,6 +293,40 @@
             return sala.id;
         }
         
+        async function esperarOponente(salaId) {
+            mostrarPantallaEspera("---");
+            salaIdActual = salaId;
+            
+            // Obtener el código para mostrarlo
+            const salaRef = doc(db, "partidas_multijugador", salaId);
+            const salaDoc = await getDoc(salaRef);
+            if (salaDoc.exists()) {
+                const codigo = salaDoc.data().codigo;
+                document.getElementById('waitingCodigo').textContent = codigo;
+            }
+            
+            // Escuchar cambios en la sala
+            const unsubscribe = onSnapshot(salaRef, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    if (data.estado === "en_curso") {
+                        unsubscribe();
+                        if (esperaInterval) clearInterval(esperaInterval);
+                        window.location.href = `juego-multijugador.html?sala=${salaId}`;
+                    }
+                }
+            });
+            
+            // Timeout después de 60 segundos
+            setTimeout(() => {
+                unsubscribe();
+                if (document.getElementById('waitingScreen').style.display === 'flex') {
+                    alert("⏰ Tiempo de espera agotado. No se encontró ningún oponente.");
+                    cancelarEspera();
+                }
+            }, 60000);
+        }
+        
         onAuthStateChanged(auth, async (user) => {
             renderUserZone();
             if (!user) {
@@ -209,18 +341,9 @@
             try {
                 let salaId = await buscarSalaAleatoria();
                 if (!salaId) {
-                    const { salaId: nuevaSala } = await crearSalaEspera();
+                    const { salaId: nuevaSala, codigo } = await crearSalaEspera();
                     salaId = nuevaSala;
-                    alert("Buscando oponente... Espera a que alguien se una.");
-                    
-                    const interval = setInterval(async () => {
-                        const salaRef = doc(db, "partidas_multijugador", salaId);
-                        const salaDoc = await getDoc(salaRef);
-                        if (salaDoc.exists() && salaDoc.data().estado === "en_curso") {
-                            clearInterval(interval);
-                            window.location.href = `juego-multijugador.html?sala=${salaId}`;
-                        }
-                    }, 2000);
+                    await esperarOponente(salaId);
                 } else {
                     window.location.href = `juego-multijugador.html?sala=${salaId}`;
                 }
@@ -233,16 +356,7 @@
         document.getElementById('btnCrearPartida').addEventListener('click', async () => {
             try {
                 const { salaId, codigo } = await crearSalaEspera();
-                alert(`✅ Partida creada!\n\nCódigo: ${codigo}\n\nCompártelo con tu amigo.`);
-                
-                const interval = setInterval(async () => {
-                    const salaRef = doc(db, "partidas_multijugador", salaId);
-                    const salaDoc = await getDoc(salaRef);
-                    if (salaDoc.exists() && salaDoc.data().estado === "en_curso") {
-                        clearInterval(interval);
-                        window.location.href = `juego-multijugador.html?sala=${salaId}`;
-                    }
-                }, 2000);
+                await esperarOponente(salaId);
             } catch (error) {
                 console.error(error);
                 alert("Error: " + error.message);
@@ -252,7 +366,7 @@
         document.getElementById('btnUnirse').addEventListener('click', async () => {
             const codigo = document.getElementById('codigoInput').value.trim();
             if (codigo.length !== 6) {
-                alert("Introduce un código de 6 dígitos");
+                alert("❌ Introduce un código de 6 dígitos");
                 return;
             }
             
@@ -261,12 +375,16 @@
                 if (salaId) {
                     window.location.href = `juego-multijugador.html?sala=${salaId}`;
                 } else {
-                    alert("No se encontró ninguna partida con ese código");
+                    alert("❌ No se encontró ninguna partida con ese código");
                 }
             } catch (error) {
                 console.error(error);
                 alert("Error: " + error.message);
             }
+        });
+        
+        document.getElementById('btnCancelarEspera').addEventListener('click', () => {
+            cancelarEspera();
         });
     </script>
 </body>
