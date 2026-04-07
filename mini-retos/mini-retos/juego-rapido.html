@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ráfaga de preguntas | Mini Retos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .game-header { background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; padding: 30px 0; text-align: center; }
+        .game-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .score-board { display: flex; justify-content: space-between; background: white; border-radius: 25px; padding: 20px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .score-item { text-align: center; flex: 1; }
+        .score-value { font-size: 2rem; font-weight: 800; color: #fbbf24; }
+        .timer-circle { width: 120px; height: 120px; margin: 0 auto 20px; position: relative; }
+        .timer-svg { transform: rotate(-90deg); }
+        .timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: 800; color: #1e293b; }
+        .question-card { background: white; border-radius: 30px; padding: 35px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; }
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; color: #1e293b; }
+        .options { display: grid; gap: 12px; }
+        .option-btn { padding: 12px 20px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 15px; cursor: pointer; transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 12px; }
+        .option-btn:hover:not(.disabled) { background: #fef3c7; border-color: #fbbf24; transform: translateX(5px); }
+        .result-message { margin-top: 20px; padding: 15px; border-radius: 15px; display: none; font-weight: 500; }
+        .result-message.correct { background: #d1fae5; color: #065f46; display: block; border-left: 4px solid #10b981; }
+        .result-message.wrong { background: #fee2e2; color: #991b1b; display: block; border-left: 4px solid #ef4444; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .time-warning { animation: pulse 0.5s ease-in-out; color: #ef4444; }
+    </style>
+</head>
+<body>
+    <header><div class="container"><div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div><div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../mini-retos/index.html" class="active">Mini Retos</a></li></ul></nav></div></div><div class="user-zone" id="userZone"></div><button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button></div></header>
+
+    <div class="game-header"><div class="container"><h1><i class="fas fa-bolt"></i> Ráfaga de preguntas</h1><p>Responde rápido antes de que se acabe el tiempo. ¡Cada acierto suma segundos!</p></div></div>
+
+    <div class="game-container">
+        <div class="score-board"><div class="score-item"><div class="score-value" id="puntos">0</div><div>🏆 Puntos</div></div><div class="score-item"><div class="score-value" id="racha">0</div><div>🔥 Racha</div></div><div class="score-item"><div class="score-value" id="respondidas">0</div><div>✅ Respondidas</div></div></div>
+        <div class="question-card"><div class="timer-circle"><svg width="120" height="120" class="timer-svg"><circle cx="60" cy="60" r="54" fill="none" stroke="#e2e8f0" stroke-width="8"/><circle cx="60" cy="60" r="54" fill="none" stroke="#fbbf24" stroke-width="8" stroke-dasharray="339.3" stroke-dashoffset="0" class="timer-progress" id="timerProgress"/></svg><div class="timer-text" id="timerText">3.0</div></div><div class="question-text" id="questionText">Cargando pregunta...</div><div class="options" id="optionsContainer"></div><div class="result-message" id="resultMessage"></div></div>
+    </div>
+
+   <script type="module">
+    import { auth, onAuthStateChanged, signOut } from '../js/firebase-init.js';
+    import { renderUserZone } from '../js/global-auth.js';
+    
+    const preguntasVF = [
+        { texto: "En una intersección sin señalizar, la prioridad la tiene el vehículo que circula por la izquierda.", esVerdadero: false, explicacion: "La prioridad es para el vehículo que circula por la derecha." },
+        { texto: "El cinturón de seguridad es obligatorio solo para el conductor y el acompañante delantero.", esVerdadero: false, explicacion: "Es obligatorio para todos los ocupantes del vehículo." },
+        { texto: "La tasa máxima de alcoholemia para conductores noveles es de 0,3 gramos por litro de sangre.", esVerdadero: true, explicacion: "Los conductores noveles tienen un límite de 0,3 g/l en sangre." },
+        { texto: "Está permitido usar el teléfono móvil mientras se conduce si se utiliza con manos libres.", esVerdadero: false, explicacion: "Está prohibido usar el móvil al volante, incluso con manos libres, salvo en caso de emergencia." },
+        { texto: "La señal de STOP tiene forma octogonal y fondo rojo con letras blancas.", esVerdadero: true, explicacion: "La señal de STOP es octogonal, de fondo rojo con letras blancas." },
+        { texto: "En una rotonda, los vehículos que circulan por ella deben ceder el paso a los que entran.", esVerdadero: false, explicacion: "Los que entran deben ceder el paso a los que ya circulan por la rotonda." },
+        { texto: "La velocidad máxima para un turismo en autovía es de 120 km/h.", esVerdadero: true, explicacion: "La velocidad máxima para turismos en autovía es 120 km/h." },
+        { texto: "Está permitido adelantar en un paso de peatones si no hay peatones cruzando.", esVerdadero: false, explicacion: "Está prohibido adelantar en pasos de peatones." },
+        { texto: "La ITV debe pasarse cada 2 años para turismos de más de 10 años.", esVerdadero: true, explicacion: "Los turismos de más de 10 años pasan ITV anualmente." },
+        { texto: "El uso de cadenas es obligatorio siempre que haya nieve en la calzada.", esVerdadero: false, explicacion: "Solo cuando lo indique la señal." },
+        { texto: "La luz de emergencia (V-16) es obligatoria desde 2026.", esVerdadero: true, explicacion: "La luz V-16 sustituirá a los triángulos de emergencia." },
+        { texto: "Los ciclomotores pueden circular por autopistas.", esVerdadero: false, explicacion: "Los ciclomotores tienen prohibido circular por autopistas y autovías." },
+        { texto: "El permiso B permite conducir turismos de hasta 3.500 kg.", esVerdadero: true, explicacion: "El permiso B es para turismos hasta 3.500 kg y 9 plazas." },
+        { texto: "Con niebla densa se recomienda usar la luz larga para ver mejor.", esVerdadero: false, explicacion: "La luz larga empeora la visibilidad con niebla. Use luz de cruce o antiniebla." },
+        { texto: "Los patinetes eléctricos (VMP) pueden circular por aceras.", esVerdadero: false, explicacion: "Los VMP tienen prohibido circular por aceras." },
+        { texto: "La distancia de seguridad recomendada es de 2 segundos con el vehículo delantero.", esVerdadero: true, explicacion: "La regla de los 2 segundos es la distancia de seguridad recomendada." },
+        { texto: "El ABS evita que las ruedas se bloqueen al frenar.", esVerdadero: true, explicacion: "El sistema antibloqueo de frenos evita el bloqueo de las ruedas." },
+        { texto: "Los conductores noveles tienen 12 puntos iniciales en el carnet.", esVerdadero: false, explicacion: "Los noveles tienen 8 puntos iniciales." },
+        { texto: "Las señales de servicio (hospital, gasolinera) son de color azul.", esVerdadero: true, explicacion: "Las señales de servicio son de color azul." },
+        { texto: "Está permitido estacionar en doble fila si es por poco tiempo.", esVerdadero: false, explicacion: "Está prohibido estacionar en doble fila en cualquier caso." }
+    ];
+
+    let preguntasActuales = [], indiceActual = 0, puntos = 0, racha = 0, opcionSeleccionada = false, timerInterval, tiempoRestante = 10;
+
+    function iniciarJuego() {
+        preguntasActuales = [...preguntasVF];
+        for (let i = preguntasActuales.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [preguntasActuales[i], preguntasActuales[j]] = [preguntasActuales[j], preguntasActuales[i]]; }
+        indiceActual = 0; puntos = 0; racha = 0; actualizarPuntuacion(); cargarPregunta();
+    }
+
+    function cargarPregunta() {
+        if (indiceActual >= preguntasActuales.length) { finalizarJuego(); return; }
+        const pregunta = preguntasActuales[indiceActual];
+        document.getElementById('questionText').textContent = pregunta.texto;
+        document.getElementById('preguntaNum').textContent = indiceActual + 1;
+        opcionSeleccionada = false;
+        document.getElementById('resultMessage').className = 'result-message';
+        document.getElementById('resultMessage').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('btnVerdadero').disabled = false;
+        document.getElementById('btnFalso').disabled = false;
+        iniciarTemporizador();
+    }
+
+    function iniciarTemporizador() {
+        if (timerInterval) clearInterval(timerInterval);
+        tiempoRestante = 10;
+        const timerFill = document.getElementById('timerFill');
+        timerFill.style.width = '100%';
+        timerFill.style.transition = 'none';
+        setTimeout(() => { timerFill.style.transition = 'width 1s linear'; }, 10);
+        timerInterval = setInterval(() => {
+            if (opcionSeleccionada) return;
+            tiempoRestante--;
+            const porcentaje = (tiempoRestante / 10) * 100;
+            timerFill.style.width = `${porcentaje}%`;
+            if (tiempoRestante <= 0) { clearInterval(timerInterval); responder(null); }
+        }, 1000);
+    }
+
+    window.responder = function(respuesta) {
+        if (opcionSeleccionada) return;
+        opcionSeleccionada = true;
+        clearInterval(timerInterval);
+        const pregunta = preguntasActuales[indiceActual];
+        const esCorrecto = (respuesta === pregunta.esVerdadero);
+        const resultMessage = document.getElementById('resultMessage');
+        document.getElementById('btnVerdadero').disabled = true;
+        document.getElementById('btnFalso').disabled = true;
+        if (esCorrecto) {
+            racha++;
+            const puntosGanados = 10 + (racha * 2);
+            puntos += puntosGanados;
+            resultMessage.className = 'result-message correct';
+            resultMessage.innerHTML = `<i class="fas fa-check-circle"></i> ¡Correcto! +${puntosGanados} puntos<br><small>${pregunta.explicacion}</small>`;
+        } else {
+            racha = 0;
+            resultMessage.className = 'result-message wrong';
+            const respuestaCorrecta = pregunta.esVerdadero ? "Verdadero" : "Falso";
+            resultMessage.innerHTML = `<i class="fas fa-times-circle"></i> Incorrecto. La respuesta correcta es: ${respuestaCorrecta}<br><small>${pregunta.explicacion}</small>`;
+        }
+        resultMessage.style.display = 'block';
+        actualizarPuntuacion();
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    window.siguientePregunta = function() { indiceActual++; cargarPregunta(); };
+    function actualizarPuntuacion() { document.getElementById('puntos').textContent = puntos; document.getElementById('racha').textContent = racha; }
+    function finalizarJuego() {
+        clearInterval(timerInterval);
+        const bonus = racha >= 5 ? 50 : 0;
+        const totalPuntos = puntos + bonus;
+        const questionCard = document.getElementById('questionCard');
+        questionCard.innerHTML = `<div style="text-align: center; padding: 20px;"><i class="fas fa-trophy" style="font-size: 4rem; color: #fbbf24;"></i><h2 style="color: #10b981;">🏆 ¡Juego completado! 🏆</h2><p>Has respondido ${preguntasActuales.length} preguntas</p><p><strong>Puntuación final:</strong> ${totalPuntos} puntos</p><p><strong>Mejor racha:</strong> ${racha} aciertos seguidos</p>${bonus > 0 ? `<p><i class="fas fa-star"></i> Bonus por racha: +${bonus} puntos</p>` : ''}<div style="margin-top: 20px;"><button onclick="reiniciarJuego()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer;"><i class="fas fa-redo"></i> Jugar de nuevo</button><a href="index.html" style="display: inline-block; margin-left: 10px; background: #f1f5f9; color: #1e293b; padding: 10px 25px; border-radius: 50px; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a></div></div>`;
+        guardarPuntuacion(totalPuntos);
+    }
+
+    window.reiniciarJuego = function() { location.reload(); };
+    function guardarPuntuacion(p) { const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}'); stats.totalJuegos = (stats.totalJuegos || 0) + 1; stats.totalPuntos = (stats.totalPuntos || 0) + p; localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats)); }
+
+    onAuthStateChanged(auth, (user) => {
+        renderUserZone();
+        if (!user) { window.location.href = '../login.html'; }
+        else { iniciarJuego(); }
+    });
+    document.getElementById('btnVerdadero').addEventListener('click', () => window.responder(true));
+    document.getElementById('btnFalso').addEventListener('click', () => window.responder(false));
+    document.getElementById('nextBtn').addEventListener('click', window.siguientePregunta);
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => { document.querySelector('.nav-wrapper')?.classList.toggle('active'); });
+</script>
+</body>
+</html>

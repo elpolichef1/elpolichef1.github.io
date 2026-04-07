@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrera de preguntas | Mini Retos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        .game-header {
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-header::before {
+            content: "🏎️";
+            position: absolute;
+            font-size: 100px;
+            opacity: 0.1;
+            bottom: -20px;
+            right: 20px;
+        }
+        .game-header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .game-header h1 i { color: #fbbf24; }
+        .game-header p { opacity: 0.9; }
+        
+        .game-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        /* Pista de carreras */
+        .race-track {
+            background: linear-gradient(135deg, #2d3e2c, #1f2e1a);
+            border-radius: 30px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+        .track {
+            position: relative;
+            height: 130px;
+            background: #4a5b3e;
+            border-radius: 65px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+        }
+        .track-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 25px, transparent 25px, transparent 50px);
+            pointer-events: none;
+        }
+        .car {
+            position: absolute;
+            bottom: 15px;
+            left: 0%;
+            font-size: 3.2rem;
+            transition: left 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+            z-index: 10;
+        }
+        .finish-line {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 35px;
+            background: repeating-linear-gradient(90deg, #000 0px, #000 12px, #fff 12px, #fff 24px);
+        }
+        .progress-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .marker {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: rgba(255,255,255,0.4);
+        }
+        
+        /* Marcador */
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            border-radius: 25px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .score-item {
+            text-align: center;
+            flex: 1;
+        }
+        .score-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fbbf24;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .score-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
+        /* Pregunta */
+        .question-card {
+            background: white;
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #fef3c7;
+            border-color: #fbbf24;
+            transform: translateX(8px);
+        }
+        .option-prefix {
+            font-weight: 800;
+            color: #fbbf24;
+            width: 35px;
+            font-size: 1.1rem;
+        }
+        .timer-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        .result-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            display: none;
+            font-weight: 500;
+        }
+        .result-message.correct {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+            border-left: 4px solid #10b981;
+        }
+        .result-message.wrong {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+            border-left: 4px solid #ef4444;
+        }
+        .next-btn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(251,191,36,0.4);
+        }
+        .game-over {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 25px;
+        }
+        .reset-btn {
+            background: #fbbf24;
+            color: #1a472a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .reset-btn:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+        }
+        @keyframes celebration {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .celebration { animation: celebration 0.5s ease; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .car-shake { animation: shake 0.3s ease-in-out; }
+        
+        @media (max-width: 768px) {
+            .game-container { padding: 15px; }
+            .score-board { flex-direction: column; gap: 10px; text-align: center; }
+            .question-text { font-size: 1rem; }
+            .option-btn { font-size: 0.9rem; padding: 12px 15px; }
+            .car { font-size: 2.5rem; bottom: 12px; }
+            .track { height: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../mini-retos/index.html" class="active">Mini Retos</a></li></ul></nav></div></div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="game-header">
+        <div class="container">
+            <h1><i class="fas fa-flag-checkered"></i> Carrera de preguntas</h1>
+            <p>Responde correctamente para que tu coche avance. ¡Llega a la meta!</p>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="race-track">
+            <div class="track">
+                <div class="track-lines"></div>
+                <div class="progress-markers" id="progressMarkers"></div>
+                <div class="car" id="car">🏎️💨</div>
+                <div class="finish-line"></div>
+            </div>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="score-value" id="currentStreak">0</div><div class="score-label">🔥 Racha actual</div></div>
+            <div class="score-item"><div class="score-value" id="totalPoints">0</div><div class="score-label">🏆 Puntos</div></div>
+            <div class="score-item"><div class="score-value" id="questionsLeft">20</div><div class="score-label">📝 Preguntas restantes</div></div>
+            <div class="score-item"><div class="score-value" id="bestStreak">0</div><div class="score-label">⭐ Mejor racha</div></div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+            <div class="question-text" id="questionText">Cargando pregunta...</div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+            <div class="result-message" id="resultMessage"></div>
+            <button class="next-btn" id="nextBtn">🚗 Siguiente pregunta →</button>
+        </div>
+    </div>
+
+    <script type="module">
+    import { auth, onAuthStateChanged, signOut } from '../js/firebase-init.js';
+    import { renderUserZone } from '../js/global-auth.js';
+    import { preguntasDGT } from '../test/data/preguntas.js';
+    
+    let preguntasActuales = [], racha = 0, mejorRacha = 0, puntos = 0, preguntaActual = null, opcionSeleccionada = false, gameActivo = true, timerInterval, tiempoRestante = 30, indicePregunta = 0;
+    const TOTAL_PREGUNTAS = 20;
+
+    function cargarMejorRacha() { const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}'); mejorRacha = stats.mejorRachaCarrera || 0; document.getElementById('bestStreak').textContent = mejorRacha; }
+    function guardarMejorRacha() { const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}'); stats.mejorRachaCarrera = Math.max(stats.mejorRachaCarrera || 0, racha); localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats)); }
+
+    function iniciarJuego() {
+        const todas = [...preguntasDGT];
+        for (let i = todas.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [todas[i], todas[j]] = [todas[j], todas[i]]; }
+        preguntasActuales = todas.slice(0, TOTAL_PREGUNTAS);
+        document.getElementById('questionsLeft').textContent = TOTAL_PREGUNTAS;
+        const markersContainer = document.getElementById('progressMarkers');
+        markersContainer.innerHTML = '';
+        for (let i = 0; i <= TOTAL_PREGUNTAS; i++) { const marker = document.createElement('div'); marker.className = 'marker'; marker.style.left = `${(i / TOTAL_PREGUNTAS) * 100}%`; markersContainer.appendChild(marker); }
+        cargarMejorRacha();
+        cargarPregunta();
+    }
+
+    function cargarPregunta() {
+        if (indicePregunta >= preguntasActuales.length) { finalizarJuego(true); return; }
+        preguntaActual = preguntasActuales[indicePregunta];
+        document.getElementById('questionText').textContent = preguntaActual.texto;
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = preguntaActual.opciones.map((opcion, idx) => `<div class="option-btn" onclick="responder(${idx})"><span class="option-prefix">${String.fromCharCode(65 + idx)}.</span><span>${opcion}</span></div>`).join('');
+        opcionSeleccionada = false;
+        document.getElementById('resultMessage').className = 'result-message';
+        document.getElementById('resultMessage').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        iniciarTemporizador();
+    }
+
+    function iniciarTemporizador() {
+        if (timerInterval) clearInterval(timerInterval);
+        tiempoRestante = 30;
+        const timerFill = document.getElementById('timerFill');
+        timerFill.style.width = '100%';
+        timerFill.style.transition = 'none';
+        setTimeout(() => { timerFill.style.transition = 'width 0.1s linear'; }, 10);
+        timerInterval = setInterval(() => {
+            if (opcionSeleccionada || !gameActivo) return;
+            tiempoRestante--;
+            const porcentaje = (tiempoRestante / 30) * 100;
+            timerFill.style.width = `${Math.max(0, porcentaje)}%`;
+            if (tiempoRestante <= 5) timerFill.style.background = '#ef4444';
+            if (tiempoRestante <= 0) { clearInterval(timerInterval); responder(-1); }
+        }, 1000);
+    }
+
+    window.responder = function(indice) {
+        if (opcionSeleccionada || !gameActivo) return;
+        clearInterval(timerInterval);
+        opcionSeleccionada = true;
+        const esCorrecto = (indice === preguntaActual.correcta);
+        const resultMessage = document.getElementById('resultMessage');
+        const carElement = document.getElementById('car');
+        if (esCorrecto) {
+            racha++;
+            if (racha > mejorRacha) { mejorRacha = racha; guardarMejorRacha(); document.getElementById('bestStreak').textContent = mejorRacha; }
+            const puntosGanados = 10 + Math.floor(racha * 1.5) + Math.floor(tiempoRestante / 3);
+            puntos += puntosGanados;
+            const avance = (indicePregunta + 1) / TOTAL_PREGUNTAS * 100;
+            carElement.style.left = `${Math.min(avance, 98)}%`;
+            carElement.classList.add('celebration');
+            setTimeout(() => carElement.classList.remove('celebration'), 500);
+            resultMessage.className = 'result-message correct';
+            resultMessage.innerHTML = `<i class="fas fa-check-circle"></i> ¡Correcto! +${puntosGanados} puntos | 🔥 Racha: ${racha}`;
+            resultMessage.style.display = 'block';
+        } else {
+            carElement.classList.add('car-shake');
+            setTimeout(() => carElement.classList.remove('car-shake'), 300);
+            if (indice === -1) { resultMessage.className = 'result-message wrong'; resultMessage.innerHTML = `<i class="fas fa-clock"></i> ⏰ ¡Tiempo agotado! La respuesta correcta era: ${String.fromCharCode(65 + preguntaActual.correcta)}. ${preguntaActual.explicacion}`; }
+            else { resultMessage.className = 'result-message wrong'; resultMessage.innerHTML = `<i class="fas fa-times-circle"></i> ❌ Incorrecto. La respuesta correcta era: ${String.fromCharCode(65 + preguntaActual.correcta)}. ${preguntaActual.explicacion}`; }
+            resultMessage.style.display = 'block';
+            gameActivo = false;
+            document.getElementById('nextBtn').style.display = 'none';
+            mostrarGameOver();
+            return;
+        }
+        document.getElementById('currentStreak').textContent = racha;
+        document.getElementById('totalPoints').textContent = puntos;
+        document.getElementById('questionsLeft').textContent = TOTAL_PREGUNTAS - (indicePregunta + 1);
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    window.siguientePregunta = function() { indicePregunta++; cargarPregunta(); };
+
+    function finalizarJuego(victoria) {
+        gameActivo = false; clearInterval(timerInterval);
+        const questionCard = document.getElementById('questionCard');
+        if (victoria) {
+            const bonus = racha >= 15 ? 200 : (racha >= 10 ? 100 : (racha >= 5 ? 50 : 0));
+            const totalPuntos = puntos + bonus;
+            document.getElementById('totalPoints').textContent = totalPuntos;
+            questionCard.innerHTML = `<div class="game-over"><i class="fas fa-trophy" style="font-size: 4rem; color: #fbbf24;"></i><h2 style="color: #10b981;">🏆 ¡VICTORIA! 🏆</h2><p>✨ Has completado las ${TOTAL_PREGUNTAS} preguntas ✨</p><div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;"><p><strong>🏆 Puntuación total:</strong> <span style="color: #fbbf24; font-size: 1.5rem;">${totalPuntos}</span> pts</p><p><strong>🔥 Mejor racha:</strong> ${mejorRacha} aciertos seguidos</p><p><strong>📊 Media de aciertos:</strong> ${Math.round((TOTAL_PREGUNTAS - (TOTAL_PREGUNTAS - (indicePregunta + 1))) / TOTAL_PREGUNTAS * 100)}%</p>${bonus > 0 ? `<p><i class="fas fa-star" style="color: #fbbf24;"></i> Bonus por racha: +${bonus} puntos</p>` : ''}</div><button class="reset-btn" onclick="reiniciarJuego()"><i class="fas fa-redo"></i> Jugar de nuevo</button><a href="index.html" class="reset-btn" style="display: inline-block; margin-left: 10px; background: #f1f5f9; color: #1e293b; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a></div>`;
+            guardarPuntuacion(totalPuntos);
+        } else { guardarPuntuacion(puntos); }
+    }
+
+    function mostrarGameOver() {
+        const questionCard = document.getElementById('questionCard');
+        const totalPuntos = puntos;
+        questionCard.innerHTML = `<div class="game-over"><i class="fas fa-times-circle" style="font-size: 4rem; color: #ef4444;"></i><h2 style="color: #991b1b;">😢 GAME OVER</h2><p>Has fallado en la pregunta ${indicePregunta + 1}</p><div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;"><p><strong>🏆 Puntuación final:</strong> <span style="color: #fbbf24;">${totalPuntos}</span> pts</p><p><strong>🔥 Racha máxima:</strong> ${mejorRacha} aciertos seguidos</p></div><button class="reset-btn" onclick="reiniciarJuego()"><i class="fas fa-redo"></i> Reintentar</button><a href="index.html" class="reset-btn" style="display: inline-block; margin-left: 10px; background: #f1f5f9; color: #1e293b; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a></div>`;
+    }
+
+    window.reiniciarJuego = function() { location.reload(); };
+    function guardarPuntuacion(puntos) { const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}'); stats.totalJuegos = (stats.totalJuegos || 0) + 1; stats.totalPuntos = (stats.totalPuntos || 0) + puntos; stats.mejorRachaCarrera = Math.max(stats.mejorRachaCarrera || 0, racha); localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats)); }
+
+    onAuthStateChanged(auth, (user) => {
+        renderUserZone();
+        if (!user) { window.location.href = '../login.html'; }
+        else { iniciarJuego(); }
+    });
+    document.getElementById('nextBtn').addEventListener('click', window.siguientePregunta);
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => { document.querySelector('.nav-wrapper')?.classList.toggle('active'); });
+</script>
+</body>
+</html>
