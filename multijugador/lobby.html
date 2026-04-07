@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Carrera Multijugador | AprobadoYa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby | Carrera Multijugador</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,258 +12,104 @@
             background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
             min-height: 100vh;
             color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .container {
-            max-width: 550px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
+        .container { max-width: 500px; width: 90%; margin: 20px; }
         .card {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(12px);
             border-radius: 40px;
-            padding: 45px 35px;
+            padding: 40px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
         }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #ffffff, #fbbf24);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        h1 i { color: #fbbf24; margin-right: 10px; }
-        .subtitle { color: #e0f0e8; margin-bottom: 35px; font-size: 0.95rem; }
-        
+        h1 { font-size: 1.8rem; margin-bottom: 10px; }
+        h1 i { color: #fbbf24; }
         .btn {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #1a472a;
             border: none;
-            padding: 16px 30px;
+            padding: 15px;
             border-radius: 60px;
             font-size: 1rem;
-            font-weight: 700;
+            font-weight: bold;
             cursor: pointer;
             width: 100%;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            margin: 10px 0;
         }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(251,191,36,0.4); }
         .btn-outline {
             background: transparent;
             border: 2px solid #fbbf24;
             color: #fbbf24;
         }
-        .btn-outline:hover { background: #fbbf24; color: #1a472a; }
-        
-        .codigo-container {
-            background: rgba(0,0,0,0.25);
-            border-radius: 25px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .codigo-container p { margin-bottom: 12px; font-size: 0.9rem; }
         .codigo-input {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin: 15px 0;
         }
         .codigo-input input {
             flex: 1;
-            padding: 14px;
-            border-radius: 60px;
+            padding: 12px;
+            border-radius: 50px;
             border: none;
-            font-size: 1rem;
             text-align: center;
+            font-size: 1rem;
             letter-spacing: 3px;
-            font-weight: bold;
         }
-        .codigo-input input:focus { outline: none; box-shadow: 0 0 0 2px #fbbf24; }
         .codigo-input button {
             background: #fbbf24;
             border: none;
-            padding: 14px 25px;
-            border-radius: 60px;
+            padding: 12px 20px;
+            border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
         }
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 25px 0;
-            color: #94a3b8;
-            font-size: 0.8rem;
-        }
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-        .divider::before { margin-right: 15px; }
-        .divider::after { margin-left: 15px; }
-        .volver {
-            display: inline-block;
-            margin-top: 20px;
-            color: #fbbf24;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        .volver:hover { color: white; }
-        
-        /* Pantalla de espera */
-        .waiting-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .waiting-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 50px;
-            padding: 50px;
-            text-align: center;
-            max-width: 450px;
-            width: 90%;
-            border: 1px solid rgba(251,191,36,0.4);
-            animation: fadeInUp 0.4s ease;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .waiting-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top-color: #fbbf24;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .waiting-codigo {
-            background: rgba(0,0,0,0.5);
-            padding: 20px;
-            border-radius: 30px;
-            margin: 25px 0;
-        }
-        .waiting-codigo span {
-            font-size: 2.2rem;
-            letter-spacing: 8px;
-            font-weight: 800;
-            color: #fbbf24;
-        }
-        .btn-cancelar {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .pulse-text { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
-        
-        @media (max-width: 560px) {
-            .card { padding: 30px 20px; }
-            h1 { font-size: 1.6rem; }
-            .waiting-codigo span { font-size: 1.5rem; letter-spacing: 4px; }
-        }
+        .error { color: #f87171; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
-            <p class="subtitle">🏁 ¡Compite contra otro jugador en tiempo real! 🏁</p>
-
-            <button class="btn" id="btnAleatorio">
-                <i class="fas fa-random"></i> Emparejamiento aleatorio
-            </button>
-
-            <div class="divider">o</div>
-
-            <div class="codigo-container">
-                <p><i class="fas fa-link"></i> Crear partida privada</p>
-                <button class="btn-outline" id="btnCrearPartida">
-                    <i class="fas fa-plus-circle"></i> Crear partida
-                </button>
+            <button class="btn" id="btnAleatorio">🎲 Emparejamiento aleatorio</button>
+            <button class="btn btn-outline" id="btnCrearPartida">➕ Crear partida privada</button>
+            <div class="codigo-input">
+                <input type="text" id="codigoInput" placeholder="Código 6 dígitos" maxlength="6">
+                <button id="btnUnirse">Unirse</button>
             </div>
-
-            <div class="codigo-container">
-                <p><i class="fas fa-door-open"></i> Unirse con código</p>
-                <div class="codigo-input">
-                    <input type="text" id="codigoInput" placeholder="Código 6 dígitos" maxlength="6" inputmode="numeric">
-                    <button id="btnUnirse"><i class="fas fa-arrow-right"></i></button>
-                </div>
-            </div>
-
-            <a href="../index.html" class="volver"><i class="fas fa-arrow-left"></i> Volver a juegos</a>
-        </div>
-    </div>
-
-    <div id="waitingScreen" class="waiting-screen">
-        <div class="waiting-card">
-            <div class="waiting-spinner"></div>
-            <h2><i class="fas fa-users"></i> Esperando oponente...</h2>
-            <div class="waiting-codigo">
-                <p>📋 Código de la sala:</p>
-                <span id="waitingCodigo">------</span>
-            </div>
-            <p class="pulse-text">🔗 Comparte este código con tu amigo</p>
-            <button class="btn-cancelar" id="btnCancelarEspera">
-                <i class="fas fa-times"></i> Cancelar
-            </button>
+            <div id="errorMsg" class="error"></div>
         </div>
     </div>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
-
+        
         let currentUser = null;
-        let unsubscribeActual = null;
-
+        
         function generarCodigo() {
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
-
+        
         async function crearSala() {
             const codigo = generarCodigo();
-            const salaId = `sala_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
-            
+            const salaId = `sala_${Date.now()}`;
             await setDoc(doc(db, "partidas_multijugador", salaId), {
                 id: salaId,
                 codigo: codigo,
                 jugador1: currentUser.uid,
                 jugador1Nombre: currentUser.displayName || currentUser.email.split('@')[0],
                 jugador2: null,
-                jugador2Nombre: null,
-                estado: "esperando",
-                creado: new Date().toISOString()
+                estado: "esperando"
             });
             return { salaId, codigo };
         }
-
+        
         async function buscarSala() {
             const salasRef = collection(db, "partidas_multijugador");
             const q = query(salasRef, where("estado", "==", "esperando"), where("jugador1", "!=", currentUser.uid));
             const snapshot = await getDocs(q);
-            
             if (!snapshot.empty) {
                 const sala = snapshot.docs[0];
                 await updateDoc(sala.ref, {
@@ -275,14 +121,12 @@
             }
             return null;
         }
-
+        
         async function unirsePorCodigo(codigo) {
             const salasRef = collection(db, "partidas_multijugador");
             const q = query(salasRef, where("codigo", "==", codigo), where("estado", "==", "esperando"));
             const snapshot = await getDocs(q);
-            
             if (snapshot.empty) return null;
-            
             const sala = snapshot.docs[0];
             await updateDoc(sala.ref, {
                 jugador2: currentUser.uid,
@@ -291,84 +135,46 @@
             });
             return sala.id;
         }
-
-        function mostrarEspera(codigo) {
-            document.getElementById('waitingCodigo').textContent = codigo;
-            document.getElementById('waitingScreen').style.display = 'flex';
-        }
-
-        function ocultarEspera() {
-            document.getElementById('waitingScreen').style.display = 'none';
-        }
-
-        function esperarOponente(salaId, codigo) {
-            mostrarEspera(codigo);
-            
-            const salaRef = doc(db, "partidas_multijugador", salaId);
-            unsubscribeActual = onSnapshot(salaRef, (doc) => {
-                if (doc.exists() && doc.data().estado === "en_curso") {
-                    if (unsubscribeActual) unsubscribeActual();
-                    window.location.href = `juego-multijugador.html?sala=${salaId}`;
-                }
-            });
-        }
-
+        
         onAuthStateChanged(auth, (user) => {
             renderUserZone();
-            if (!user) {
-                window.location.href = '../../login.html';
-                return;
-            }
+            if (!user) { window.location.href = '../../login.html'; return; }
             currentUser = user;
         });
-
+        
         document.getElementById('btnAleatorio').addEventListener('click', async () => {
-            try {
-                let salaId = await buscarSala();
-                if (!salaId) {
-                    const { salaId: nuevaSala, codigo } = await crearSala();
-                    esperarOponente(nuevaSala, codigo);
-                } else {
-                    window.location.href = `juego-multijugador.html?sala=${salaId}`;
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message);
+            let salaId = await buscarSala();
+            if (!salaId) {
+                const { salaId: nuevaSala, codigo } = await crearSala();
+                localStorage.setItem('sala_actual', nuevaSala);
+                window.location.href = `espera.html?creador=true&sala=${nuevaSala}&codigo=${codigo}`;
+            } else {
+                localStorage.setItem('sala_actual', salaId);
+                window.location.href = `juego.html?sala=${salaId}`;
             }
         });
-
+        
         document.getElementById('btnCrearPartida').addEventListener('click', async () => {
-            try {
-                const { salaId, codigo } = await crearSala();
-                esperarOponente(salaId, codigo);
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message);
-            }
+            const { salaId, codigo } = await crearSala();
+            localStorage.setItem('sala_actual', salaId);
+            window.location.href = `espera.html?creador=true&sala=${salaId}&codigo=${codigo}`;
         });
-
+        
         document.getElementById('btnUnirse').addEventListener('click', async () => {
             const codigo = document.getElementById('codigoInput').value.trim();
             if (codigo.length !== 6) {
-                alert("❌ Introduce un código de 6 dígitos");
+                document.getElementById('errorMsg').textContent = "❌ Código de 6 dígitos";
+                document.getElementById('errorMsg').style.display = 'block';
                 return;
             }
-            try {
-                const salaId = await unirsePorCodigo(codigo);
-                if (salaId) {
-                    window.location.href = `juego-multijugador.html?sala=${salaId}`;
-                } else {
-                    alert("❌ No se encontró ninguna partida con ese código");
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message);
+            const salaId = await unirsePorCodigo(codigo);
+            if (salaId) {
+                localStorage.setItem('sala_actual', salaId);
+                window.location.href = `juego.html?sala=${salaId}`;
+            } else {
+                document.getElementById('errorMsg').textContent = "❌ Partida no encontrada";
+                document.getElementById('errorMsg').style.display = 'block';
             }
-        });
-
-        document.getElementById('btnCancelarEspera').addEventListener('click', () => {
-            if (unsubscribeActual) unsubscribeActual();
-            ocultarEspera();
         });
     </script>
 </body>
