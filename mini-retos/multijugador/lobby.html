@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrera Multijugador | AprobadoYa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        h1 { font-size: 2rem; margin-bottom: 10px; }
+        h1 i { color: #fbbf24; margin-right: 10px; }
+        .subtitle { color: #e0f0e8; margin-bottom: 30px; }
+        .btn {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251,191,36,0.3); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #fbbf24;
+            color: #fbbf24;
+        }
+        .btn-outline:hover { background: #fbbf24; color: #1a472a; }
+        .codigo-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .codigo-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .codigo-input input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+        .codigo-input button {
+            background: #fbbf24;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #94a3b8;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .divider::before { margin-right: 15px; }
+        .divider::after { margin-left: 15px; }
+        .volver {
+            display: inline-block;
+            margin-top: 20px;
+            color: #fbbf24;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            .card { padding: 25px; }
+            h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
+            <p class="subtitle">¡Compite contra otro jugador en tiempo real!</p>
+
+            <button class="btn" id="btnAleatorio">
+                <i class="fas fa-random"></i> Emparejamiento aleatorio
+            </button>
+
+            <div class="divider">o</div>
+
+            <div class="codigo-container">
+                <p><i class="fas fa-link"></i> Crear partida privada</p>
+                <button class="btn-outline" id="btnCrearPartida" style="margin-top: 10px;">
+                    <i class="fas fa-plus-circle"></i> Crear partida
+                </button>
+            </div>
+
+            <div class="codigo-container">
+                <p><i class="fas fa-door-open"></i> Unirse con código</p>
+                <div class="codigo-input">
+                    <input type="text" id="codigoInput" placeholder="Código de 6 dígitos" maxlength="6">
+                    <button id="btnUnirse"><i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <a href="../index.html" class="volver"><i class="fas fa-arrow-left"></i> Volver a juegos</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { renderUserZone } from '../../js/global-auth.js';
+        
+        let currentUser = null;
+        
+        // Generar código aleatorio de 6 dígitos
+        function generarCodigo() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+        
+        // Buscar partida aleatoria disponible
+        async function buscarPartidaAleatoria() {
+            const salasRef = collection(db, "partidas_multijugador");
+            const q = query(salasRef, where("estado", "==", "esperando"), where("jugador1", "!=", currentUser.uid));
+            const snapshot = await getDocs(q);
+            
+            if (!snapshot.empty) {
+                // Unirse a partida existente
+                const sala = snapshot.docs[0];
+                await updateDoc(sala.ref, {
+                    jugador2: currentUser.uid,
+                    jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
+                    jugador2Avatar: "🏎️",
+                    estado: "en_curso",
+                    turno: 0
+                });
+                return sala.id;
+            } else {
+                // Crear nueva partida
+                const codigo = generarCodigo();
+                const salaId = `partida_${Date.now()}`;
+                await setDoc(doc(db, "partidas_multijugador", salaId), {
+                    id: salaId,
+                    codigo: codigo,
+                    jugador1: currentUser.uid,
+                    jugador1Nombre: currentUser.displayName || currentUser.email.split('@')[0],
+                    jugador1Avatar: "🏎️",
+                    jugador2: null,
+                    jugador2Nombre: null,
+                    jugador2Avatar: null,
+                    estado: "esperando",
+                    turno: 0,
+                    preguntas: [],
+                    puntuacion1: 0,
+                    puntuacion2: 0,
+                    creado: new Date().toISOString()
+                });
+                return salaId;
+            }
+        }
+        
+        // Crear partida privada
+        async function crearPartidaPrivada() {
+            const codigo = generarCodigo();
+            const salaId = `partida_${Date.now()}`;
+            await setDoc(doc(db, "partidas_multijugador", salaId), {
+                id: salaId,
+                codigo: codigo,
+                jugador1: currentUser.uid,
+                jugador1Nombre: currentUser.displayName || currentUser.email.split('@')[0],
+                jugador1Avatar: "🏎️",
+                jugador2: null,
+                jugador2Nombre: null,
+                jugador2Avatar: null,
+                estado: "esperando",
+                turno: 0,
+                preguntas: [],
+                puntuacion1: 0,
+                puntuacion2: 0,
+                creado: new Date().toISOString()
+            });
+            
+            // Mostrar código al usuario
+            alert(`Código de partida: ${codigo}\nCompártelo con tu amigo para que se una.`);
+            return salaId;
+        }
+        
+        // Unirse por código
+        async function unirsePorCodigo(codigo) {
+            const salasRef = collection(db, "partidas_multijugador");
+            const q = query(salasRef, where("codigo", "==", codigo), where("estado", "==", "esperando"));
+            const snapshot = await getDocs(q);
+            
+            if (snapshot.empty) {
+                alert("❌ No se encontró ninguna partida con ese código");
+                return null;
+            }
+            
+            const sala = snapshot.docs[0];
+            await updateDoc(sala.ref, {
+                jugador2: currentUser.uid,
+                jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
+                jugador2Avatar: "🏎️",
+                estado: "en_curso",
+                turno: 0
+            });
+            return sala.id;
+        }
+        
+        // Redirigir al juego
+        function irAlJuego(salaId, esCreador) {
+            localStorage.setItem('partida_actual', salaId);
+            window.location.href = `juego-multijugador.html?sala=${salaId}`;
+        }
+        
+        onAuthStateChanged(auth, async (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../../login.html';
+                return;
+            }
+            currentUser = user;
+        });
+        
+        document.getElementById('btnAleatorio').addEventListener('click', async () => {
+            const salaId = await buscarPartidaAleatoria();
+            if (salaId) {
+                irAlJuego(salaId, false);
+            } else {
+                alert("Buscando oponente...");
+                setTimeout(async () => {
+                    const salaId2 = await buscarPartidaAleatoria();
+                    if (salaId2) irAlJuego(salaId2, true);
+                }, 1000);
+            }
+        });
+        
+        document.getElementById('btnCrearPartida').addEventListener('click', async () => {
+            const salaId = await crearPartidaPrivada();
+            if (salaId) {
+                irAlJuego(salaId, true);
+            }
+        });
+        
+        document.getElementById('btnUnirse').addEventListener('click', async () => {
+            const codigo = document.getElementById('codigoInput').value.trim();
+            if (codigo.length !== 6) {
+                alert("Introduce un código de 6 dígitos");
+                return;
+            }
+            const salaId = await unirsePorCodigo(codigo);
+            if (salaId) {
+                irAlJuego(salaId, false);
+            }
+        });
+    </script>
+</body>
+</html>
