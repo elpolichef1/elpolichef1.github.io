@@ -97,6 +97,11 @@
             color: #fbbf24;
             text-decoration: none;
         }
+        .loading-spinner {
+            display: none;
+            margin-top: 15px;
+            color: #fbbf24;
+        }
         @media (max-width: 768px) {
             .container { padding: 20px; }
             .card { padding: 25px; }
@@ -113,6 +118,9 @@
             <button class="btn" id="btnAleatorio">
                 <i class="fas fa-random"></i> Emparejamiento aleatorio
             </button>
+            <div id="loadingAleatorio" class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i> Buscando oponente...
+            </div>
 
             <div class="divider">o</div>
 
@@ -129,6 +137,9 @@
                     <input type="text" id="codigoInput" placeholder="Código de 6 dígitos" maxlength="6">
                     <button id="btnUnirse"><i class="fas fa-arrow-right"></i></button>
                 </div>
+                <div id="loadingUnirse" class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> Uniendo a la partida...
+                </div>
             </div>
 
             <a href="../index.html" class="volver"><i class="fas fa-arrow-left"></i> Volver a juegos</a>
@@ -136,59 +147,34 @@
     </div>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         let currentUser = null;
         
-        // Generar código aleatorio de 6 dígitos
         function generarCodigo() {
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
         
-        // Buscar partida aleatoria disponible
         async function buscarPartidaAleatoria() {
             const salasRef = collection(db, "partidas_multijugador");
             const q = query(salasRef, where("estado", "==", "esperando"), where("jugador1", "!=", currentUser.uid));
             const snapshot = await getDocs(q);
             
             if (!snapshot.empty) {
-                // Unirse a partida existente
                 const sala = snapshot.docs[0];
                 await updateDoc(sala.ref, {
                     jugador2: currentUser.uid,
                     jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
                     jugador2Avatar: "🏎️",
-                    estado: "en_curso",
-                    turno: 0
+                    estado: "en_curso"
                 });
                 return sala.id;
-            } else {
-                // Crear nueva partida
-                const codigo = generarCodigo();
-                const salaId = `partida_${Date.now()}`;
-                await setDoc(doc(db, "partidas_multijugador", salaId), {
-                    id: salaId,
-                    codigo: codigo,
-                    jugador1: currentUser.uid,
-                    jugador1Nombre: currentUser.displayName || currentUser.email.split('@')[0],
-                    jugador1Avatar: "🏎️",
-                    jugador2: null,
-                    jugador2Nombre: null,
-                    jugador2Avatar: null,
-                    estado: "esperando",
-                    turno: 0,
-                    preguntas: [],
-                    puntuacion1: 0,
-                    puntuacion2: 0,
-                    creado: new Date().toISOString()
-                });
-                return salaId;
             }
+            return null;
         }
         
-        // Crear partida privada
-        async function crearPartidaPrivada() {
+        async function crearPartidaEspera() {
             const codigo = generarCodigo();
             const salaId = `partida_${Date.now()}`;
             await setDoc(doc(db, "partidas_multijugador", salaId), {
@@ -201,44 +187,26 @@
                 jugador2Nombre: null,
                 jugador2Avatar: null,
                 estado: "esperando",
-                turno: 0,
-                preguntas: [],
-                puntuacion1: 0,
-                puntuacion2: 0,
                 creado: new Date().toISOString()
             });
-            
-            // Mostrar código al usuario
-            alert(`Código de partida: ${codigo}\nCompártelo con tu amigo para que se una.`);
-            return salaId;
+            return { salaId, codigo };
         }
         
-        // Unirse por código
         async function unirsePorCodigo(codigo) {
             const salasRef = collection(db, "partidas_multijugador");
             const q = query(salasRef, where("codigo", "==", codigo), where("estado", "==", "esperando"));
             const snapshot = await getDocs(q);
             
-            if (snapshot.empty) {
-                alert("❌ No se encontró ninguna partida con ese código");
-                return null;
-            }
+            if (snapshot.empty) return null;
             
             const sala = snapshot.docs[0];
             await updateDoc(sala.ref, {
                 jugador2: currentUser.uid,
                 jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
                 jugador2Avatar: "🏎️",
-                estado: "en_curso",
-                turno: 0
+                estado: "en_curso"
             });
             return sala.id;
-        }
-        
-        // Redirigir al juego
-        function irAlJuego(salaId, esCreador) {
-            localStorage.setItem('partida_actual', salaId);
-            window.location.href = `juego-multijugador.html?sala=${salaId}`;
         }
         
         onAuthStateChanged(auth, async (user) => {
@@ -251,34 +219,91 @@
         });
         
         document.getElementById('btnAleatorio').addEventListener('click', async () => {
-            const salaId = await buscarPartidaAleatoria();
-            if (salaId) {
-                irAlJuego(salaId, false);
-            } else {
-                alert("Buscando oponente...");
-                setTimeout(async () => {
-                    const salaId2 = await buscarPartidaAleatoria();
-                    if (salaId2) irAlJuego(salaId2, true);
-                }, 1000);
+            const loading = document.getElementById('loadingAleatorio');
+            loading.style.display = 'block';
+            document.getElementById('btnAleatorio').disabled = true;
+            
+            try {
+                let salaId = await buscarPartidaAleatoria();
+                if (!salaId) {
+                    const { salaId: nuevaSala } = await crearPartidaEspera();
+                    salaId = nuevaSala;
+                    
+                    // Esperar a que alguien se una
+                    const esperaInterval = setInterval(async () => {
+                        const salaRef = doc(db, "partidas_multijugador", salaId);
+                        const salaDoc = await getDoc(salaRef);
+                        if (salaDoc.exists() && salaDoc.data().estado === "en_curso") {
+                            clearInterval(esperaInterval);
+                            window.location.href = `juego-multijugador.html?sala=${salaId}`;
+                        }
+                    }, 1000);
+                    
+                    // Timeout después de 30 segundos
+                    setTimeout(() => {
+                        clearInterval(esperaInterval);
+                        if (document.location.href.includes('lobby')) {
+                            alert("No se encontró ningún oponente. Inténtalo de nuevo.");
+                            loading.style.display = 'none';
+                            document.getElementById('btnAleatorio').disabled = false;
+                        }
+                    }, 30000);
+                } else {
+                    window.location.href = `juego-multijugador.html?sala=${salaId}`;
+                }
+            } catch (error) {
+                console.error(error);
+                loading.style.display = 'none';
+                document.getElementById('btnAleatorio').disabled = false;
+                alert("Error al buscar partida");
             }
         });
         
         document.getElementById('btnCrearPartida').addEventListener('click', async () => {
-            const salaId = await crearPartidaPrivada();
-            if (salaId) {
-                irAlJuego(salaId, true);
+            try {
+                const { salaId, codigo } = await crearPartidaEspera();
+                alert(`✅ Partida creada!\n\nCódigo: ${codigo}\n\nCompártelo con tu amigo para que se una.`);
+                
+                // Esperar a que alguien se una
+                const esperaInterval = setInterval(async () => {
+                    const salaRef = doc(db, "partidas_multijugador", salaId);
+                    const salaDoc = await getDoc(salaRef);
+                    if (salaDoc.exists() && salaDoc.data().estado === "en_curso") {
+                        clearInterval(esperaInterval);
+                        window.location.href = `juego-multijugador.html?sala=${salaId}`;
+                    }
+                }, 1000);
+            } catch (error) {
+                console.error(error);
+                alert("Error al crear la partida");
             }
         });
         
         document.getElementById('btnUnirse').addEventListener('click', async () => {
             const codigo = document.getElementById('codigoInput').value.trim();
             if (codigo.length !== 6) {
-                alert("Introduce un código de 6 dígitos");
+                alert("❌ Introduce un código de 6 dígitos");
                 return;
             }
-            const salaId = await unirsePorCodigo(codigo);
-            if (salaId) {
-                irAlJuego(salaId, false);
+            
+            const loading = document.getElementById('loadingUnirse');
+            loading.style.display = 'block';
+            document.getElementById('btnUnirse').disabled = true;
+            
+            try {
+                const salaId = await unirsePorCodigo(codigo);
+                if (salaId) {
+                    window.location.href = `juego-multijugador.html?sala=${salaId}`;
+                } else {
+                    alert("❌ No se encontró ninguna partida con ese código");
+                    loading.style.display = 'none';
+                    document.getElementById('btnUnirse').disabled = false;
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error al unirse a la partida");
+                loading.style.display = 'none';
+                document.getElementById('btnUnirse').disabled = false;
             }
         });
     </script>

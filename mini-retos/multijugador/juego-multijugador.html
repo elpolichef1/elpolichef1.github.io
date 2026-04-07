@@ -50,8 +50,6 @@
             filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
             z-index: 10;
         }
-        .car.azul { left: 0%; }
-        .car.rojo { left: 0%; }
         .finish-line {
             position: absolute;
             right: 0;
@@ -128,6 +126,15 @@
         .disabled { opacity: 0.5; cursor: not-allowed; }
         .correct { background: #d1fae5; border-color: #10b981; }
         .incorrect { background: #fee2e2; border-color: #ef4444; }
+        .result-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            display: none;
+            font-weight: 500;
+        }
+        .result-message.correct { background: #d1fae5; color: #065f46; display: block; border-left: 4px solid #10b981; }
+        .result-message.wrong { background: #fee2e2; color: #991b1b; display: block; border-left: 4px solid #ef4444; }
         
         .waiting-message {
             text-align: center;
@@ -198,18 +205,16 @@
         }
         
         async function iniciarPartida() {
-            if (!salaData.preguntas || salaData.preguntas.length === 0) {
-                const preguntas = [];
-                for (let i = 0; i < 10; i++) {
-                    preguntas.push(obtenerPreguntaAleatoria());
-                }
-                await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                    preguntas: preguntas,
-                    turno: 0,
-                    puntuacion1: 0,
-                    puntuacion2: 0
-                });
+            const preguntas = [];
+            for (let i = 0; i < 10; i++) {
+                preguntas.push(obtenerPreguntaAleatoria());
             }
+            await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                preguntas: preguntas,
+                turno: 0,
+                puntuacion1: 0,
+                puntuacion2: 0
+            });
             renderizarJuego();
         }
         
@@ -224,7 +229,6 @@
             const pregunta = salaData.preguntas[salaData.turno];
             const esCorrecto = (respuesta === pregunta.correcta);
             
-            // Marcar opción seleccionada
             const opciones = document.querySelectorAll('.option-btn');
             opciones.forEach((btn, idx) => {
                 btn.classList.add('disabled');
@@ -232,7 +236,6 @@
                 if (idx === respuesta && respuesta !== pregunta.correcta) btn.classList.add('incorrect');
             });
             
-            // Mostrar feedback
             const feedbackDiv = document.getElementById('feedback');
             if (feedbackDiv) {
                 feedbackDiv.className = esCorrecto ? 'result-message correct' : 'result-message wrong';
@@ -242,7 +245,6 @@
                 feedbackDiv.style.display = 'block';
             }
             
-            // Actualizar puntuación
             const nuevaPuntuacion1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
             const nuevaPuntuacion2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
             const nuevoTurno = salaData.turno + 1;
@@ -253,7 +255,6 @@
                 turno: nuevoTurno
             });
             
-            // Verificar si terminó el juego
             if (nuevoTurno >= salaData.preguntas.length) {
                 setTimeout(() => finalizarJuego(), 1500);
             } else {
@@ -289,12 +290,12 @@
                 <div class="race-track">
                     <div class="track">
                         <div class="player-name">🏎️ ${jugador1Nombre}</div>
-                        <div class="car azul" style="left: ${Math.min(avance1, 98)}%">🏎️</div>
+                        <div class="car" style="left: ${Math.min(avance1, 98)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="player-name">🏎️ ${jugador2Nombre}</div>
-                        <div class="car rojo" style="left: ${Math.min(avance2, 98)}%">🏎️</div>
+                        <div class="car" style="left: ${Math.min(avance2, 98)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
@@ -357,13 +358,11 @@
                 </div>
             `;
             
-            // Guardar puntuación en localStorage
             const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
             stats.totalJuegos = (stats.totalJuegos || 0) + 1;
             stats.totalPuntos = (stats.totalPuntos || 0) + (esGanador ? 100 : 50);
             localStorage.setItem('aprobadoya_minijuegos', JSON.stringify(stats));
             
-            // Limpiar la sala
             if (unsubscribe) unsubscribe();
             await updateDoc(doc(db, "partidas_multijugador", salaId), { estado: "terminado" });
         }
