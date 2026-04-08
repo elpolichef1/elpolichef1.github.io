@@ -234,7 +234,7 @@
     <header>
         <div class="container">
             <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
             <div class="user-zone" id="userZone"></div>
             <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
@@ -267,46 +267,96 @@
 
     <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
 
-    <script src="../js/auth.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="data/preguntas.js"></script>
-    <script>
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        import { preguntasDGT, obtenerPreguntasPorTema } from './data/preguntas.js';
+        
+        console.log("📚 preguntasDGT cargadas:", preguntasDGT?.length);
+        
         const temasList = [
             { numero: 1, nombre: "Normas generales" },{ numero: 2, nombre: "Señales" },{ numero: 3, nombre: "Circulación" },{ numero: 4, nombre: "Maniobras" },{ numero: 5, nombre: "Velocidad" },
             { numero: 6, nombre: "Adversas" },{ numero: 7, nombre: "Vehículos" },{ numero: 8, nombre: "Conductores" },{ numero: 9, nombre: "Alcoholemia" },{ numero: 10, nombre: "Seguridad vial" },
             { numero: 11, nombre: "Transporte" },{ numero: 12, nombre: "Vehículos especiales" },{ numero: 13, nombre: "Accidentes" },{ numero: 14, nombre: "Factores de riesgo" },{ numero: 15, nombre: "Medio ambiente" },
             { numero: 16, nombre: "Permiso por puntos" },{ numero: 17, nombre: "ITV" },{ numero: 18, nombre: "Seguros" },{ numero: 19, nombre: "Movilidad" },{ numero: 20, nombre: "Legislación" }
         ];
-        let temaSeleccionado = 1, preguntasActuales = [], respuestas = [], timerInterval, tiempoRestante = 0, testActivo = false;
-
+        
+        let temaSeleccionado = 1;
+        let preguntasActuales = [];
+        let respuestas = [];
+        let timerInterval;
+        let tiempoRestante = 0;
+        let testActivo = false;
+        
         function renderizarTemas() {
-            document.getElementById('temasGrid').innerHTML = temasList.map(t => `<div class="tema-btn ${t.numero === temaSeleccionado ? 'active' : ''}" onclick="seleccionarTema(${t.numero})"><div class="tema-numero">Tema ${t.numero}</div><div class="tema-nombre">${t.nombre}</div></div>`).join('');
+            const grid = document.getElementById('temasGrid');
+            grid.innerHTML = temasList.map(t => `
+                <div class="tema-btn ${t.numero === temaSeleccionado ? 'active' : ''}" data-tema="${t.numero}">
+                    <div class="tema-numero">Tema ${t.numero}</div>
+                    <div class="tema-nombre">${t.nombre}</div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.tema-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    temaSeleccionado = parseInt(btn.dataset.tema);
+                    renderizarTemas();
+                });
+            });
         }
-        function seleccionarTema(n) { temaSeleccionado = n; renderizarTemas(); }
-
+        
+        function obtenerPreguntasPorTemaFiltrado(tema) {
+            if (!preguntasDGT || preguntasDGT.length === 0) {
+                console.error("No hay preguntas cargadas");
+                return [];
+            }
+            const filtradas = preguntasDGT.filter(p => p.tema === tema);
+            console.log(`Tema ${tema}: ${filtradas.length} preguntas encontradas`);
+            return filtradas;
+        }
+        
         function iniciarTest() {
             const num = parseInt(document.getElementById('numPreguntas').value);
             const tiempoMin = parseInt(document.getElementById('tiempoLimite').value);
-            const todas = obtenerPreguntasPorTema(temaSeleccionado);
-            if (todas.length === 0) { alert('No hay preguntas para este tema.'); return; }
+            
+            const todas = obtenerPreguntasPorTemaFiltrado(temaSeleccionado);
+            if (todas.length === 0) {
+                alert(`No hay preguntas disponibles para el tema ${temaSeleccionado}.`);
+                return;
+            }
+            
             const mezcladas = [...todas];
-            for (let i = mezcladas.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]]; }
+            for (let i = mezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
+            }
             preguntasActuales = mezcladas.slice(0, Math.min(num, mezcladas.length));
             respuestas = new Array(preguntasActuales.length).fill(null);
-            if (tiempoMin > 0) { tiempoRestante = tiempoMin * 60; iniciarTemporizador(); } else document.getElementById('timer').textContent = 'Sin límite';
-            document.getElementById('testTitle').innerHTML = `<i class="fas fa-book-open"></i> Tema ${temaSeleccionado}: ${temasList.find(t => t.numero === temaSeleccionado).nombre} (${preguntasActuales.length} preguntas)`;
+            
+            if (timerInterval) clearInterval(timerInterval);
+            if (tiempoMin > 0) {
+                tiempoRestante = tiempoMin * 60;
+                iniciarTemporizador();
+            } else {
+                document.getElementById('timer').textContent = 'Sin límite';
+                document.getElementById('timer').classList.remove('warning');
+            }
+            
+            const temaNombre = temasList.find(t => t.numero === temaSeleccionado)?.nombre || `Tema ${temaSeleccionado}`;
+            document.getElementById('testTitle').innerHTML = `<i class="fas fa-book-open"></i> Tema ${temaSeleccionado}: ${temaNombre} (${preguntasActuales.length} preguntas)`;
             document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
             document.getElementById('respondidas').textContent = '0';
             renderizarPreguntas();
             document.getElementById('testContainer').style.display = 'block';
+            document.getElementById('resultado').style.display = 'none';
             testActivo = true;
             document.getElementById('testContainer').scrollIntoView({ behavior: 'smooth' });
         }
-
+        
         function renderizarPreguntas() {
             const container = document.getElementById('preguntasContainer');
             container.innerHTML = preguntasActuales.map((p, idx) => `
-                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
+                <div class="pregunta" data-id="${p.id || idx}" data-correcta="${p.correcta}">
                     <div class="pregunta-texto">${idx + 1}. ${p.texto}</div>
                     ${p.opciones.map((opcion, optIdx) => `
                         <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
@@ -327,7 +377,7 @@
                 });
             });
         }
-
+        
         function iniciarTemporizador() {
             if (timerInterval) clearInterval(timerInterval);
             const timerElem = document.getElementById('timer');
@@ -337,10 +387,14 @@
                 const m = Math.floor(tiempoRestante / 60), s = tiempoRestante % 60;
                 timerElem.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 if (tiempoRestante <= 60) timerElem.classList.add('warning');
-                if (tiempoRestante <= 0) { clearInterval(timerInterval); alert('⏰ ¡Tiempo agotado!'); finalizarTest(); }
+                if (tiempoRestante <= 0) {
+                    clearInterval(timerInterval);
+                    alert('⏰ ¡Tiempo agotado!');
+                    finalizarTest();
+                }
             }, 1000);
         }
-
+        
         function finalizarTest() {
             if (!testActivo) return;
             testActivo = false;
@@ -360,14 +414,13 @@
                     correcta: p.correcta,
                     seleccionada: respuesta,
                     esCorrecto: esCorrecto,
-                    explicacion: p.explicacion
+                    explicacion: p.explicacion || "Sin explicación"
                 });
                 
-                // Marcar visualmente en el DOM
-                const preguntaDiv = document.querySelector(`.pregunta[data-id="${p.id}"]`);
+                const preguntaDiv = document.querySelector(`.pregunta[data-id="${p.id || idx}"]`);
                 if (preguntaDiv) preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
                 
-                document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => {
+                document.querySelectorAll(`.pregunta[data-id="${p.id || idx}"] .opcion`).forEach((op, optIdx) => {
                     op.classList.add('disabled');
                     if (optIdx === p.correcta) op.classList.add('correcta-respuesta');
                     if (respuesta === optIdx && respuesta !== p.correcta) op.classList.add('incorrecta-respuesta');
@@ -393,7 +446,6 @@
             `;
             resultadoDiv.style.display = 'block';
             
-            // Botón para mostrar respuestas
             document.getElementById('btnVerResultados').addEventListener('click', () => {
                 const detalleDiv = document.getElementById('detalleResultados');
                 if (detalleDiv.style.display === 'none') {
@@ -418,33 +470,34 @@
                 }
             });
             
-            // Guardar resultado
-            const tests = JSON.parse(localStorage.getItem('dgt_tests') || '[]');
-            tests.push({ tema: temaSeleccionado, aciertos: aciertos, total: preguntasActuales.length, fecha: new Date().toISOString() });
-            localStorage.setItem('dgt_tests', JSON.stringify(tests));
-            
-            // Actualizar estadísticas del usuario
-            const currentUser = getCurrentUser();
-            if (currentUser && typeof updateUserStats === 'function') {
-                updateUserStats(currentUser.id, aciertos, preguntasActuales.length);
-            }
+            // Guardar estadísticas en localStorage
+            const stats = JSON.parse(localStorage.getItem('aprobadoya_test_stats') || '{}');
+            stats.totalTests = (stats.totalTests || 0) + 1;
+            stats.totalAciertos = (stats.totalAciertos || 0) + aciertos;
+            stats.totalPreguntas = (stats.totalPreguntas || 0) + preguntasActuales.length;
+            stats.mejorResultado = Math.max(stats.mejorResultado || 0, porcentaje);
+            localStorage.setItem('aprobadoya_test_stats', JSON.stringify(stats));
         }
         
         function reiniciarTest() {
             location.reload();
         }
-
-        function renderUserZone() {
-            const u = getCurrentUser();
-            const z = document.getElementById('userZone');
-            if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
-            else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
-        }
-
-        renderUserZone();
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../login.html';
+            }
+        });
+        
         renderizarTemas();
         document.getElementById('btnIniciarTest').addEventListener('click', iniciarTest);
         document.getElementById('btnEnviar').addEventListener('click', finalizarTest);
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.querySelector('.nav-wrapper');
+            if (wrapper) wrapper.classList.toggle('active');
+        });
     </script>
 </body>
 </html>

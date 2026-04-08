@@ -264,7 +264,7 @@
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-number" id="totalTests">0</div><div class="stat-label">Tests realizados</div></div>
                     <div class="stat-card"><div class="stat-number" id="testsAprobados">0</div><div class="stat-label">Tests aprobados</div></div>
-                    <div class="stat-card"><div class="stat-number" id="tasaAprobados">0%</div><div class="stat-label">Tasa de aciertos</div></div>
+                    <div class="stat-card"><div class="stat-number" id="tasaAciertos">0%</div><div class="stat-label">Tasa de aciertos</div></div>
                     <div class="stat-card"><div class="stat-number" id="mejorResultado">0%</div><div class="stat-label">Mejor resultado</div></div>
                 </div>
             </div>
@@ -284,10 +284,10 @@
                 <div class="test-card" onclick="window.location.href='test-completo.html'">
                     <div class="test-icon"><i class="fas fa-list-check"></i></div>
                     <h3>Test Completo</h3>
-                    <p>30 preguntas como en el examen oficial</p>
+                    <p>30 preguntas con 100 tests diferentes por nivel</p>
                     <div class="test-features">
                         <span class="feature"><i class="fas fa-sliders-h"></i> 30 preguntas</span>
-                        <span class="feature"><i class="fas fa-clock"></i> 30 minutos</span>
+                        <span class="feature"><i class="fas fa-layer-group"></i> 100 tests/nivel</span>
                     </div>
                     <span class="test-badge"><i class="fas fa-play"></i> Comenzar ahora</span>
                 </div>
@@ -329,39 +329,79 @@
     </footer>
 
     <script type="module">
-        import { auth, onAuthStateChanged, signOut, db, doc, getDoc } from '../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc } from '../js/firebase-init.js';
         import { renderUserZone } from '../js/global-auth.js';
         
-        // Función para obtener estadísticas del usuario desde Firestore
-        async function cargarEstadisticas(user) {
-            try {
-                const userRef = doc(db, "usuarios", user.uid);
-                const userDoc = await getDoc(userRef);
-                
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    document.getElementById('totalTests').textContent = userData.testsRealizados || 0;
-                    document.getElementById('testsAprobados').textContent = userData.testsAprobados || 0;
-                    document.getElementById('tasaAprobados').textContent = `${userData.mediaAciertos || 0}%`;
-                    document.getElementById('mejorResultado').textContent = `${userData.mejorResultado || 0}%`;
-                }
-            } catch (error) {
-                console.error("Error al cargar estadísticas:", error);
-            }
+        // Clave para estadísticas en localStorage
+        const STATS_KEY = 'aprobadoya_test_stats';
+        
+        // Cargar estadísticas desde localStorage
+        function cargarEstadisticas() {
+            const stats = JSON.parse(localStorage.getItem(STATS_KEY) || '{}');
+            document.getElementById('totalTests').textContent = stats.totalTests || 0;
+            document.getElementById('testsAprobados').textContent = stats.testsAprobados || 0;
+            document.getElementById('tasaAciertos').textContent = `${stats.tasaAciertos || 0}%`;
+            document.getElementById('mejorResultado').textContent = `${stats.mejorResultado || 0}%`;
         }
         
-        // Verificar autenticación
+        // Guardar estadísticas en localStorage y sincronizar con Firestore
+        async function guardarEstadisticas(userId, aciertos, total, testNombre) {
+            const porcentaje = Math.round((aciertos / total) * 100);
+            const aprobado = porcentaje >= 90;
+            
+            // Actualizar localStorage
+            const stats = JSON.parse(localStorage.getItem(STATS_KEY) || '{}');
+            stats.totalTests = (stats.totalTests || 0) + 1;
+            if (aprobado) stats.testsAprobados = (stats.testsAprobados || 0) + 1;
+            
+            // Calcular nueva tasa de aciertos
+            const nuevosAciertosTotales = (stats.totalAciertos || 0) + aciertos;
+            const nuevasPreguntasTotales = (stats.totalPreguntas || 0) + total;
+            stats.tasaAciertos = Math.round((nuevosAciertosTotales / nuevasPreguntasTotales) * 100);
+            stats.mejorResultado = Math.max(stats.mejorResultado || 0, porcentaje);
+            stats.totalAciertos = nuevosAciertosTotales;
+            stats.totalPreguntas = nuevasPreguntasTotales;
+            
+            localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+            
+            // Actualizar también en Firestore
+            if (userId) {
+                const userRef = doc(db, "usuarios", userId);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    const nuevosTests = (userData.testsRealizados || 0) + 1;
+                    const nuevosAciertosFirestore = (userData.totalAciertos || 0) + aciertos;
+                    const nuevasPreguntasFirestore = (userData.totalPreguntas || 0) + total;
+                    const nuevaMedia = Math.round((nuevosAciertosFirestore / nuevasPreguntasFirestore) * 100);
+                    const nuevoMejor = Math.max(userData.mejorResultado || 0, porcentaje);
+                    
+                    await updateDoc(userRef, {
+                        testsRealizados: nuevosTests,
+                        totalAciertos: nuevosAciertosFirestore,
+                        totalPreguntas: nuevasPreguntasFirestore,
+                        mediaAciertos: nuevaMedia,
+                        mejorResultado: nuevoMejor,
+                        ultimoTest: new Date().toISOString()
+                    });
+                }
+            }
+            
+            cargarEstadisticas();
+            return porcentaje;
+        }
+        
+        // Exponer función global para que test-completo.html la use
+        window.actualizarEstadisticasTest = guardarEstadisticas;
+        
         onAuthStateChanged(auth, (user) => {
             renderUserZone();
-            
+            cargarEstadisticas();
             if (!user) {
                 window.location.href = '../login.html';
-            } else {
-                cargarEstadisticas(user);
             }
         });
         
-        // Menú móvil
         document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
             const wrapper = document.querySelector('.nav-wrapper');
             if (wrapper) wrapper.classList.toggle('active');

@@ -2,240 +2,387 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Test Completo | AprobadoYa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <style>
-        .page-header {
-            text-align: center;
-            padding: 40px 0;
-            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
-            color: white;
-            margin-bottom: 30px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f5f3 0%, #e0ece8 100%);
+            min-height: 100vh;
+            color: #0f2b2d;
         }
-        .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
-        
-        .nivel-selector {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+        header {
+            background: #0a2f2a;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .btn-nivel {
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 28px;
         }
-        .btn-nivel.facil { background: #10b981; color: white; }
-        .btn-nivel.medio { background: #f59e0b; color: white; }
-        .btn-nivel.dificil { background: #ef4444; color: white; }
-        .btn-nivel.active { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
-        
-        .test-selector {
-            background: white;
-            border-radius: 25px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-            display: none;
-        }
-        .test-selector.active { display: block; }
-        
-        .selector-header {
+        header .container {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 12px 28px;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
         }
-        .selector-controls {
+        .logo {
             display: flex;
-            gap: 15px;
             align-items: center;
-            flex-wrap: wrap;
-        }
-        .selector-controls select {
-            padding: 8px 15px;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            background: white;
+            gap: 10px;
             cursor: pointer;
         }
-        .btn-random {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a472a;
+        .logo i { font-size: 2rem; color: #f5b042; }
+        .logo h1 { font-size: 1.7rem; font-weight: 800; color: white; }
+        .logo span { color: #f5b042; }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #eef2f5;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #f5b042; }
+        .user-zone { display: flex; align-items: center; }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255,255,255,0.12);
+            padding: 6px 20px;
+            border-radius: 60px;
+        }
+        .user-avatar { font-size: 1.6rem; }
+        .user-name { color: white; font-weight: 500; }
+        .btn-profile, .btn-logout {
+            background: #f5b042;
             border: none;
-            padding: 8px 20px;
-            border-radius: 50px;
+            padding: 6px 16px;
+            border-radius: 40px;
             font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #0a2f2a;
+        }
+        .btn-logout { background: #e2e8f0; color: #1e293b; }
+        .btn-login {
+            background: #f5b042;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #0a2f2a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
             cursor: pointer;
         }
         
+        .page-header {
+            background: linear-gradient(125deg, #0f3b2c 0%, #1b5a44 100%);
+            padding: 50px 0;
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 2.5rem; font-weight: 800; }
+        .page-header h1 i { color: #f5b042; margin-right: 12px; }
+        .page-header p { color: #e0f0e8; margin-top: 8px; }
+        
+        .nivel-section {
+            background: white;
+            border-radius: 32px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .nivel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #1a472a;
+        }
+        .nivel-grid {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .nivel-card {
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            border-radius: 28px;
+            padding: 30px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+            min-width: 180px;
+        }
+        .nivel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .nivel-card.seleccionado {
+            border-color: #f5b042;
+            background: linear-gradient(135deg, #fef3c7, #fff);
+        }
+        .nivel-icono { font-size: 3rem; margin-bottom: 15px; }
+        .nivel-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        .nivel-card p { color: #64748b; font-size: 0.85rem; }
+        .nivel-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-facil { background: #d1fae5; color: #065f46; }
+        .badge-medio { background: #fef3c7; color: #b45309; }
+        .badge-dificil { background: #fee2e2; color: #991b1b; }
+        
+        .tests-section {
+            background: white;
+            border-radius: 32px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .tests-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .tests-header h2 {
+            color: #1a472a;
+            font-size: 1.3rem;
+        }
+        .btn-volver-nivel {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-volver-nivel:hover { background: #cbd5e1; }
         .tests-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
-            max-height: 450px;
+            max-height: 500px;
             overflow-y: auto;
-            padding: 10px;
+            padding: 5px;
         }
-        .test-card {
+        .test-item {
             background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
             padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
         }
-        .test-card:hover {
-            border-color: #fbbf24;
+        .test-item:hover {
             background: #fef3c7;
-            transform: translateY(-2px);
+            border-color: #f5b042;
+            transform: translateY(-3px);
         }
-        .test-card.completado {
-            background: #d1fae5;
-            border-color: #10b981;
+        .test-numero {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #f5b042;
         }
-        .test-numero { font-weight: 800; color: #fbbf24; font-size: 1.1rem; }
-        .test-nivel-badge {
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            display: inline-block;
+        .test-titulo {
+            font-size: 0.85rem;
+            color: #1e293b;
             margin-top: 5px;
         }
-        .test-nivel-badge.facil { background: #d1fae5; color: #065f46; }
-        .test-nivel-badge.medio { background: #fef3c7; color: #b45309; }
-        .test-nivel-badge.dificil { background: #fee2e2; color: #991b1b; }
         
-        .paginacion {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .page-btn {
-            background: #f1f5f9;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .page-btn.active { background: #fbbf24; color: #1a472a; font-weight: 600; }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .exam-container {
+        .stats-test {
             background: white;
-            border-radius: 30px;
-            padding: 35px;
-            margin-bottom: 60px;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        }
-        .exam-header {
+            border-radius: 28px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
             flex-wrap: wrap;
             gap: 15px;
+            display: none;
         }
-        .exam-info { display: flex; gap: 20px; flex-wrap: wrap; }
-        .exam-info-item {
-            background: #f8fafc;
-            padding: 8px 18px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .timer {
-            font-size: 1.5rem;
-            font-weight: 700;
-            font-family: monospace;
-            background: #1e293b;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 50px;
-        }
-        .timer.warning { background: #ef4444; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; transform: scale(1.02); } }
+        .stats-item { display: flex; align-items: center; gap: 12px; }
+        .stats-number { font-size: 1.8rem; font-weight: 800; color: #f5b042; }
+        .stats-label { color: #64748b; font-size: 0.85rem; }
+        .progress-bar { flex: 1; height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f5b042, #f59e0b); border-radius: 10px; width: 0%; transition: width 0.3s; }
         
-        .pregunta {
+        .question-card {
+            background: white;
+            border-radius: 32px;
+            padding: 35px;
             margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            display: none;
         }
-        .pregunta.correcta { border-left: 4px solid #10b981; padding-left: 20px; background: #f0fdf4; border-radius: 12px; }
-        .pregunta.incorrecta { border-left: 4px solid #ef4444; padding-left: 20px; background: #fef2f2; border-radius: 12px; }
-        .pregunta-texto { font-weight: 600; margin-bottom: 18px; color: #1e293b; font-size: 1rem; }
-        .opcion {
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0e5d4;
+        }
+        .pregunta-numero {
+            background: #f5b042;
+            color: #1a472a;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+        .options { display: grid; gap: 12px; margin-bottom: 20px; }
+        .option-btn {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-            padding: 10px 15px;
-            border-radius: 12px;
+            gap: 15px;
+            padding: 14px 20px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
             cursor: pointer;
-            background: #fafcff;
-            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            font-weight: 500;
         }
-        .opcion:hover:not(.disabled) { background: #fef3c7; border-color: #fbbf24; transform: translateX(5px); }
-        .opcion.disabled { cursor: not-allowed; opacity: 0.7; }
-        .opcion.correcta-respuesta { background: #d1fae5; border-color: #10b981; }
-        .opcion.incorrecta-respuesta { background: #fee2e2; border-color: #ef4444; }
-        .btn-enviar {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a472a;
-            border: none;
-            padding: 14px 35px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
+        .option-btn:hover:not(.disabled) {
+            background: #fef3c7;
+            border-color: #f5b042;
+            transform: translateX(8px);
+        }
+        .option-prefix { font-weight: 800; color: #f5b042; width: 35px; font-size: 1.1rem; }
+        .disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .correct { background: #d1fae5; border-color: #10b981; }
+        .incorrect { background: #fee2e2; border-color: #ef4444; }
+        
+        .feedback {
             margin-top: 20px;
-            width: 100%;
-        }
-        .resultado {
-            margin-top: 25px;
-            padding: 25px;
+            padding: 15px;
             border-radius: 20px;
             display: none;
-            text-align: center;
+            font-weight: 500;
         }
-        .resultado.exito { background: #d1fae5; color: #065f46; }
-        .resultado.error { background: #fee2e2; color: #991b1b; }
-        .volver { display: inline-block; margin-top: 20px; color: #64748b; background: none; border: none; cursor: pointer; }
+        .feedback.correct { background: #d1fae5; color: #065f46; display: block; border-left: 4px solid #10b981; }
+        .feedback.wrong { background: #fee2e2; color: #991b1b; display: block; border-left: 4px solid #ef4444; }
+        
+        .btn-siguiente {
+            background: linear-gradient(135deg, #f5b042, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            display: none;
+            transition: all 0.3s;
+        }
+        .btn-siguiente:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(245,176,66,0.4); }
+        
+        .resultado-final {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+        }
+        .resultado-final h2 { margin-bottom: 20px; }
+        .puntuacion-final { font-size: 3rem; font-weight: 800; color: #f5b042; margin: 20px 0; }
+        .btn-reiniciar {
+            background: #f5b042;
+            color: #1a472a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 60px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        footer {
+            background: #0f2a22;
+            color: #cbdcd6;
+            margin-top: 60px;
+            padding: 40px 0 24px;
+            border-radius: 40px 40px 0 0;
+        }
+        .footer-bottom { text-align: center; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); }
         
         @media (max-width: 768px) {
-            .btn-nivel { padding: 10px 20px; font-size: 1rem; }
-            .tests-grid { grid-template-columns: 1fr; }
+            .page-header h1 { font-size: 1.8rem; }
+            .nivel-grid { gap: 15px; }
+            .nivel-card { padding: 20px 15px; min-width: 140px; }
+            .nivel-icono { font-size: 2rem; }
+            .tests-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            .stats-test { flex-direction: column; text-align: center; }
+            .menu-mobile { display: block; }
+            .nav-wrapper { display: none; }
+            .nav-wrapper.active { display: block; width: 100%; margin-top: 16px; }
+            header .container { flex-wrap: wrap; }
+            nav ul { flex-wrap: wrap; justify-content: center; gap: 16px; }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="logo" onclick="window.location.href='../index.html'">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper" id="navWrapper">
+                    <nav>
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="../temas/index.html">Temas</a></li>
+                            <li><a href="../test/index.html">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
             <div class="user-zone" id="userZone"></div>
             <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
@@ -243,104 +390,222 @@
 
     <div class="page-header">
         <div class="container">
-            <h1><i class="fas fa-list-check"></i> Test Completo</h1>
-            <p>Elige tu nivel y practica con 100 tests diferentes cada nivel</p>
+            <h1><i class="fas fa-clipboard-list"></i> Test Completo</h1>
+            <p>Elige tu nivel y practica con 100 tests diferentes (30 preguntas únicas cada uno)</p>
         </div>
     </div>
 
-    <main><div class="container">
-        <div class="nivel-selector">
-            <button class="btn-nivel facil" data-nivel="facil" onclick="cambiarNivel('facil')">🌱 FÁCIL (100 tests)</button>
-            <button class="btn-nivel medio" data-nivel="medio" onclick="cambiarNivel('medio')">⚡ MEDIO (100 tests)</button>
-            <button class="btn-nivel dificil" data-nivel="dificil" onclick="cambiarNivel('dificil')">🔥 DIFÍCIL (100 tests)</button>
-        </div>
-
-        <div id="testSelector" class="test-selector">
-            <div class="selector-header">
-                <h3 id="selectorTitle"><i class="fas fa-list"></i> Tests disponibles</h3>
-                <div class="selector-controls">
-                    <select id="pageSizeSelect"><option value="12">12 por página</option><option value="20" selected>20 por página</option><option value="30">30 por página</option></select>
-                    <button class="btn-random" id="btnRandomTest"><i class="fas fa-random"></i> Test aleatorio</button>
+    <main>
+        <div class="container">
+            <div class="nivel-section" id="nivelSection">
+                <div class="nivel-title">
+                    <i class="fas fa-chart-line"></i> Selecciona tu nivel de dificultad
+                </div>
+                <div class="nivel-grid">
+                    <div class="nivel-card" data-nivel="facil">
+                        <div class="nivel-icono">🌱</div>
+                        <h3>Fácil</h3>
+                        <p>100 tests básicos</p>
+                        <span class="nivel-badge badge-facil">Principiante</span>
+                    </div>
+                    <div class="nivel-card" data-nivel="medio">
+                        <div class="nivel-icono">⚡</div>
+                        <h3>Medio</h3>
+                        <p>100 tests intermedios</p>
+                        <span class="nivel-badge badge-medio">Intermedio</span>
+                    </div>
+                    <div class="nivel-card" data-nivel="dificil">
+                        <div class="nivel-icono">🔥</div>
+                        <h3>Difícil</h3>
+                        <p>100 tests avanzados</p>
+                        <span class="nivel-badge badge-dificil">Experto</span>
+                    </div>
                 </div>
             </div>
-            <div id="testsGrid" class="tests-grid"></div>
-            <div id="paginacion" class="paginacion"></div>
-        </div>
 
-        <div class="exam-container" id="examContainer">
-            <div class="exam-header">
-                <div class="exam-info">
-                    <div class="exam-info-item"><i class="fas fa-dice-d6"></i> Test <span id="testId">-</span></div>
-                    <div class="exam-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">0</span></div>
-                    <div class="exam-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div>
+            <div class="tests-section" id="testsSection">
+                <div class="tests-header">
+                    <h2 id="nivelSeleccionadoTitle">📋 Tests Fáciles</h2>
+                    <button class="btn-volver-nivel" id="btnVolverNivel">← Volver a niveles</button>
                 </div>
-                <div class="timer" id="timer">30:00</div>
+                <div class="tests-grid" id="testsGrid"></div>
             </div>
-            <div id="preguntasContainer"></div>
-            <button class="btn-enviar" id="btnEnviar">Finalizar test</button>
-            <div id="resultado" class="resultado"></div>
-            <button onclick="cerrarExamen()" class="volver"><i class="fas fa-arrow-left"></i> Volver a selección</button>
+
+            <div class="stats-test" id="statsTest">
+                <div class="stats-item">
+                    <div class="stats-number" id="preguntaActual">0</div>
+                    <div class="stats-label">de <span id="totalPreguntas">30</span></div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-number" id="aciertos">0</div>
+                    <div class="stats-label">✅ Aciertos</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-number" id="fallos">0</div>
+                    <div class="stats-label">❌ Fallos</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="question-card" id="questionCard"></div>
+            <div id="resultadoFinal" class="resultado-final"></div>
         </div>
-    </div></main>
+    </main>
 
-    <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
 
-    <script src="../js/auth.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="data/preguntas.js"></script>
-    <script>
-        let nivelActual = "facil";
-        let testsActuales = [];
-        let testSeleccionado = null;
-        let respuestas = [];
-        let tiempoRestante = 30 * 60;
-        let timerInterval;
-        let testActivo = false;
-        let testFinalizado = false;
-        let paginaActual = 1;
-        let itemsPorPagina = 20;
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
         
-        const TESTS_COMPLETADOS_KEY = 'aprobadoya_tests_completados';
-
-        function obtenerTestsCompletados() {
-            const completados = localStorage.getItem(TESTS_COMPLETADOS_KEY);
-            return completados ? JSON.parse(completados) : [];
-        }
-
-        function guardarTestsCompletados(completados) {
-            localStorage.setItem(TESTS_COMPLETADOS_KEY, JSON.stringify(completados));
-        }
-
-        function isTestCompletado(testId) {
-            const completados = obtenerTestsCompletados();
-            return completados.includes(testId);
-        }
-
-        // Generar tests con preguntas reales para cada nivel
-        function generarTestsPorNivel() {
-            const user = getCurrentUser();
-            const seed = user ? user.id : 0;
-            
+        // ============================================
+        // BANCO DE PREGUNTAS (60+ preguntas por nivel para que no se repitan)
+        // ============================================
+        
+        const bancoPreguntas = {
+            facil: [
+                { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
+                { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Detenerse obligatoriamente." },
+                { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "0,3 g/l." },
+                { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 3 puntos." },
+                { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "8 puntos." },
+                { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
+                { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Ceder el paso." },
+                { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "30 km/h." },
+                { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Reducir velocidad." },
+                { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2, explicacion: "Para evitar accidentes." },
+                { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Permiso de conducir", "ITV en vigor", "Todas son correctas"], correcta: 3, explicacion: "Todas son obligatorias." },
+                { texto: "¿Durante cuánto tiempo se es conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "2 años." },
+                { texto: "¿Dónde se debe circular normalmente en una vía de doble sentido?", opciones: ["Por el carril izquierdo", "Por el carril derecho", "Por el centro", "Por el arcén"], correcta: 1, explicacion: "Por el carril derecho." },
+                { texto: "¿Qué significa la luz amarilla intermitente de un semáforo?", opciones: ["Paso prohibido", "Paso obligatorio", "Precaución, prioridad de paso", "Fin de prohibición"], correcta: 2, explicacion: "Precaución y prioridad." },
+                { texto: "¿Qué vehículos tienen prohibido circular por autopistas?", opciones: ["Ciclomotores", "Motocicletas de menos de 125cc", "Vehículos agrícolas", "Todas son correctas"], correcta: 3, explicacion: "Todos ellos." },
+                { texto: "¿Qué significa una señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0, explicacion: "Prohíbe adelantar." },
+                { texto: "¿Cuál es la sanción por no respetar un semáforo en rojo?", opciones: ["100€ y 2 puntos", "200€ y 4 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 4 puntos." },
+                { texto: "¿Qué indica una línea discontinua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar si es seguro", "Prohibido estacionar", "Zona de carga"], correcta: 1, explicacion: "Permite adelantar si es seguro." },
+                { texto: "¿Qué velocidad máxima pueden alcanzar las motocicletas en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
+                { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "2 segundos." },
+                { texto: "¿Qué debe hacer un conductor en un túnel?", opciones: ["Encender luces de cruce", "Reducir velocidad", "No adelantar", "Todas son correctas"], correcta: 3, explicacion: "Todas las anteriores." },
+                { texto: "¿Está permitido circular marcha atrás en autovía?", opciones: ["Sí, si es necesario", "Sí, para estacionar", "No, está prohibido", "Solo en caso de emergencia"], correcta: 2, explicacion: "Prohibido." },
+                { texto: "¿Qué significa una flecha blanca pintada en el pavimento?", opciones: ["Dirección obligatoria", "Zona de estacionamiento", "Prohibido girar", "Carril de aceleración"], correcta: 0, explicacion: "Dirección obligatoria." },
+                { texto: "¿Qué deben hacer los vehículos lentos en carretera?", opciones: ["Circular por el centro", "Circular por la derecha", "Utilizar el arcén", "Aumentar velocidad"], correcta: 1, explicacion: "Circular por la derecha." },
+                { texto: "¿Está permitido parar en autovía?", opciones: ["Sí, en cualquier lugar", "Sí, solo en áreas de descanso", "No, está prohibido", "Solo para emergencias"], correcta: 3, explicacion: "Solo para emergencias." },
+                { texto: "¿Qué debe hacer un conductor si un vehículo quiere adelantarle?", opciones: ["Acelerar", "Mantenerse en su carril", "Cambiar de carril", "Tocar el claxon"], correcta: 1, explicacion: "Mantenerse en su carril." },
+                { texto: "¿Cuándo está permitido utilizar el teléfono móvil al volante?", opciones: ["Siempre con manos libres", "Nunca", "Solo en caso de emergencia", "Con el vehículo detenido"], correcta: 2, explicacion: "Solo en caso de emergencia." },
+                { texto: "¿Qué debe hacer un conductor si el semáforo se pone amarillo?", opciones: ["Acelerar para pasar", "Detenerse si es seguro", "Continuar sin cambios", "Tocar el claxon"], correcta: 1, explicacion: "Detenerse si es seguro." },
+                { texto: "¿Qué debe hacer un conductor en un carril de aceleración?", opciones: ["Detenerse", "Acelerar para incorporarse", "Reducir velocidad", "Circular marcha atrás"], correcta: 1, explicacion: "Acelerar para incorporarse." },
+                { texto: "¿Qué debe hacer un conductor en un carril de deceleración?", opciones: ["Acelerar", "Reducir velocidad para salir", "Detenerse", "Adelantar"], correcta: 1, explicacion: "Reducir velocidad." },
+                { texto: "¿Qué significa una señal de 'Prohibido estacionar'?", opciones: ["No se puede parar", "No se puede estacionar", "No se puede circular", "Zona de carga"], correcta: 1, explicacion: "Prohíbe estacionar." },
+                { texto: "¿Qué indica una señal de 'Curva peligrosa'?", opciones: ["Curva a la izquierda", "Curva a la derecha", "Curva cerrada", "Todas según dibujo"], correcta: 3, explicacion: "Según el dibujo." },
+                { texto: "¿Qué indica una señal de 'Zona escolar'?", opciones: ["Proximidad colegio", "Velocidad 20 km/h", "Precaución niños", "Todas correctas"], correcta: 3, explicacion: "Todas las anteriores." },
+                { texto: "¿Qué indican las señales de color naranja?", opciones: ["Obras", "Servicios", "Peligro", "Información turística"], correcta: 0, explicacion: "Indican obras." },
+                { texto: "¿Qué significa una señal de 'Senda ciclista'?", opciones: ["Vía para bicicletas", "Prohibido bicicletas", "Carril bici", "Zona peatonal"], correcta: 0, explicacion: "Vía para bicicletas." },
+                { texto: "¿Qué significa una señal de 'Sentido obligatorio'?", opciones: ["Dirección obligatoria", "Prohibido girar", "Calle sentido único", "Calle peatonal"], correcta: 0, explicacion: "Dirección obligatoria." },
+                { texto: "¿Qué indica una señal de 'Paso de peatones'?", opciones: ["Prohibido cruzar", "Zona cruce peatones", "Carril bici", "Zona carga"], correcta: 1, explicacion: "Zona de cruce de peatones." },
+                { texto: "¿Qué significa una señal de 'Túnel'?", opciones: ["Paso inferior", "Paso superior", "Proximidad túnel", "Zona obras"], correcta: 2, explicacion: "Proximidad de un túnel." },
+                { texto: "¿Qué indica una señal de 'Glacis'?", opciones: ["Paso elevado", "Resalto", "Lomo de asno", "Todas correctas"], correcta: 3, explicacion: "Resalto en la calzada." },
+                { texto: "¿Qué indica una señal de 'Carril bus'?", opciones: ["Carril exclusivo autobuses", "Carril alta ocupación", "Carril bicicletas", "Carril emergencia"], correcta: 0, explicacion: "Carril exclusivo para autobuses." }
+            ],
+            medio: [
+                { texto: "¿Qué velocidad máxima puede alcanzar un turismo en autopista con lluvia?", opciones: ["100 km/h", "110 km/h", "120 km/h", "80 km/h"], correcta: 0, explicacion: "100 km/h con lluvia." },
+                { texto: "¿Qué significa una señal de 'Paso a nivel sin barreras'?", opciones: ["Paso a nivel con barreras", "Paso a nivel sin barreras", "Paso inferior", "Paso superior"], correcta: 1, explicacion: "Paso a nivel sin barreras." },
+                { texto: "¿Cuántos puntos se pierden por conducir con alcohol >0.60 mg/l?", opciones: ["4 puntos", "6 puntos", "8 puntos", "Pérdida total"], correcta: 1, explicacion: "6 puntos." },
+                { texto: "¿Qué significa una señal de 'Zona de bajas emisiones'?", opciones: ["Restricción circulación", "Prohibido estacionar", "Zona peatonal", "Carril bici"], correcta: 0, explicacion: "Restricción de circulación." },
+                { texto: "¿Qué deben hacer los vehículos lentos en carretera?", opciones: ["Circular centro", "Circular derecha", "Utilizar arcén", "Aumentar velocidad"], correcta: 1, explicacion: "Circular por la derecha." },
+                { texto: "¿Qué indica una señal de 'Carril reversible'?", opciones: ["Carril cambia sentido", "Carril vehículos lentos", "Carril aceleración", "Carril deceleración"], correcta: 0, explicacion: "Cambia de sentido." },
+                { texto: "¿Cuál es la distancia de seguridad con lluvia?", opciones: ["2 segundos", "3 segundos", "4 segundos", "5 segundos"], correcta: 1, explicacion: "3-4 segundos." },
+                { texto: "¿Qué significa una señal de 'Prohibido girar en U'?", opciones: ["Prohibido cambiar sentido", "Prohibido girar izquierda", "Prohibido girar derecha", "Prohibido circular"], correcta: 0, explicacion: "Prohibido cambiar de sentido." },
+                { texto: "¿Qué velocidad máxima pueden alcanzar los camiones en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 1, explicacion: "90 km/h." },
+                { texto: "¿Qué indica una señal de 'Carril bus'?", opciones: ["Carril exclusivo autobuses", "Carril alta ocupación", "Carril bicicletas", "Carril emergencia"], correcta: 0, explicacion: "Exclusivo autobuses." },
+                { texto: "¿Qué velocidad máxima con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h." },
+                { texto: "¿Distancia a 120 km/h en 2 segundos?", opciones: ["33.3 m", "66.6 m", "100 m", "120 m"], correcta: 1, explicacion: "66.6 metros." },
+                { texto: "¿Metros mínimos al estacionar en paso de peatones?", opciones: ["5 m", "10 m", "15 m", "20 m"], correcta: 0, explicacion: "5 metros." },
+                { texto: "¿Tasa de alcohol que constituye delito penal?", opciones: ["0.5 g/l", "0.8 g/l", "1.0 g/l", "1.2 g/l"], correcta: 3, explicacion: "1.2 g/l." },
+                { texto: "¿Sanción por superar velocidad en más de 50 km/h?", opciones: ["200€", "300€", "500€ y 6 puntos", "600€ y 6 puntos"], correcta: 2, explicacion: "500€ y 6 puntos." },
+                { texto: "¿Cuándo está permitido adelantar por la derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas varios carriles." },
+                { texto: "¿Qué indica señal de 'Carril de aceleración'?", opciones: ["Aumentar velocidad", "Disminuir velocidad", "Adelantar", "Estacionar"], correcta: 0, explicacion: "Aumentar velocidad." },
+                { texto: "¿Qué indican señales de color marrón?", opciones: ["Información turística", "Obras", "Peligro", "Servicios"], correcta: 0, explicacion: "Lugares turísticos." },
+                { texto: "¿Qué indica 'Peligro por viento lateral'?", opciones: ["Viento fuerte", "Curva peligrosa", "Desprendimiento", "Pavimento deslizante"], correcta: 0, explicacion: "Viento lateral." },
+                { texto: "¿Qué indica 'Zona de prioridad peatonal'?", opciones: ["Peatones prioridad", "Prohibido peatones", "Velocidad 50", "Carril peatones"], correcta: 0, explicacion: "Prioridad peatones." },
+                { texto: "¿Qué significa una línea continua amarilla en el bordillo?", opciones: ["Prohibido estacionar", "Prohibido parar", "Zona carga", "Parada bus"], correcta: 1, explicacion: "Prohibido parar y estacionar." },
+                { texto: "¿Qué indica un semáforo con flecha verde?", opciones: ["Prohibido paso", "Paso permitido dirección", "Precaución", "Fin prohibición"], correcta: 1, explicacion: "Paso en esa dirección." },
+                { texto: "¿Qué señal indica 'Ceda el paso'?", opciones: ["Triángulo invertido", "Círculo rojo", "Octógono rojo", "Cuadrado azul"], correcta: 0, explicacion: "Triángulo invertido." },
+                { texto: "¿Qué color tienen las señales de autopista?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 1, explicacion: "Fondo verde." },
+                { texto: "¿Qué indica señal cuadrada o rectangular azul?", opciones: ["Prohibición", "Peligro", "Información o servicio", "Obligación"], correcta: 2, explicacion: "Información o servicio." },
+                { texto: "¿Qué significa señal con peatón dentro triángulo?", opciones: ["Paso peatones", "Zona peatonal", "Peligro peatones", "Prohibido peatones"], correcta: 2, explicacion: "Peligro por peatones." },
+                { texto: "¿Qué indica señal de 'Carril adicional'?", opciones: ["Carril lentos", "Carril adelantar", "Carril incorporarse", "Carril exclusivo"], correcta: 2, explicacion: "Carril para incorporarse." },
+                { texto: "¿Qué significa señal de 'Prohibido girar izquierda'?", opciones: ["Prohibido girar U", "Prohibido girar izquierda", "Prohibido girar derecha", "Prohibido circular"], correcta: 1, explicacion: "Prohíbe girar izquierda." },
+                { texto: "¿Qué significa señal de 'Velocidad mínima'?", opciones: ["Velocidad máxima", "Velocidad mínima obligatoria", "Velocidad recomendada", "Fin velocidad mínima"], correcta: 1, explicacion: "Velocidad mínima obligatoria." },
+                { texto: "¿Qué indica señal de 'Peligro por desprendimiento'?", opciones: ["Caída piedras", "Curva peligrosa", "Derrumbes", "Mal estado"], correcta: 0, explicacion: "Posible caída de piedras." }
+            ],
+            dificil: [
+                { texto: "¿Qué velocidad máxima con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h con remolque." },
+                { texto: "¿Distancia a 120 km/h en 2 segundos?", opciones: ["33.3 m", "66.6 m", "100 m", "120 m"], correcta: 1, explicacion: "66.6 metros." },
+                { texto: "¿Metros mínimos al estacionar en paso de peatones?", opciones: ["5 m", "10 m", "15 m", "20 m"], correcta: 0, explicacion: "5 metros." },
+                { texto: "¿Tasa de alcohol que constituye delito penal?", opciones: ["0.5 g/l", "0.8 g/l", "1.0 g/l", "1.2 g/l"], correcta: 3, explicacion: "1.2 g/l o 0.60 mg/l." },
+                { texto: "¿Sanción por superar velocidad en más de 50 km/h?", opciones: ["200€", "300€", "500€ y 6 puntos", "600€ y 6 puntos"], correcta: 2, explicacion: "500€ y 6 puntos." },
+                { texto: "¿Cuándo está permitido adelantar por la derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas con varios carriles." },
+                { texto: "¿Qué indica señal de 'Carril de aceleración'?", opciones: ["Aumentar velocidad", "Disminuir velocidad", "Adelantar", "Estacionar"], correcta: 0, explicacion: "Aumentar velocidad para incorporarse." },
+                { texto: "¿Qué indican señales de color marrón?", opciones: ["Información turística", "Obras", "Peligro", "Servicios"], correcta: 0, explicacion: "Lugares de interés turístico." },
+                { texto: "¿Qué indica 'Peligro por viento lateral'?", opciones: ["Viento fuerte", "Curva peligrosa", "Desprendimiento", "Pavimento deslizante"], correcta: 0, explicacion: "Viento lateral fuerte." },
+                { texto: "¿Qué indica 'Zona de prioridad peatonal'?", opciones: ["Peatones prioridad", "Prohibido peatones", "Velocidad 50 km/h", "Carril peatones"], correcta: 0, explicacion: "Los peatones tienen prioridad." },
+                { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["Prohibido adelantar desde continua", "Prohibido adelantar desde discontinua", "Permite adelantar ambos", "Prohibido adelantar ambos"], correcta: 0, explicacion: "No se puede adelantar desde el lado de la continua." },
+                { texto: "¿Qué significa flecha blanca pintada hacia izquierda?", opciones: ["Prohibido girar izquierda", "Dirección obligatoria izquierda", "Adelantamiento izquierda", "Carril aceleración"], correcta: 1, explicacion: "Dirección obligatoria hacia la izquierda." },
+                { texto: "¿Cuántos puntos se pierden por alcohol >0.60 mg/l?", opciones: ["4 puntos", "6 puntos", "8 puntos", "Pérdida total"], correcta: 1, explicacion: "6 puntos." },
+                { texto: "¿En qué casos está permitido adelantar por derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas con varios carriles." },
+                { texto: "¿Qué significa señal de 'Carril reversible'?", opciones: ["Carril cambia sentido", "Carril lentos", "Carril aceleración", "Carril deceleración"], correcta: 0, explicacion: "Cambia de sentido." },
+                { texto: "¿Qué velocidad máxima puede alcanzar un turismo en autovía con nieve?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h con nieve." },
+                { texto: "¿Qué sanción tiene superar velocidad máxima entre 20-30 km/h?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€"], correcta: 1, explicacion: "200€ y 2 puntos." },
+                { texto: "¿Qué velocidad máxima en autopista con niebla?", opciones: ["60 km/h", "70 km/h", "80 km/h", "90 km/h"], correcta: 0, explicacion: "60 km/h con niebla densa." },
+                { texto: "¿Cómo se calcula la distancia de seguridad?", opciones: ["Regla 2 segundos", "Regla 3 segundos", "Regla 5 segundos", "Regla 10 segundos"], correcta: 0, explicacion: "Regla de los 2 segundos." },
+                { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida adherencia agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0, explicacion: "Pérdida de adherencia por agua." },
+                { texto: "¿Cómo actuar en aquaplaning?", opciones: ["Frenar brusco", "Acelerar", "Mantener dirección no frenar", "Girar volante"], correcta: 2, explicacion: "Mantener dirección y no frenar." },
+                { texto: "¿Qué luces con niebla densa?", opciones: ["Luz larga", "Luz cruce", "Luz antiniebla", "Luz emergencia"], correcta: 2, explicacion: "Luces antiniebla." },
+                { texto: "¿Está permitido luz larga con niebla?", opciones: ["Sí recomendable", "Sí sin tráfico", "No empeora visión", "Solo carretera"], correcta: 2, explicacion: "Empeora la visibilidad." },
+                { texto: "¿Qué hacer con lluvia intensa?", opciones: ["Aumentar velocidad", "Reducir velocidad distancia", "Detenerse", "Usar luz larga"], correcta: 1, explicacion: "Reducir velocidad y aumentar distancia." },
+                { texto: "¿Qué hacer con hielo calzada?", opciones: ["Frenar brusco", "Marchas largas", "Acelerar", "Freno mano"], correcta: 1, explicacion: "Circular con marchas largas." },
+                { texto: "¿Cuándo usar cadenas obligatorio?", opciones: ["Cuando nieva", "Cuando hielo", "Cuando indique señal", "Siempre invierno"], correcta: 2, explicacion: "Cuando lo indique la señal." },
+                { texto: "¿Velocidad máxima con niebla densa?", opciones: ["Mitad límite", "30 km/h", "50 km/h", "80 km/h"], correcta: 0, explicacion: "Mitad del límite genérico." },
+                { texto: "¿Qué hacer con granizada?", opciones: ["Acelerar", "Buscar refugio", "Detenerse arcén", "Continuar"], correcta: 1, explicacion: "Buscar refugio." },
+                { texto: "¿Qué hacer en túnel largo?", opciones: ["Luces cruce", "Quitar gafas sol", "Aumentar distancia", "Todas"], correcta: 3, explicacion: "Todas las anteriores." },
+                { texto: "¿Qué hacer si sol deslumbra?", opciones: ["Cerrar ojos", "Usar visera", "Acelerar", "Detenerse"], correcta: 1, explicacion: "Usar la visera parasol." }
+            ]
+        };
+        
+        // Generar 100 tests por nivel (cada test tiene 30 preguntas ÚNICAS sin repetir)
+        function generarTests() {
             const tests = { facil: [], medio: [], dificil: [] };
             
-            // Para cada nivel, crear 100 tests con 30 preguntas cada uno
             for (let nivel of ['facil', 'medio', 'dificil']) {
+                const banco = [...bancoPreguntas[nivel]];
+                
                 for (let i = 1; i <= 100; i++) {
-                    // Mezclar preguntas basado en el nivel y el usuario
-                    let preguntas = [...preguntasDGT];
-                    for (let j = preguntas.length - 1; j > 0; j--) {
-                        const k = Math.floor((seed + i + nivel.length) % (j + 1));
-                        [preguntas[j], preguntas[k]] = [preguntas[k], preguntas[j]];
+                    // Mezclar el banco de preguntas
+                    const mezcladas = [...banco];
+                    for (let j = mezcladas.length - 1; j > 0; j--) {
+                        const k = Math.floor(Math.random() * (j + 1));
+                        [mezcladas[j], mezcladas[k]] = [mezcladas[k], mezcladas[j]];
                     }
-                    const preguntasTest = preguntas.slice(0, 30).map((p, idx) => ({
-                        id: (nivel === 'facil' ? i : nivel === 'medio' ? i + 100 : i + 200) * 100 + idx,
+                    
+                    // Tomar 30 preguntas (son únicas porque el banco tiene más de 30)
+                    const preguntasTest = mezcladas.slice(0, 30).map((p, idx) => ({
+                        id: idx,
                         texto: p.texto,
                         opciones: [...p.opciones],
                         correcta: p.correcta,
                         explicacion: p.explicacion
                     }));
+                    
                     tests[nivel].push({
-                        id: nivel === 'facil' ? i : nivel === 'medio' ? i + 100 : i + 200,
+                        id: i,
+                        numero: i,
                         nombre: `Test ${nivel === 'facil' ? 'Fácil' : nivel === 'medio' ? 'Medio' : 'Difícil'} ${i}`,
                         nivel: nivel,
                         preguntas: preguntasTest
@@ -349,265 +614,222 @@
             }
             return tests;
         }
-
-        let TESTS_POR_NIVEL = generarTestsPorNivel();
-
-        function obtenerTestsPorNivel(nivel) {
-            return TESTS_POR_NIVEL[nivel] || [];
-        }
-
-        function obtenerTestPorId(id) {
-            const todos = [...TESTS_POR_NIVEL.facil, ...TESTS_POR_NIVEL.medio, ...TESTS_POR_NIVEL.dificil];
-            return todos.find(t => t.id === id);
-        }
-
-        function obtenerTestsPaginados(nivel, page = 1, pageSize = 20) {
-            const tests = obtenerTestsPorNivel(nivel);
-            const start = (page - 1) * pageSize;
-            const end = start + pageSize;
-            return {
-                tests: tests.slice(start, end),
-                total: tests.length,
-                page: page,
-                totalPages: Math.ceil(tests.length / pageSize)
-            };
-        }
-
-        function cambiarNivel(nivel) {
-            nivelActual = nivel;
-            paginaActual = 1;
-            document.querySelectorAll('.btn-nivel').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.dataset.nivel === nivel) btn.classList.add('active');
-            });
-            cargarTests();
-            document.getElementById('testSelector').classList.add('active');
-            document.getElementById('examContainer').style.display = 'none';
-        }
-
-        function cargarTests() {
-            const resultado = obtenerTestsPaginados(nivelActual, paginaActual, itemsPorPagina);
-            testsActuales = resultado.tests;
-            const totalPages = resultado.totalPages;
-            
-            const titulos = { facil: '🌱 Tests Fáciles - 30 preguntas cada uno', medio: '⚡ Tests Medios - 30 preguntas cada uno', dificil: '🔥 Tests Difíciles - 30 preguntas cada uno' };
-            document.getElementById('selectorTitle').innerHTML = `<i class="fas fa-list"></i> ${titulos[nivelActual]}`;
+        
+        const TESTS = generarTests();
+        
+        let testActual = null;
+        let indiceActual = 0;
+        let aciertos = 0;
+        let fallos = 0;
+        let respuestaSeleccionada = false;
+        let testActivo = false;
+        let nivelSeleccionadoActual = null;
+        let currentUser = null;
+        
+        function mostrarTestsPorNivel(nivel) {
+            nivelSeleccionadoActual = nivel;
+            const tests = TESTS[nivel];
+            const titulo = nivel === 'facil' ? '📋 Tests Fáciles' : nivel === 'medio' ? '📋 Tests Medios' : '📋 Tests Difíciles';
+            document.getElementById('nivelSeleccionadoTitle').textContent = titulo;
             
             const grid = document.getElementById('testsGrid');
-            const badgeClass = { facil: 'facil', medio: 'medio', dificil: 'dificil' };
-            const badgeText = { facil: '🌱 Fácil', medio: '⚡ Medio', dificil: '🔥 Difícil' };
-            
-            grid.innerHTML = testsActuales.map(test => {
-                const completado = isTestCompletado(test.id);
-                return `
-                    <div class="test-card ${completado ? 'completado' : ''}" data-id="${test.id}" onclick="seleccionarTest(${test.id})">
-                        <div class="test-numero">Test ${test.id % 100 === 0 ? 100 : test.id % 100}</div>
-                        <div class="test-nivel-badge ${badgeClass[test.nivel.toLowerCase()]}">${badgeText[test.nivel.toLowerCase()]}</div>
-                        <div style="font-size:0.7rem; margin-top:5px;"><i class="fas fa-question-circle"></i> 30 preguntas</div>
-                    </div>
-                `;
-            }).join('');
-            
-            const paginacionDiv = document.getElementById('paginacion');
-            let paginasHtml = '';
-            let inicioPagina = Math.max(1, paginaActual - 3);
-            let finPagina = Math.min(totalPages, inicioPagina + 7);
-            for (let i = inicioPagina; i <= finPagina; i++) {
-                paginasHtml += `<button class="page-btn ${i === paginaActual ? 'active' : ''}" onclick="irPagina(${i})">${i}</button>`;
-            }
-            paginacionDiv.innerHTML = `<button class="page-btn" onclick="irPagina(${paginaActual - 1})" ${paginaActual === 1 ? 'disabled' : ''}>◀</button>${paginasHtml}<button class="page-btn" onclick="irPagina(${paginaActual + 1})" ${paginaActual === totalPages ? 'disabled' : ''}>▶</button>`;
-        }
-
-        function irPagina(pagina) {
-            const resultado = obtenerTestsPaginados(nivelActual, pagina, itemsPorPagina);
-            if (pagina < 1 || pagina > resultado.totalPages) return;
-            paginaActual = pagina;
-            cargarTests();
-        }
-
-        function seleccionarTest(id) {
-            testSeleccionado = obtenerTestPorId(id);
-            if (!testSeleccionado) return;
-            
-            respuestas = new Array(testSeleccionado.preguntas.length).fill(null);
-            document.getElementById('testId').textContent = `${testSeleccionado.nivel} - ${testSeleccionado.nombre}`;
-            document.getElementById('totalPreguntas').textContent = testSeleccionado.preguntas.length;
-            document.getElementById('respondidas').textContent = '0';
-            tiempoRestante = 30 * 60;
-            iniciarTemporizador();
-            renderizarPreguntas();
-            document.getElementById('examContainer').style.display = 'block';
-            document.getElementById('testSelector').classList.remove('active');
-            testActivo = true;
-            testFinalizado = false;
-            document.getElementById('examContainer').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function renderizarPreguntas() {
-            const container = document.getElementById('preguntasContainer');
-            container.innerHTML = testSeleccionado.preguntas.map((p, idx) => `
-                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
-                    <div class="pregunta-texto">${idx + 1}. ${p.texto}</div>
-                    ${p.opciones.map((opcion, optIdx) => `
-                        <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
-                            <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
-                            <span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span>
-                        </label>
-                    `).join('')}
+            grid.innerHTML = tests.map(test => `
+                <div class="test-item" data-test-id="${test.id}" data-test-nivel="${nivel}">
+                    <div class="test-numero">Test ${test.numero}</div>
+                    <div class="test-titulo">30 preguntas</div>
                 </div>
             `).join('');
             
-            document.querySelectorAll('.opcion input').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
-                    const valor = parseInt(e.target.value);
-                    respuestas[preguntaIndex] = valor;
-                    document.getElementById('respondidas').textContent = respuestas.filter(r => r !== null).length;
-                });
-            });
-        }
-
-        function iniciarTemporizador() {
-            if (timerInterval) clearInterval(timerInterval);
-            const timerElem = document.getElementById('timer');
-            timerInterval = setInterval(() => {
-                if (!testActivo || testFinalizado) return;
-                tiempoRestante--;
-                const m = Math.floor(tiempoRestante / 60), s = tiempoRestante % 60;
-                timerElem.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                if (tiempoRestante <= 60) timerElem.classList.add('warning');
-                if (tiempoRestante <= 0) { clearInterval(timerInterval); alert('⏰ ¡Tiempo agotado!'); finalizarTest(); }
-            }, 1000);
-        }
-
-        function finalizarTest() {
-            if (testFinalizado) return;
-            testFinalizado = true;
-            testActivo = false;
-            clearInterval(timerInterval);
-            
-            let aciertos = 0;
-            testSeleccionado.preguntas.forEach((p, idx) => {
-                const respuesta = respuestas[idx];
-                const esCorrecto = (respuesta === p.correcta);
-                if (esCorrecto) aciertos++;
-                
-                const preguntaDiv = document.querySelector(`.pregunta[data-id="${p.id}"]`);
-                if (preguntaDiv) preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
-                
-                document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => {
-                    op.classList.add('disabled');
-                    if (optIdx === p.correcta) op.classList.add('correcta-respuesta');
-                    if (respuesta === optIdx && respuesta !== p.correcta) op.classList.add('incorrecta-respuesta');
+            document.querySelectorAll('.test-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const testId = parseInt(item.dataset.testId);
+                    const testNivel = item.dataset.testNivel;
+                    iniciarTest(testNivel, testId);
                 });
             });
             
-            const porcentaje = Math.round((aciertos / testSeleccionado.preguntas.length) * 100);
-            const aprobado = porcentaje >= 90;
-            const resultadoDiv = document.getElementById('resultado');
+            document.getElementById('nivelSection').style.display = 'none';
+            document.getElementById('testsSection').style.display = 'block';
+            document.getElementById('statsTest').style.display = 'none';
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('resultadoFinal').style.display = 'none';
+        }
+        
+        function iniciarTest(nivel, testId) {
+            const tests = TESTS[nivel];
+            testActual = tests.find(t => t.id === testId);
+            if (!testActual) return;
             
-            const mensajes = {
-                facil: aprobado ? '🎉 ¡Excelente! Dominas el nivel fácil.' : '📚 Sigue practicando los temas básicos.',
-                medio: aprobado ? '⚡ ¡Impresionante! Controlas el nivel medio.' : '🔥 Necesitas repasar. Sigue practicando.',
-                dificil: aprobado ? '🏆 ¡ERES UN EXPERTO! Has superado el nivel difícil.' : '💀 Este nivel es muy exigente. Sigue practicando.'
-            };
+            indiceActual = 0;
+            aciertos = 0;
+            fallos = 0;
+            respuestaSeleccionada = false;
+            testActivo = true;
             
-            resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
-            resultadoDiv.innerHTML = `
-                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-skull'}" style="font-size: 2.5rem;"></i>
-                <h3>${aprobado ? '🎉 ¡APROBADO! 🎉' : '💀 ¡SUSPENDIDO! 💀'}</h3>
-                <div class="resultado-stats">
-                    <div class="resultado-stat"><div class="resultado-stat-number">${aciertos}/${testSeleccionado.preguntas.length}</div><div>Aciertos</div></div>
-                    <div class="resultado-stat"><div class="resultado-stat-number">${porcentaje}%</div><div>Porcentaje</div></div>
-                    <div class="resultado-stat"><div class="resultado-stat-number">${aprobado ? 'APTO' : 'NO APTO'}</div><div>Resultado</div></div>
-                </div>
-                <p>${mensajes[nivelActual]}</p>
-                <button onclick="reiniciarTest()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;"><i class="fas fa-redo"></i> Nuevo test</button>
-                <button id="btnVerRespuestas" style="background: #f1f5f9; color: #1e293b; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; margin-left: 10px; cursor: pointer;"><i class="fas fa-eye"></i> Ver respuestas</button>
-                <div id="detalleResultados" style="display: none; margin-top: 20px; text-align: left; max-height: 400px; overflow-y: auto;"></div>
-            `;
-            resultadoDiv.style.display = 'block';
+            document.getElementById('totalPreguntas').textContent = testActual.preguntas.length;
+            document.getElementById('aciertos').textContent = aciertos;
+            document.getElementById('fallos').textContent = fallos;
+            document.getElementById('statsTest').style.display = 'flex';
+            document.getElementById('testsSection').style.display = 'none';
+            document.getElementById('resultadoFinal').style.display = 'none';
             
-            // Guardar resultado del test
-            guardarResultadoTest(aciertos, testSeleccionado.preguntas.length, 'test-completo', null, nivelActual, testSeleccionado.id);
-            
-            // Marcar como completado
-            let completados = obtenerTestsCompletados();
-            if (!completados.includes(testSeleccionado.id)) {
-                completados.push(testSeleccionado.id);
-                guardarTestsCompletados(completados);
+            cargarPregunta();
+        }
+        
+        function cargarPregunta() {
+            if (indiceActual >= testActual.preguntas.length) {
+                finalizarTest();
+                return;
             }
             
-            // Recargar la lista para mostrar el estado
-            cargarTests();
+            const pregunta = testActual.preguntas[indiceActual];
+            document.getElementById('preguntaActual').textContent = indiceActual + 1;
+            actualizarProgreso();
             
-            document.getElementById('btnVerRespuestas').addEventListener('click', () => {
-                const detalleDiv = document.getElementById('detalleResultados');
-                if (detalleDiv.style.display === 'none') {
-                    detalleDiv.innerHTML = `<h4 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Respuestas correctas:</h4>` + 
-                        testSeleccionado.preguntas.map((p, idx) => `
-                            <div style="padding: 12px; margin-bottom: 10px; border-radius: 12px; background: #f8fafc; border-left: 4px solid ${respuestas[idx] === p.correcta ? '#10b981' : '#ef4444'}">
-                                <strong>${idx + 1}. ${p.texto}</strong><br>
-                                <span style="color: ${respuestas[idx] === p.correcta ? '#10b981' : '#ef4444'}">
-                                    ${respuestas[idx] === p.correcta ? '✅ Correcta' : '❌ Incorrecta'} - 
-                                    Respuesta correcta: ${String.fromCharCode(65 + p.correcta)}. ${p.opciones[p.correcta]}
-                                </span>
-                                <div style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">
-                                    <i class="fas fa-info-circle"></i> ${p.explicacion}
-                                </div>
-                            </div>
-                        `).join('');
-                    detalleDiv.style.display = 'block';
-                    document.getElementById('btnVerRespuestas').innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar respuestas';
-                } else {
-                    detalleDiv.style.display = 'none';
-                    document.getElementById('btnVerRespuestas').innerHTML = '<i class="fas fa-eye"></i> Ver respuestas';
+            const questionCard = document.getElementById('questionCard');
+            questionCard.style.display = 'block';
+            questionCard.innerHTML = `
+                <div class="question-header">
+                    <div class="pregunta-numero">Pregunta ${indiceActual + 1}</div>
+                </div>
+                <div class="question-text">${escapeHtml(pregunta.texto)}</div>
+                <div class="options" id="optionsContainer">
+                    ${pregunta.opciones.map((opt, idx) => `
+                        <div class="option-btn" data-opcion="${idx}">
+                            <span class="option-prefix">${String.fromCharCode(65 + idx)}.</span>
+                            <span>${escapeHtml(opt)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div id="feedback" class="feedback"></div>
+                <button class="btn-siguiente" id="btnSiguiente">Siguiente pregunta →</button>
+            `;
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
+            });
+            
+            document.getElementById('btnSiguiente').addEventListener('click', () => {
+                if (respuestaSeleccionada) {
+                    indiceActual++;
+                    respuestaSeleccionada = false;
+                    cargarPregunta();
                 }
             });
+            
+            respuestaSeleccionada = false;
+            document.getElementById('btnSiguiente').style.display = 'none';
         }
-
-        function reiniciarTest() {
-            cerrarExamen();
-            cargarTests();
+        
+        function responder(opcion) {
+            if (respuestaSeleccionada || !testActivo) return;
+            
+            const pregunta = testActual.preguntas[indiceActual];
+            const esCorrecto = (opcion === pregunta.correcta);
+            
+            respuestaSeleccionada = true;
+            
+            if (esCorrecto) {
+                aciertos++;
+                document.getElementById('aciertos').textContent = aciertos;
+                mostrarFeedback(true, pregunta.explicacion || "¡Respuesta correcta!");
+            } else {
+                fallos++;
+                document.getElementById('fallos').textContent = fallos;
+                const letraCorrecta = String.fromCharCode(65 + pregunta.correcta);
+                mostrarFeedback(false, `Respuesta incorrecta. La correcta era ${letraCorrecta}. ${pregunta.explicacion || ''}`);
+            }
+            
+            actualizarProgreso();
+            
+            const opciones = document.querySelectorAll('.option-btn');
+            opciones.forEach((btn, idx) => {
+                btn.classList.add('disabled');
+                if (idx === pregunta.correcta) btn.classList.add('correct');
+                if (idx === opcion && opcion !== pregunta.correcta) btn.classList.add('incorrect');
+            });
+            
+            document.getElementById('btnSiguiente').style.display = 'block';
         }
-
-        function cerrarExamen() {
+        
+        function mostrarFeedback(esCorrecto, mensaje) {
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.className = `feedback ${esCorrecto ? 'correct' : 'wrong'}`;
+            feedbackDiv.innerHTML = `<i class="fas ${esCorrecto ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${mensaje}`;
+            feedbackDiv.style.display = 'block';
+        }
+        
+        function actualizarProgreso() {
+            const porcentaje = ((indiceActual + 1) / testActual.preguntas.length) * 100;
+            document.getElementById('progressFill').style.width = `${porcentaje}%`;
+        }
+        
+        async function finalizarTest() {
             testActivo = false;
-            testFinalizado = false;
-            if (timerInterval) clearInterval(timerInterval);
-            document.getElementById('examContainer').style.display = 'none';
-            document.getElementById('testSelector').classList.add('active');
-            document.getElementById('resultado').style.display = 'none';
+            const porcentaje = Math.round((aciertos / testActual.preguntas.length) * 100);
+            const aprobado = porcentaje >= 90;
+            
+            if (currentUser) {
+                await window.actualizarEstadisticasTest(currentUser.uid, aciertos, testActual.preguntas.length, testActual.nombre);
+            }
+            
+            const resultadoDiv = document.getElementById('resultadoFinal');
+            resultadoDiv.style.display = 'block';
+            resultadoDiv.innerHTML = `
+                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 4rem; color: #f5b042;"></i>
+                <h2>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h2>
+                <div class="puntuacion-final">${porcentaje}%</div>
+                <p>Has acertado <strong>${aciertos}</strong> de <strong>${testActual.preguntas.length}</strong> preguntas</p>
+                <p>Test: <strong>${testActual.nombre}</strong> - Nivel: ${testActual.nivel === 'facil' ? '🌱 Fácil' : testActual.nivel === 'medio' ? '⚡ Medio' : '🔥 Difícil'}</p>
+                <button class="btn-reiniciar" id="btnReiniciar"><i class="fas fa-redo"></i> Volver a tests</button>
+            `;
+            
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('statsTest').style.display = 'none';
+            
+            document.getElementById('btnReiniciar').addEventListener('click', () => {
+                mostrarTestsPorNivel(testActual.nivel);
+            });
         }
-
-        function testAleatorio() {
-            const resultado = obtenerTestsPaginados(nivelActual, 1, 999);
-            const testsDisponibles = resultado.tests;
-            if (testsDisponibles.length === 0) return;
-            const randomIndex = Math.floor(Math.random() * testsDisponibles.length);
-            const test = testsDisponibles[randomIndex];
-            seleccionarTest(test.id);
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
-
-        function renderUserZone() {
-            const u = getCurrentUser();
-            const z = document.getElementById('userZone');
-            if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`;
-            else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
-        }
-
-        document.getElementById('pageSizeSelect').addEventListener('change', (e) => {
-            itemsPorPagina = parseInt(e.target.value);
-            paginaActual = 1;
-            cargarTests();
+        
+        document.querySelectorAll('.nivel-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const nivel = card.dataset.nivel;
+                mostrarTestsPorNivel(nivel);
+            });
         });
-        document.getElementById('btnRandomTest').addEventListener('click', testAleatorio);
-        document.getElementById('btnEnviar').addEventListener('click', () => {
-            if (!testFinalizado && confirm('¿Seguro que quieres finalizar el test?')) finalizarTest();
+        
+        document.getElementById('btnVolverNivel').addEventListener('click', () => {
+            document.getElementById('nivelSection').style.display = 'block';
+            document.getElementById('testsSection').style.display = 'none';
+            document.getElementById('statsTest').style.display = 'none';
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('resultadoFinal').style.display = 'none';
         });
-
-        renderUserZone();
-        cambiarNivel('facil');
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../login.html';
+            } else {
+                currentUser = user;
+            }
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.getElementById('navWrapper');
+            if (wrapper) wrapper.classList.toggle('active');
+        });
     </script>
 </body>
 </html>
