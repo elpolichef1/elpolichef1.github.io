@@ -68,6 +68,55 @@
             margin-bottom: 35px;
             font-size: 0.95rem;
         }
+        
+        /* Selector de coche */
+        .car-selector {
+            background: rgba(0,0,0,0.3);
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .car-selector p {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #fbbf24;
+        }
+        .car-options {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .car-option {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid transparent;
+        }
+        .car-option span {
+            font-size: 0.8rem;
+            color: #a8c4b8;
+        }
+        .car-option:hover {
+            background: rgba(251,191,36,0.3);
+            transform: scale(1.05);
+        }
+        .car-option.selected {
+            background: #fbbf24;
+            border-color: white;
+        }
+        .car-option.selected span {
+            color: #1a472a;
+            font-weight: bold;
+        }
+        
         .btn {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #1a472a;
@@ -242,6 +291,8 @@
             .card { padding: 30px 20px; }
             h1 { font-size: 1.6rem; }
             .waiting-codigo span { font-size: 1.6rem; letter-spacing: 5px; }
+            .car-option { padding: 8px 12px; font-size: 1rem; }
+            .car-option span { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -250,6 +301,23 @@
         <div class="card">
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
             <p class="subtitle">🏁 ¡Compite contra otro jugador en tiempo real! 🏁</p>
+
+            <!-- SELECTOR DE COCHE -->
+            <div class="car-selector">
+                <p><i class="fas fa-car"></i> Elige tu coche:</p>
+                <div class="car-options" id="carOptions">
+                    <div class="car-option" data-car="🏎️">🏎️ <span>F1</span></div>
+                    <div class="car-option" data-car="🚗">🚗 <span>Sedán</span></div>
+                    <div class="car-option" data-car="🚙">🚙 <span>SUV</span></div>
+                    <div class="car-option" data-car="🏍️">🏍️ <span>Moto</span></div>
+                    <div class="car-option" data-car="🚕">🚕 <span>Taxi</span></div>
+                    <div class="car-option" data-car="🚓">🚓 <span>Policía</span></div>
+                    <div class="car-option" data-car="🚑">🚑 <span>Ambulancia</span></div>
+                    <div class="car-option" data-car="🚒">🚒 <span>Bombero</span></div>
+                    <div class="car-option" data-car="🛵">🛵 <span>Scooter</span></div>
+                    <div class="car-option" data-car="🚚">🚚 <span>Camión</span></div>
+                </div>
+            </div>
 
             <button class="btn" id="btnAleatorio">
                 <i class="fas fa-random"></i> Emparejamiento aleatorio
@@ -297,6 +365,22 @@
         
         let currentUser = null;
         let unsubscribeActual = null;
+        let cocheSeleccionado = localStorage.getItem('multiplayer_car') || '🏎️';
+        
+        // Inicializar selector de coche
+        function initCarSelector() {
+            document.querySelectorAll('.car-option').forEach(opt => {
+                if (opt.dataset.car === cocheSeleccionado) {
+                    opt.classList.add('selected');
+                }
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.car-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    cocheSeleccionado = opt.dataset.car;
+                    localStorage.setItem('multiplayer_car', cocheSeleccionado);
+                });
+            });
+        }
         
         function generarCodigo() {
             return Math.floor(100000 + Math.random() * 900000).toString();
@@ -310,7 +394,10 @@
                 codigo: codigo,
                 jugador1: currentUser.uid,
                 jugador1Nombre: currentUser.displayName || currentUser.email.split('@')[0],
+                jugador1Coche: cocheSeleccionado,
                 jugador2: null,
+                jugador2Nombre: null,
+                jugador2Coche: null,
                 estado: "esperando"
             });
             return { salaId, codigo };
@@ -325,6 +412,7 @@
                 await updateDoc(sala.ref, {
                     jugador2: currentUser.uid,
                     jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
+                    jugador2Coche: cocheSeleccionado,
                     estado: "en_curso"
                 });
                 return sala.id;
@@ -341,6 +429,7 @@
             await updateDoc(sala.ref, {
                 jugador2: currentUser.uid,
                 jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
+                jugador2Coche: cocheSeleccionado,
                 estado: "en_curso"
             });
             return sala.id;
@@ -370,6 +459,7 @@
             renderUserZone();
             if (!user) { window.location.href = '../../login.html'; return; }
             currentUser = user;
+            initCarSelector();
         });
         
         document.getElementById('btnAleatorio').addEventListener('click', async () => {

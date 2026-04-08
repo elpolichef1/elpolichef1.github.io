@@ -233,7 +233,7 @@
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // PREGUNTAS PARA MULtijUGADOR (10 preguntas)
+        // PREGUNTAS PARA MULTIJUGADOR (10 preguntas)
         // ============================================
         const preguntasMulti = [
             { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
@@ -256,6 +256,7 @@
         let gameActivo = true;
         let unsubscribe = null;
         let timerInterval = null;
+        let procesandoRespuesta = false; // 🔧 NUEVO: Evita respuestas duplicadas
         
         const TOTAL_PREGUNTAS = 10;
         const TIEMPO_RESPUESTA = 15000; // 15 segundos
@@ -263,7 +264,6 @@
         function iniciarTimer() {
             if (timerInterval) clearInterval(timerInterval);
             
-            let tiempoRestante = TIEMPO_RESPUESTA / 1000;
             const timerFill = document.getElementById('timerFill');
             const startTime = Date.now();
             
@@ -277,8 +277,7 @@
                 
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
-                    if (!respuestaSeleccionada && gameActivo) {
-                        // Timeout - responder incorrecto automáticamente
+                    if (!respuestaSeleccionada && gameActivo && !procesandoRespuesta) {
                         manejarTimeout();
                     }
                 }
@@ -286,27 +285,33 @@
         }
         
         async function manejarTimeout() {
-            if (!gameActivo || respuestaSeleccionada) return;
-            respuestaSeleccionada = true;
+            if (!gameActivo || respuestaSeleccionada || procesandoRespuesta) return;
+            if (!salaData) return;
             
-            // Responder incorrecto automáticamente
+            procesandoRespuesta = true;
+            
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
             
-            if (!esMiTurno) return;
+            if (!esMiTurno) {
+                procesandoRespuesta = false;
+                return;
+            }
             
-            const nuevaP1 = salaData.puntuacion1 + (esJugador1 ? 0 : 0);
-            const nuevaP2 = salaData.puntuacion2 + (!esJugador1 ? 0 : 0);
+            respuestaSeleccionada = true;
+            
             const nuevoTurno = turnoActual + 1;
             
-            await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                puntuacion1: nuevaP1,
-                puntuacion2: nuevaP2,
-                turno: nuevoTurno,
-                ultimoRespuesta: Date.now()
-            });
+            try {
+                await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                    turno: nuevoTurno,
+                    ultimoRespuesta: Date.now()
+                });
+            } catch (error) {
+                console.error("Error en timeout:", error);
+            }
             
-            respuestaSeleccionada = false;
+            procesandoRespuesta = false;
             if (timerInterval) clearInterval(timerInterval);
         }
         
@@ -334,7 +339,7 @@
         }
         
         async function iniciarJuego() {
-            // Seleccionar 10 preguntas aleatorias
+            // Mezclar preguntas
             const preguntasSeleccionadas = [...preguntasMulti];
             for (let i = preguntasSeleccionadas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -352,10 +357,13 @@
         }
         
         async function responder(respuesta) {
-            if (!gameActivo || respuestaSeleccionada) return;
-            if (!salaData || salaData.turno !== (esJugador1 ? 0 : 1)) return;
+            if (!gameActivo || respuestaSeleccionada || procesandoRespuesta) return;
+            if (!salaData) return;
+            if (salaData.turno !== (esJugador1 ? 0 : 1)) return;
             
+            procesandoRespuesta = true;
             respuestaSeleccionada = true;
+            
             if (timerInterval) clearInterval(timerInterval);
             
             const pregunta = salaData.preguntas[salaData.turno];
@@ -373,17 +381,21 @@
             const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
             const nuevoTurno = salaData.turno + 1;
             
-            await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                puntuacion1: nuevaP1,
-                puntuacion2: nuevaP2,
-                turno: nuevoTurno,
-                ultimoRespuesta: Date.now()
-            });
+            try {
+                await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                    puntuacion1: nuevaP1,
+                    puntuacion2: nuevaP2,
+                    turno: nuevoTurno,
+                    ultimoRespuesta: Date.now()
+                });
+            } catch (error) {
+                console.error("Error al responder:", error);
+            }
+            
+            procesandoRespuesta = false;
             
             if (nuevoTurno >= TOTAL_PREGUNTAS) {
                 setTimeout(() => finalizarJuego(), 2000);
-            } else {
-                respuestaSeleccionada = false;
             }
         }
         
@@ -404,18 +416,22 @@
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
             
+            // Obtener coches de los jugadores (si existen)
+            const coche1 = salaData.jugador1Coche || '🏎️';
+            const coche2 = salaData.jugador2Coche || '🏎️';
+            
             document.getElementById('gameContent').innerHTML = `
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">🏎️ ${salaData.jugador1Nombre}</div>
-                        <div class="car" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
+                        <div class="player-name">${coche1} ${salaData.jugador1Nombre}</div>
+                        <div class="car" style="left: ${Math.min(avance1, 96)}%">${coche1}</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">🏎️ ${salaData.jugador2Nombre}</div>
-                        <div class="car" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
+                        <div class="player-name">${coche2} ${salaData.jugador2Nombre}</div>
+                        <div class="car" style="left: ${Math.min(avance2, 96)}%">${coche2}</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
@@ -438,6 +454,9 @@
                     </div>
                 </div>
             `;
+            
+            // Resetear estado de respuesta para la nueva pregunta
+            respuestaSeleccionada = false;
             
             if (esMiTurno && gameActivo) {
                 document.querySelectorAll('.option-btn').forEach(btn => {
@@ -510,8 +529,8 @@
                     const oldTurno = salaData?.turno;
                     salaData = newData;
                     
+                    // Si cambió el turno, actualizar la interfaz
                     if (oldTurno !== salaData.turno && gameActivo) {
-                        respuestaSeleccionada = false;
                         if (timerInterval) clearInterval(timerInterval);
                         renderizarJuego();
                     }
