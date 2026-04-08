@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        /* mismos estilos que test-rapido.html */
         .page-header { text-align: center; padding: 40px 0; background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; margin-bottom: 30px; }
         .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
         .test-container { background: white; border-radius: 30px; padding: 35px; margin-bottom: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
@@ -21,15 +20,23 @@
         .pregunta { margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid #e2e8f0; }
         .pregunta.correcta { border-left: 4px solid #10b981; padding-left: 20px; background: #f0fdf4; border-radius: 12px; }
         .pregunta.incorrecta { border-left: 4px solid #ef4444; padding-left: 20px; background: #fef2f2; border-radius: 12px; }
+        .pregunta-texto { font-weight: 600; margin-bottom: 18px; color: #1e293b; font-size: 1rem; }
         .opcion { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; padding: 10px 15px; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #fafcff; border: 1px solid #e2e8f0; }
         .opcion:hover:not(.disabled) { background: #fef3c7; border-color: #fbbf24; transform: translateX(5px); }
-        .btn-enviar { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 12px 30px; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        .opcion.disabled { cursor: not-allowed; opacity: 0.7; }
+        .opcion.correcta-respuesta { background: #d1fae5; border-color: #10b981; }
+        .opcion.incorrecta-respuesta { background: #fee2e2; border-color: #ef4444; }
+        .btn-enviar { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 12px 30px; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.3s; }
+        .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251,191,36,0.3); }
         .resultado { margin-top: 25px; padding: 25px; border-radius: 20px; display: none; text-align: center; }
         .resultado.exito { background: #d1fae5; color: #065f46; }
         .resultado.error { background: #fee2e2; color: #991b1b; }
         .explicacion { margin-top: 12px; padding: 12px 15px; background: #f8fafc; border-radius: 12px; font-size: 0.85rem; color: #475569; display: none; border-left: 3px solid #fbbf24; }
-        .btn-ver-explicacion { background: none; border: none; color: #fbbf24; cursor: pointer; font-size: 0.75rem; margin-top: 8px; }
-        .volver { display: inline-block; margin-top: 20px; color: #64748b; text-decoration: none; }
+        .explicacion.mostrar { display: block; }
+        .btn-ver-explicacion { background: none; border: none; color: #fbbf24; cursor: pointer; font-size: 0.75rem; margin-top: 8px; transition: 0.2s; }
+        .btn-ver-explicacion:hover { color: #f59e0b; }
+        .volver { display: inline-block; margin-top: 20px; color: #64748b; text-decoration: none; transition: 0.2s; }
+        .volver:hover { color: #fbbf24; }
         @media (max-width: 768px) { .test-container { padding: 20px; } .test-header { flex-direction: column; text-align: center; } .test-info { flex-wrap: wrap; justify-content: center; } }
     </style>
 </head>
@@ -37,7 +44,7 @@
     <header>
         <div class="container">
             <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
             <div class="user-zone" id="userZone"></div>
             <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
@@ -48,7 +55,7 @@
     <main><div class="container">
         <div class="test-container">
             <div class="test-header">
-                <div class="test-info"><div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">0</span></div><div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div></div>
+                <div class="test-info"><div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">30</span></div><div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div></div>
                 <div class="timer" id="timer">30:00</div>
             </div>
             <div id="preguntasContainer"></div>
@@ -60,18 +67,231 @@
 
     <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
 
-    <script src="../js/auth.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="data/preguntas.js"></script>
-    <script>
-        let preguntasActuales = [], respuestas = [], tiempoRestante = 30 * 60, timerInterval, testFinalizado = false;
-        function iniciarExamen() { preguntasActuales = obtenerPreguntasAleatorias(30); respuestas = new Array(30).fill(null); document.getElementById('totalPreguntas').textContent = preguntasActuales.length; renderizarPreguntas(); iniciarTemporizador(); }
-        function renderizarPreguntas() { const c = document.getElementById('preguntasContainer'); c.innerHTML = preguntasActuales.map((p, idx) => `<div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}"><div class="pregunta-texto">${idx + 1}. ${p.texto}</div>${p.opciones.map((opcion, optIdx) => `<label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}"><input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}><span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span></label>`).join('')}<button class="btn-ver-explicacion" onclick="mostrarExplicacion(${idx})"><i class="fas fa-lightbulb"></i> Ver explicación (después)</button><div class="explicacion" id="explicacion_${idx}"><i class="fas fa-info-circle"></i> ${p.explicacion}</div></div>`).join(''); document.querySelectorAll('.opcion input').forEach(i => i.addEventListener('change', (e) => { const idx = parseInt(e.target.name.split('_')[1]); respuestas[idx] = parseInt(e.target.value); document.getElementById('respondidas').textContent = respuestas.filter(r => r !== null).length; })); }
-        function iniciarTemporizador() { timerInterval = setInterval(() => { if (testFinalizado) return; tiempoRestante--; const m = Math.floor(tiempoRestante / 60), s = tiempoRestante % 60; const t = document.getElementById('timer'); t.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`; if (tiempoRestante <= 60) t.classList.add('warning'); if (tiempoRestante <= 0) { clearInterval(timerInterval); alert('¡Tiempo agotado!'); finalizarExamen(); } }, 1000); }
-        function mostrarExplicacion(idx) { if (testFinalizado) document.getElementById(`explicacion_${idx}`).classList.toggle('mostrar'); else alert('Las explicaciones solo después de finalizar el examen.'); }
-        function finalizarExamen() { if (testFinalizado) return; testFinalizado = true; clearInterval(timerInterval); let aciertos = 0; preguntasActuales.forEach((p, idx) => { const esCorrecto = (respuestas[idx] === p.correcta); if (esCorrecto) aciertos++; const div = document.querySelector(`.pregunta[data-id="${p.id}"]`); if (div) div.classList.add(esCorrecto ? 'correcta' : 'incorrecta'); document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => { op.classList.add('disabled'); if (optIdx === p.correcta) op.classList.add('correcta-respuesta'); if (respuestas[idx] === optIdx && respuestas[idx] !== p.correcta) op.classList.add('incorrecta-respuesta'); }); }); const pct = Math.round((aciertos / preguntasActuales.length) * 100), ok = pct >= 90, r = document.getElementById('resultado'); r.className = `resultado ${ok ? 'exito' : 'error'}`; r.innerHTML = `<i class="fas ${ok ? 'fa-trophy' : 'fa-book-open'}" style="font-size:2rem;"></i><h3>${ok ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h3><p>Has acertado <strong>${aciertos}</strong> de <strong>${preguntasActuales.length}</strong> preguntas (${pct}%)</p><button onclick="location.reload()" style="background:#fbbf24; color:#1a472a; border:none; padding:10px 20px; border-radius:50px; cursor:pointer;"><i class="fas fa-redo"></i> Nuevo examen oficial</button>`; r.style.display = 'block'; const tests = JSON.parse(localStorage.getItem('dgt_tests') || '[]'); tests.push({ tipo: 'examen-oficial', aciertos: aciertos, total: preguntasActuales.length, fecha: new Date().toISOString() }); localStorage.setItem('dgt_tests', JSON.stringify(tests)); }
-        function renderUserZone() { const u = getCurrentUser(); const z = document.getElementById('userZone'); if (u) z.innerHTML = `<div class="user-menu"><div class="user-avatar">${u.avatar || "🚗"}</div><span class="user-name">${u.nombre}</span><a href="../perfil/index.html" class="btn-profile">Mi perfil</a><button onclick="logoutUser()" class="btn-logout">Cerrar sesión</button></div>`; else z.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`; }
-        renderUserZone(); document.getElementById('btnEnviar').addEventListener('click', () => { if (!testFinalizado && confirm('¿Finalizar examen?')) finalizarExamen(); }); iniciarExamen();
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        import { preguntasDGT, obtenerPreguntasAleatorias } from './data/preguntas.js';
+        
+        console.log("📚 Examen Oficial - preguntasDGT cargadas:", preguntasDGT?.length);
+        
+        let preguntasActuales = [];
+        let respuestas = [];
+        let tiempoRestante = 30 * 60;
+        let timerInterval;
+        let testFinalizado = false;
+        let currentUser = null;
+        
+        function mostrarExplicacion(idx) {
+            if (testFinalizado) {
+                const explicacionDiv = document.getElementById(`explicacion_${idx}`);
+                if (explicacionDiv) explicacionDiv.classList.toggle('mostrar');
+            } else {
+                alert('Las explicaciones solo están disponibles después de finalizar el examen.');
+            }
+        }
+        
+        function renderizarPreguntas() {
+            const container = document.getElementById('preguntasContainer');
+            if (!container) return;
+            
+            container.innerHTML = preguntasActuales.map((p, idx) => `
+                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
+                    <div class="pregunta-texto">${idx + 1}. ${escapeHtml(p.texto)}</div>
+                    ${p.opciones.map((opcion, optIdx) => `
+                        <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
+                            <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
+                            <span>${String.fromCharCode(65 + optIdx)}. ${escapeHtml(opcion)}</span>
+                        </label>
+                    `).join('')}
+                    <button class="btn-ver-explicacion" onclick="mostrarExplicacion(${idx})">
+                        <i class="fas fa-lightbulb"></i> Ver explicación (después del examen)
+                    </button>
+                    <div class="explicacion" id="explicacion_${idx}">
+                        <i class="fas fa-info-circle"></i> ${escapeHtml(p.explicacion || "Sin explicación disponible")}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Event listeners para las respuestas
+            document.querySelectorAll('.opcion input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
+                    const valor = parseInt(e.target.value);
+                    respuestas[preguntaIndex] = valor;
+                    const respondidas = respuestas.filter(r => r !== null).length;
+                    document.getElementById('respondidas').textContent = respondidas;
+                });
+            });
+        }
+        
+        function iniciarTemporizador() {
+            if (timerInterval) clearInterval(timerInterval);
+            const timerElem = document.getElementById('timer');
+            
+            timerInterval = setInterval(() => {
+                if (testFinalizado) return;
+                
+                tiempoRestante--;
+                const minutos = Math.floor(tiempoRestante / 60);
+                const segundos = tiempoRestante % 60;
+                timerElem.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+                
+                if (tiempoRestante <= 60) {
+                    timerElem.classList.add('warning');
+                }
+                
+                if (tiempoRestante <= 0) {
+                    clearInterval(timerInterval);
+                    alert('⏰ ¡Tiempo agotado!');
+                    finalizarExamen();
+                }
+            }, 1000);
+        }
+        
+        function iniciarExamen() {
+            if (!preguntasDGT || preguntasDGT.length === 0) {
+                console.error("No hay preguntas disponibles");
+                alert("Error: No se pudieron cargar las preguntas. Recarga la página.");
+                return;
+            }
+            
+            preguntasActuales = obtenerPreguntasAleatorias(30);
+            respuestas = new Array(30).fill(null);
+            
+            document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
+            document.getElementById('respondidas').textContent = '0';
+            document.getElementById('timer').textContent = '30:00';
+            document.getElementById('timer').classList.remove('warning');
+            
+            renderizarPreguntas();
+            iniciarTemporizador();
+            testFinalizado = false;
+        }
+        
+        async function finalizarExamen() {
+            if (testFinalizado) return;
+            testFinalizado = true;
+            if (timerInterval) clearInterval(timerInterval);
+            
+            let aciertos = 0;
+            const total = preguntasActuales.length;
+            
+            // Calcular aciertos y marcar visualmente
+            preguntasActuales.forEach((pregunta, idx) => {
+                const respuesta = respuestas[idx];
+                const esCorrecto = (respuesta === pregunta.correcta);
+                if (esCorrecto) aciertos++;
+                
+                // Marcar pregunta como correcta/incorrecta
+                const preguntaDiv = document.querySelector(`.pregunta[data-id="${pregunta.id}"]`);
+                if (preguntaDiv) {
+                    preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
+                }
+                
+                // Marcar opciones correctas/incorrectas
+                const opciones = document.querySelectorAll(`.pregunta[data-id="${pregunta.id}"] .opcion`);
+                opciones.forEach((opcion, optIdx) => {
+                    opcion.classList.add('disabled');
+                    if (optIdx === pregunta.correcta) {
+                        opcion.classList.add('correcta-respuesta');
+                    }
+                    if (respuesta === optIdx && respuesta !== pregunta.correcta) {
+                        opcion.classList.add('incorrecta-respuesta');
+                    }
+                });
+            });
+            
+            const porcentaje = Math.round((aciertos / total) * 100);
+            const aprobado = porcentaje >= 90;
+            const resultadoDiv = document.getElementById('resultado');
+            
+            resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
+            resultadoDiv.innerHTML = `
+                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 2.5rem;"></i>
+                <h3>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h3>
+                <p>Has acertado <strong>${aciertos}</strong> de <strong>${total}</strong> preguntas (${porcentaje}%)</p>
+                <button onclick="reiniciarExamen()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;">
+                    <i class="fas fa-redo"></i> Nuevo examen oficial
+                </button>
+            `;
+            resultadoDiv.style.display = 'block';
+            
+            // Guardar estadísticas en localStorage
+            const stats = JSON.parse(localStorage.getItem('aprobadoya_test_stats') || '{}');
+            stats.totalTests = (stats.totalTests || 0) + 1;
+            stats.totalAciertos = (stats.totalAciertos || 0) + aciertos;
+            stats.totalPreguntas = (stats.totalPreguntas || 0) + total;
+            stats.mejorResultado = Math.max(stats.mejorResultado || 0, porcentaje);
+            stats.tasaAciertos = Math.round((stats.totalAciertos / stats.totalPreguntas) * 100);
+            if (aprobado) stats.testsAprobados = (stats.testsAprobados || 0) + 1;
+            localStorage.setItem('aprobadoya_test_stats', JSON.stringify(stats));
+            
+            // Guardar también en Firestore
+            if (currentUser) {
+                try {
+                    const { db, doc, getDoc, updateDoc } = await import('../js/firebase-init.js');
+                    const userRef = doc(db, "usuarios", currentUser.uid);
+                    const userDoc = await getDoc(userRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const nuevosTests = (userData.testsRealizados || 0) + 1;
+                        const nuevosAciertos = (userData.totalAciertos || 0) + aciertos;
+                        const nuevasPreguntas = (userData.totalPreguntas || 0) + total;
+                        const nuevaMedia = Math.round((nuevosAciertos / nuevasPreguntas) * 100);
+                        const nuevoMejor = Math.max(userData.mejorResultado || 0, porcentaje);
+                        
+                        await updateDoc(userRef, {
+                            testsRealizados: nuevosTests,
+                            totalAciertos: nuevosAciertos,
+                            totalPreguntas: nuevasPreguntas,
+                            mediaAciertos: nuevaMedia,
+                            mejorResultado: nuevoMejor
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error guardando en Firestore:", error);
+                }
+            }
+        }
+        
+        function reiniciarExamen() {
+            location.reload();
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Exponer función global para el onclick
+        window.mostrarExplicacion = mostrarExplicacion;
+        window.reiniciarExamen = reiniciarExamen;
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../login.html';
+            } else {
+                currentUser = user;
+                iniciarExamen();
+            }
+        });
+        
+        document.getElementById('btnEnviar')?.addEventListener('click', () => {
+            if (!testFinalizado && confirm('¿Seguro que quieres finalizar el examen?')) {
+                finalizarExamen();
+            }
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.querySelector('.nav-wrapper');
+            if (wrapper) wrapper.classList.toggle('active');
+        });
     </script>
 </body>
 </html>
