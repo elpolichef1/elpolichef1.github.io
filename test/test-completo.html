@@ -187,6 +187,17 @@
             transition: 0.3s;
         }
         .btn-volver-nivel:hover { background: #cbd5e1; }
+        .btn-volver-index {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-volver-index:hover { background: #475569; }
         .tests-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -338,6 +349,13 @@
             margin-top: 20px;
         }
         
+        .botones-accion {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
         footer {
             background: #0f2a22;
             color: #cbdcd6;
@@ -360,6 +378,54 @@
             header .container { flex-wrap: wrap; }
             nav ul { flex-wrap: wrap; justify-content: center; gap: 16px; }
         }
+        .test-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.test-aprobado {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid #10b981;
+}
+
+.test-suspendido {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border: 2px solid #ef4444;
+}
+
+.test-pendiente {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.test-estado {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.test-aprobado .test-estado {
+    color: #065f46;
+    font-weight: 600;
+}
+
+.test-suspendido .test-estado {
+    color: #991b1b;
+    font-weight: 600;
+}
+
+.test-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
     </style>
 </head>
 <body>
@@ -426,7 +492,10 @@
             <div class="tests-section" id="testsSection">
                 <div class="tests-header">
                     <h2 id="nivelSeleccionadoTitle">📋 Tests Fáciles</h2>
-                    <button class="btn-volver-nivel" id="btnVolverNivel">← Volver a niveles</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-volver-index" id="btnVolverIndex">← Volver al inicio</button>
+                        <button class="btn-volver-nivel" id="btnVolverNivel">← Volver a niveles</button>
+                    </div>
                 </div>
                 <div class="tests-grid" id="testsGrid"></div>
             </div>
@@ -462,10 +531,10 @@
         </div>
     </footer>
 
-   <script type="module">
+  <script type="module">
     import { auth, onAuthStateChanged } from '../js/firebase-init.js';
     import { renderUserZone } from '../js/global-auth.js';
-    import { marcarTestCompletado, TIPOS_TEST } from '../js/progreso-tests.js';
+    import { guardarResultadoTest, obtenerResultadosTests } from '../js/progreso-tests.js';
     
     // ============================================
     // BANCO DE PREGUNTAS (60+ preguntas por nivel para que no se repitan)
@@ -580,7 +649,7 @@
         ]
     };
     
-    // Generar 100 tests por nivel (cada test tiene 30 preguntas ÚNICAS sin repetir)
+    // Generar 100 tests por nivel
     function generarTests() {
         const tests = { facil: [], medio: [], dificil: [] };
         
@@ -632,19 +701,53 @@
         setTimeout(() => toast.remove(), 3000);
     }
     
-    function mostrarTestsPorNivel(nivel) {
+    async function mostrarTestsPorNivel(nivel) {
         nivelSeleccionadoActual = nivel;
         const tests = TESTS[nivel];
         const titulo = nivel === 'facil' ? '📋 Tests Fáciles' : nivel === 'medio' ? '📋 Tests Medios' : '📋 Tests Difíciles';
         document.getElementById('nivelSeleccionadoTitle').textContent = titulo;
         
+        // Obtener resultados guardados
+        let resultadosTests = {};
+        if (currentUser) {
+            resultadosTests = await obtenerResultadosTests(currentUser.uid);
+        }
+        
         const grid = document.getElementById('testsGrid');
-        grid.innerHTML = tests.map(test => `
-            <div class="test-item" data-test-id="${test.id}" data-test-nivel="${nivel}">
-                <div class="test-numero">Test ${test.numero}</div>
-                <div class="test-titulo">30 preguntas</div>
-            </div>
-        `).join('');
+        grid.innerHTML = tests.map(test => {
+            const clave = `${nivel}_${test.id}`;
+            const resultado = resultadosTests[clave];
+            let estadoClass = '';
+            let estadoIcono = '';
+            let estadoTexto = '';
+            
+            if (resultado) {
+                if (resultado.aprobado) {
+                    estadoClass = 'test-aprobado';
+                    estadoIcono = '✅';
+                    estadoTexto = `${resultado.porcentaje}% APROBADO`;
+                } else {
+                    estadoClass = 'test-suspendido';
+                    estadoIcono = '❌';
+                    estadoTexto = `${resultado.porcentaje}% SUSPENDIDO`;
+                }
+            } else {
+                estadoClass = 'test-pendiente';
+                estadoIcono = '📝';
+                estadoTexto = 'Sin realizar';
+            }
+            
+            return `
+                <div class="test-item ${estadoClass}" data-test-id="${test.id}" data-test-nivel="${nivel}">
+                    <div class="test-numero">Test ${test.numero}</div>
+                    <div class="test-titulo">30 preguntas</div>
+                    <div class="test-estado">
+                        <span>${estadoIcono}</span>
+                        <span>${estadoTexto}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
         
         document.querySelectorAll('.test-item').forEach(item => {
             item.addEventListener('click', () => {
@@ -775,34 +878,46 @@
         const porcentaje = Math.round((aciertos / testActual.preguntas.length) * 100);
         const aprobado = porcentaje >= 90;
         
-        if (currentUser) {
-            await window.actualizarEstadisticasTest(currentUser.uid, aciertos, testActual.preguntas.length, testActual.nombre);
-        }
-        
+        // MOSTRAR RESULTADO
         const resultadoDiv = document.getElementById('resultadoFinal');
         resultadoDiv.style.display = 'block';
         resultadoDiv.innerHTML = `
             <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 4rem; color: #f5b042;"></i>
-            <h2>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h2>
+            <h2>${aprobado ? '🎉 ¡APROBADO! 🎉' : '❌ SUSPENDIDO'}</h2>
             <div class="puntuacion-final">${porcentaje}%</div>
             <p>Has acertado <strong>${aciertos}</strong> de <strong>${testActual.preguntas.length}</strong> preguntas</p>
-            <p>Test: <strong>${testActual.nombre}</strong> - Nivel: ${testActual.nivel === 'facil' ? '🌱 Fácil' : testActual.nivel === 'medio' ? '⚡ Medio' : '🔥 Difícil'}</p>
-            <button class="btn-reiniciar" id="btnReiniciar"><i class="fas fa-redo"></i> Volver a tests</button>
+            <p style="color: ${aprobado ? '#10b981' : '#ef4444'}; font-weight: bold; font-size: 1.2rem;">
+                ${aprobado ? '✅ NOTA: APTO' : '❌ NOTA: NO APTO'}
+            </p>
+            <button id="btnVolverMenu" style="background: #f5b042; color: #1a472a; border: none; padding: 12px 30px; border-radius: 60px; font-weight: 700; cursor: pointer; margin-top: 20px;">
+                <i class="fas fa-home"></i> Volver al menú de tests
+            </button>
         `;
+        
+        // GUARDAR RESULTADO EN FIRESTORE
+        if (currentUser && testActual) {
+            await guardarResultadoTest(
+                currentUser.uid, 
+                testActual.nivel,
+                testActual.id,
+                testActual.nombre,
+                {
+                    aprobado: aprobado,
+                    porcentaje: porcentaje,
+                    aciertos: aciertos,
+                    total: testActual.preguntas.length
+                }
+            );
+            mostrarToast(`${testActual.nombre}: ${aprobado ? 'APROBADO' : 'SUSPENDIDO'} (${porcentaje}%)`);
+        }
+        
+        // BOTÓN VOLVER
+        document.getElementById('btnVolverMenu').addEventListener('click', () => {
+            window.location.href = '../test/index.html';
+        });
         
         document.getElementById('questionCard').style.display = 'none';
         document.getElementById('statsTest').style.display = 'none';
-        
-        document.getElementById('btnReiniciar').addEventListener('click', () => {
-            mostrarTestsPorNivel(testActual.nivel);
-        });
-        
-        // ✅ GUARDAR TEST COMO COMPLETADO
-        if (currentUser) {
-            const resultado = { aciertos, total: testActual.preguntas.length, porcentaje };
-            await marcarTestCompletado(currentUser.uid, TIPOS_TEST.COMPLETO, resultado);
-            mostrarToast('✅ Test completo finalizado. Progreso guardado correctamente.');
-        }
     }
     
     function escapeHtml(str) {
@@ -830,6 +945,10 @@
         document.getElementById('resultadoFinal').style.display = 'none';
     });
     
+    document.getElementById('btnVolverIndex')?.addEventListener('click', () => {
+        window.location.href = '../test/index.html';
+    });
+    
     onAuthStateChanged(auth, (user) => {
         renderUserZone();
         if (!user) {
@@ -844,5 +963,6 @@
         if (wrapper) wrapper.classList.toggle('active');
     });
 </script>
+
 </body>
 </html>

@@ -847,10 +847,10 @@
             </div>
         </div>
     </footer>
-
-    <script type="module">
+<script type="module">
     import { auth, onAuthStateChanged, signOut, db, doc, getDoc, updateDoc, deleteDoc, setDoc } from '../js/firebase-init.js';
     import { renderUserZone, updateGlobalAvatar } from '../js/global-auth.js';
+    import { obtenerTestsCompletados } from '../js/progreso-tests.js';
     
     const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
     
@@ -882,66 +882,93 @@
         }, 2500);
     }
     
-    // Función para cargar y mostrar los tests completados
+    // Función para cargar y mostrar los tests completados (CORREGIDA)
     async function cargarTestsCompletados(userId) {
         try {
-            const userRef = doc(db, "usuarios", userId);
-            const userDoc = await getDoc(userRef);
-            
-            let testsCompletados = {};
-            if (userDoc.exists()) {
-                testsCompletados = userDoc.data().testsCompletados || {};
-            }
+            // Usar la función importada que entiende las claves compuestas
+            const testsCompletados = await obtenerTestsCompletados(userId);
             
             const container = document.getElementById('testsCompletadosContainer');
             if (!container) return;
             
-            const testsDisponibles = ['test-rapido', 'test-completo', 'test-por-temas', 'test-examen'];
+            // Contar tests completos hechos (los que empiezan con 'test-completo_')
+            let testsCompletosHechos = 0;
+            let testRapidoCompletado = false;
+            let testPorTemasCompletado = false;
+            let testExamenCompletado = false;
+            let ultimoTestCompleto = null;
+            
+            for (const [clave, valor] of Object.entries(testsCompletados)) {
+                if (clave.startsWith('test-completo_')) {
+                    testsCompletosHechos++;
+                    if (valor.testNombre) ultimoTestCompleto = valor.testNombre;
+                } else if (clave === 'test-rapido') {
+                    testRapidoCompletado = true;
+                } else if (clave === 'test-por-temas') {
+                    testPorTemasCompletado = true;
+                } else if (clave === 'test-examen') {
+                    testExamenCompletado = true;
+                }
+            }
             
             let html = '<div class="tests-completados-grid">';
             
-            for (const testId of testsDisponibles) {
-                const testData = testsCompletados[testId];
-                const nombreTest = NOMBRES_TESTS[testId] || testId;
-                
-                if (testData && testData.completado) {
-                    const fecha = new Date(testData.fecha).toLocaleDateString('es-ES');
-                    const resultado = testData.resultado;
-                    const porcentaje = resultado ? `${resultado.porcentaje}%` : '';
-                    
-                    html += `
-                        <div class="test-completado-item">
-                            <i class="fas fa-check-circle"></i>
-                            <div>
-                                <strong>${nombreTest}</strong>
-                                <small>✅ Completado: ${fecha} ${porcentaje ? `· ${porcentaje} aciertos` : ''}</small>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="test-pendiente-item">
-                            <i class="fas fa-clock"></i>
-                            <div>
-                                <strong>${nombreTest}</strong>
-                                <small>⏳ Pendiente de completar</small>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
+            // Test Rápido
+            html += `
+                <div class="test-completado-item ${testRapidoCompletado ? 'completado' : 'pendiente'}">
+                    <i class="fas ${testRapidoCompletado ? 'fa-check-circle' : 'fa-clock'}"></i>
+                    <div>
+                        <strong>🏁 Test Rápido</strong>
+                        <small>${testRapidoCompletado ? '✅ Completado' : '⏳ Pendiente de completar'}</small>
+                    </div>
+                </div>
+            `;
+            
+            // Test Completo - muestra cuántos ha hecho
+            html += `
+                <div class="test-completado-item ${testsCompletosHechos > 0 ? 'completado' : 'pendiente'}">
+                    <i class="fas ${testsCompletosHechos > 0 ? 'fa-check-circle' : 'fa-clock'}"></i>
+                    <div>
+                        <strong>📋 Test Completo</strong>
+                        <small>${testsCompletosHechos} tests realizados de 300</small>
+                        ${ultimoTestCompleto ? `<br><small style="font-size: 0.65rem;">Último: ${ultimoTestCompleto}</small>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Test por Temas
+            html += `
+                <div class="test-completado-item ${testPorTemasCompletado ? 'completado' : 'pendiente'}">
+                    <i class="fas ${testPorTemasCompletado ? 'fa-check-circle' : 'fa-clock'}"></i>
+                    <div>
+                        <strong>📚 Test por Temas</strong>
+                        <small>${testPorTemasCompletado ? '✅ Completado' : '⏳ Pendiente de completar'}</small>
+                    </div>
+                </div>
+            `;
+            
+            // Examen Oficial
+            html += `
+                <div class="test-completado-item ${testExamenCompletado ? 'completado' : 'pendiente'}">
+                    <i class="fas ${testExamenCompletado ? 'fa-check-circle' : 'fa-clock'}"></i>
+                    <div>
+                        <strong>🎯 Examen Oficial</strong>
+                        <small>${testExamenCompletado ? '✅ Completado' : '⏳ Pendiente de completar'}</small>
+                    </div>
+                </div>
+            `;
             
             html += '</div>';
             
             // Contador de tests completados
-            const completadosCount = Object.keys(testsCompletados).filter(key => testsCompletados[key]?.completado).length;
-            const totalTests = testsDisponibles.length;
+            const completadosCount = (testRapidoCompletado ? 1 : 0) + (testsCompletosHechos > 0 ? 1 : 0) + (testPorTemasCompletado ? 1 : 0) + (testExamenCompletado ? 1 : 0);
+            const totalTests = 4;
             
             html += `
                 <div style="text-align: center; margin-top: 15px; padding: 12px; background: #fefaf2; border-radius: 30px;">
                     <span style="font-weight: 600;">Progreso total:</span> 
                     <span style="color: #f5b042; font-weight: 800;">${completadosCount}/${totalTests}</span> 
-                    tests completados
+                    tipos de test completados
                 </div>
             `;
             
@@ -1044,7 +1071,7 @@
                 </div>
             `;
             
-            // Cargar los tests completados
+            // Cargar los tests completados con la función corregida
             await cargarTestsCompletados(user.uid);
             
             // Gráficos
@@ -1187,5 +1214,6 @@
         }
     };
 </script>
+
 </body>
 </html>

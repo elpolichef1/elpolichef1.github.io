@@ -1,16 +1,64 @@
 // js/progreso-tests.js
 import { db, doc, getDoc, updateDoc } from './firebase-init.js';
 
-// Tipos de tests
-export const TIPOS_TEST = {
-    RAPIDO: 'test-rapido',
-    COMPLETO: 'test-completo',
-    POR_TEMAS: 'test-por-temas',
-    EXAMEN: 'test-examen'
-};
+// Guardar resultado de un test completo
+export async function guardarResultadoTest(userId, nivel, testId, testNombre, resultado) {
+    if (!userId) return false;
+    
+    try {
+        const userRef = doc(db, "usuarios", userId);
+        const userDoc = await getDoc(userRef);
+        
+        let resultadosTests = {};
+        let userData = {};
+        
+        if (userDoc.exists()) {
+            userData = userDoc.data();
+            resultadosTests = userData.resultadosTests || {};
+        }
+        
+        const clave = `${nivel}_${testId}`;
+        
+        resultadosTests[clave] = {
+            nivel: nivel,
+            testId: testId,
+            testNombre: testNombre,
+            aprobado: resultado.aprobado,
+            porcentaje: resultado.porcentaje,
+            aciertos: resultado.aciertos,
+            total: resultado.total,
+            fecha: new Date().toISOString()
+        };
+        
+        // Actualizar estadísticas globales
+        const nuevosTests = (userData.testsRealizados || 0) + 1;
+        const nuevosAciertos = (userData.totalAciertos || 0) + resultado.aciertos;
+        const nuevasPreguntas = (userData.totalPreguntas || 0) + resultado.total;
+        const nuevaMedia = Math.round((nuevosAciertos / nuevasPreguntas) * 100);
+        const nuevoMejor = Math.max(userData.mejorResultado || 0, resultado.porcentaje);
+        const nuevosAprobados = (userData.testsAprobados || 0) + (resultado.aprobado ? 1 : 0);
+        
+        await updateDoc(userRef, {
+            resultadosTests: resultadosTests,
+            testsRealizados: nuevosTests,
+            totalAciertos: nuevosAciertos,
+            totalPreguntas: nuevasPreguntas,
+            mediaAciertos: nuevaMedia,
+            mejorResultado: nuevoMejor,
+            testsAprobados: nuevosAprobados
+        });
+        
+        console.log(`✅ Test ${clave} guardado. Total tests: ${nuevosTests}`);
+        return true;
+        
+    } catch (error) {
+        console.error("Error guardando:", error);
+        return false;
+    }
+}
 
-// Obtener progreso del usuario
-export async function obtenerProgresoTest(userId) {
+// Obtener todos los resultados
+export async function obtenerResultadosTests(userId) {
     if (!userId) return {};
     
     try {
@@ -18,7 +66,7 @@ export async function obtenerProgresoTest(userId) {
         const userDoc = await getDoc(userRef);
         
         if (userDoc.exists()) {
-            return userDoc.data().testsCompletados || {};
+            return userDoc.data().resultadosTests || {};
         }
         return {};
     } catch (error) {
@@ -27,44 +75,28 @@ export async function obtenerProgresoTest(userId) {
     }
 }
 
-// Marcar test como completado
-export async function marcarTestCompletado(userId, testId, resultado = null) {
-    if (!userId) return;
+// Obtener estadísticas del usuario
+export async function obtenerEstadisticasUsuario(userId) {
+    if (!userId) return null;
     
     try {
         const userRef = doc(db, "usuarios", userId);
         const userDoc = await getDoc(userRef);
         
-        let testsCompletados = {};
         if (userDoc.exists()) {
-            testsCompletados = userDoc.data().testsCompletados || {};
+            const data = userDoc.data();
+            return {
+                testsRealizados: data.testsRealizados || 0,
+                testsAprobados: data.testsAprobados || 0,
+                mediaAciertos: data.mediaAciertos || 0,
+                mejorResultado: data.mejorResultado || 0,
+                totalAciertos: data.totalAciertos || 0,
+                totalPreguntas: data.totalPreguntas || 0
+            };
         }
-        
-        testsCompletados[testId] = {
-            completado: true,
-            fecha: new Date().toISOString(),
-            resultado: resultado,
-            ultimoIntento: new Date().toISOString()
-        };
-        
-        await updateDoc(userRef, {
-            testsCompletados: testsCompletados
-        });
-        
-        // Disparar evento para actualizar otras páginas
-        window.dispatchEvent(new CustomEvent('test-completado', { 
-            detail: { testId, completado: true } 
-        }));
-        
-        return true;
+        return null;
     } catch (error) {
-        console.error("Error guardando:", error);
-        return false;
+        console.error("Error:", error);
+        return null;
     }
-}
-
-// Verificar si un test está completado
-export async function isTestCompletado(userId, testId) {
-    const progreso = await obtenerProgresoTest(userId);
-    return progreso[testId]?.completado === true;
 }

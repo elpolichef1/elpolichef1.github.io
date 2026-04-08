@@ -247,6 +247,15 @@
 .test-card.completado .test-badge {
     display: none;
 }
+.test-card.completado {
+    border: 2px solid #10b981;
+    background: linear-gradient(135deg, #ffffff, #f0fdf4);
+}
+
+.test-card.completado .test-badge {
+    background: #10b981;
+    color: white;
+}
     </style>
 </head>
 <body>
@@ -359,54 +368,48 @@
     <script type="module">
     import { auth, onAuthStateChanged } from '../js/firebase-init.js';
     import { renderUserZone } from '../js/global-auth.js';
-    import { obtenerProgresoTest, TIPOS_TEST } from '../js/progreso-tests.js';
     
-    // Mapeo de IDs de test
-    const testIds = {
-        'test-rapido.html': TIPOS_TEST.RAPIDO,
-        'test-completo.html': TIPOS_TEST.COMPLETO,
-        'test-por-temas.html': TIPOS_TEST.POR_TEMAS,
-        'test-examen.html': TIPOS_TEST.EXAMEN
-    };
+    let unsubscribeSnapshot = null;
     
-    // Función para marcar tests completados en la interfaz
-    async function marcarTestsCompletados(userId) {
-        if (!userId) return;
-        
-        const progreso = await obtenerProgresoTest(userId);
-        
-        // Recorrer cada tarjeta de test
-        document.querySelectorAll('.test-card').forEach(card => {
-            const onclickAttr = card.getAttribute('onclick');
-            let testPage = '';
+    // Cargar estadísticas y escuchar cambios en tiempo real
+    async function cargarEstadisticasConRealtime(userId) {
+        try {
+            const { db, doc, onSnapshot } = await import('../js/firebase-init.js');
+            const userRef = doc(db, "usuarios", userId);
             
-            if (onclickAttr) {
-                const match = onclickAttr.match(/'(.*?)'/);
-                if (match) testPage = match[1];
+            // Si ya había una suscripción, la cancelamos
+            if (unsubscribeSnapshot) {
+                unsubscribeSnapshot();
             }
             
-            const testId = testIds[testPage];
-            if (testId && progreso[testId]?.completado) {
-                card.classList.add('completado');
-                
-                // Cambiar el botón por un badge de completado
-                const badge = card.querySelector('.test-badge');
-                if (badge) {
-                    badge.innerHTML = '<i class="fas fa-check-circle"></i> Finalizado';
-                    badge.classList.add('badge-completado');
-                    badge.classList.remove('test-badge');
+            // Escuchar cambios en tiempo real
+            unsubscribeSnapshot = onSnapshot(userRef, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    document.getElementById('totalTests').textContent = data.testsRealizados || 0;
+                    document.getElementById('testsAprobados').textContent = data.testsAprobados || 0;
+                    document.getElementById('tasaAciertos').textContent = `${data.mediaAciertos || 0}%`;
+                    document.getElementById('mejorResultado').textContent = `${data.mejorResultado || 0}%`;
+                    console.log("📊 Estadísticas actualizadas en tiempo real:", data.testsRealizados);
                 }
-            }
-        });
+            }, (error) => {
+                console.error("Error en snapshot:", error);
+            });
+            
+        } catch (error) {
+            console.error("Error cargando estadísticas:", error);
+        }
     }
     
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         renderUserZone();
-        if (user) {
-            marcarTestsCompletados(user.uid);
-        } else {
+        
+        if (!user) {
             window.location.href = '../login.html';
+            return;
         }
+        
+        await cargarEstadisticasConRealtime(user.uid);
     });
     
     document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
