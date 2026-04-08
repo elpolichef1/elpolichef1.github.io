@@ -13,24 +13,12 @@
             min-height: 100vh;
             color: white;
             padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-        body::before {
-            content: "🏁";
-            position: absolute;
-            font-size: 300px;
-            opacity: 0.03;
-            bottom: -50px;
-            right: -50px;
-            pointer-events: none;
         }
         .container { max-width: 1200px; margin: 0 auto; }
         
         .game-header {
             text-align: center;
             margin-bottom: 30px;
-            position: relative;
         }
         .game-header h1 {
             font-size: 2rem;
@@ -39,7 +27,6 @@
             background-clip: text;
             color: transparent;
         }
-        .game-header h1 i { color: #fbbf24; }
         
         .race-track {
             background: rgba(0,0,0,0.4);
@@ -47,7 +34,6 @@
             border-radius: 40px;
             padding: 30px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
         }
         .track {
             position: relative;
@@ -56,7 +42,6 @@
             border-radius: 60px;
             overflow: hidden;
             margin-bottom: 20px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 2px 5px rgba(0,0,0,0.2);
         }
         .track:last-child { margin-bottom: 0; }
         .track-lines {
@@ -66,7 +51,6 @@
             width: 100%;
             height: 100%;
             background: repeating-linear-gradient(90deg, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 30px, transparent 30px, transparent 60px);
-            pointer-events: none;
         }
         .car {
             position: absolute;
@@ -77,8 +61,6 @@
             filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.4));
             z-index: 10;
         }
-        .car-azul { filter: drop-shadow(2px 4px 8px rgba(0,0,255,0.3)); }
-        .car-rojo { filter: drop-shadow(2px 4px 8px rgba(255,0,0,0.3)); }
         .finish-line {
             position: absolute;
             right: 0;
@@ -87,7 +69,6 @@
             width: 40px;
             background: repeating-linear-gradient(90deg, #000 0px, #000 15px, #fff 15px, #fff 30px);
             border-radius: 0 60px 60px 0;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.3);
         }
         .player-name {
             position: absolute;
@@ -97,9 +78,6 @@
             background: rgba(0,0,0,0.8);
             padding: 4px 16px;
             border-radius: 30px;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.2);
         }
         
         .score-board {
@@ -110,18 +88,10 @@
             border-radius: 30px;
             padding: 20px 30px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
         }
         .score-item { text-align: center; flex: 1; }
-        .score-value {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .score-label { font-size: 0.7rem; opacity: 0.7; margin-top: 5px; }
+        .score-value { font-size: 1.8rem; font-weight: 800; color: #fbbf24; }
+        .score-label { font-size: 0.7rem; opacity: 0.7; }
         
         .question-card {
             background: white;
@@ -134,7 +104,6 @@
             font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 25px;
-            line-height: 1.5;
             color: #1a472a;
         }
         .options { display: grid; gap: 12px; }
@@ -151,19 +120,12 @@
             font-weight: 500;
         }
         .option-btn:hover:not(.disabled) {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            background: #fef3c7;
             border-color: #fbbf24;
             transform: translateX(8px);
         }
-        .option-prefix {
-            font-weight: 800;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            width: 35px;
-        }
-        .disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .option-prefix { font-weight: 800; color: #fbbf24; width: 35px; }
+        .disabled { opacity: 0.6; cursor: not-allowed; }
         .correct { background: #d1fae5; border-color: #10b981; }
         .incorrect { background: #fee2e2; border-color: #ef4444; }
         
@@ -179,7 +141,22 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            font-size: 0.95rem;
+        }
+        
+        .timer-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .timer-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            border-radius: 3px;
+            transition: width 0.1s linear;
         }
         
         .countdown-overlay {
@@ -210,29 +187,6 @@
             70% { transform: scale(1.2); }
             100% { transform: scale(1); opacity: 1; }
         }
-        .countdown-text {
-            font-size: 1.2rem;
-            margin-top: 20px;
-            color: #a8c4b8;
-        }
-        
-        .waiting-message {
-            text-align: center;
-            padding: 80px;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-        }
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,255,255,0.15);
-            border-top-color: #fbbf24;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
         
         .resultado-final {
             text-align: center;
@@ -240,10 +194,7 @@
             background: rgba(0,0,0,0.5);
             backdrop-filter: blur(10px);
             border-radius: 40px;
-            border: 1px solid rgba(251,191,36,0.3);
         }
-        .resultado-final i { font-size: 4rem; margin-bottom: 20px; }
-        .resultado-final h2 { margin-bottom: 20px; }
         .btn-reintentar {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #1a472a;
@@ -253,16 +204,12 @@
             font-weight: 700;
             cursor: pointer;
             margin-top: 20px;
-            transition: 0.3s;
         }
-        .btn-reintentar:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251,191,36,0.4); }
         
         @media (max-width: 768px) {
             .car { font-size: 1.8rem; bottom: 10px; }
             .track { height: 80px; }
             .question-text { font-size: 1rem; }
-            .score-value { font-size: 1.2rem; }
-            .waiting-message { padding: 40px; }
         }
     </style>
 </head>
@@ -272,76 +219,33 @@
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
         </div>
         <div id="gameContent">
-            <div class="waiting-message">
-                <div class="spinner"></div>
+            <div style="text-align:center; padding:80px;">
+                <div style="width:60px; height:60px; border:4px solid rgba(255,255,255,0.15); border-top-color:#fbbf24; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 25px;"></div>
                 <p>Cargando partida...</p>
             </div>
         </div>
     </div>
+
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <script type="module">
         import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // BASE DE DATOS REAL DE PREGUNTAS DGT
+        // PREGUNTAS PARA MULtijUGADOR (10 preguntas)
         // ============================================
-        const preguntasReales = [
-            // TEMA 1: NORMAS GENERALES
-            { id: 1, tema: 1, dificultad: "facil", texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1, explicacion: "En las intersecciones sin señalizar, la prioridad la tiene el vehículo que circula por la derecha." },
-            { id: 2, tema: 1, dificultad: "facil", texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación y seguro", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV en vigor", "Permiso de conducir y seguro"], correcta: 2, explicacion: "Es obligatorio llevar el permiso de conducir, el permiso de circulación y la ITV en vigor." },
-            { id: 3, tema: 1, dificultad: "media", texto: "¿Cuál es la tasa máxima de alcoholemia permitida para conductores noveles?", opciones: ["0,5 gramos por litro de sangre", "0,3 gramos por litro de sangre", "0,25 gramos por litro de sangre", "0,0 gramos por litro de sangre"], correcta: 1, explicacion: "Para conductores noveles (primeros 2 años) y profesionales, el límite es de 0,3 g/l en sangre." },
-            { id: 4, tema: 1, dificultad: "media", texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "Usar el móvil al volante es una infracción grave: 200€ de multa y 3 puntos del carnet." },
-            { id: 5, tema: 1, dificultad: "facil", texto: "¿Durante cuánto tiempo es considerado conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "Se considera conductor novel durante los primeros 2 años desde la obtención del permiso." },
-            { id: 6, tema: 1, dificultad: "facil", texto: "¿Qué significa la señal de STOP?", opciones: ["Prohibido el paso", "Ceda el paso", "Detención obligatoria", "Prohibido estacionar"], correcta: 2, explicacion: "La señal de STOP indica detención obligatoria antes de continuar." },
-            { id: 7, tema: 1, dificultad: "facil", texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "La velocidad máxima para turismos en autovía y autopista es de 120 km/h." },
-            { id: 8, tema: 1, dificultad: "facil", texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar para pasar rápido", "Tocar el claxon", "Reducir la velocidad y ceder el paso", "Estacionar antes del paso"], correcta: 2, explicacion: "Debe reducir la velocidad y ceder el paso a los peatones que crucen o vayan a cruzar." },
-            { id: 9, tema: 1, dificultad: "media", texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "La línea continua prohíbe adelantar y cruzar sobre ella." },
-            { id: 10, tema: 1, dificultad: "facil", texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre que se quiera", "Para saludar a conocidos", "Para evitar un accidente", "En zonas urbanas siempre"], correcta: 2, explicacion: "El claxon solo debe usarse para evitar un accidente o en casos de emergencia." },
-            { id: 11, tema: 1, dificultad: "media", texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar la velocidad", "Detenerse siempre", "Reducir la velocidad y extremar la precaución", "Tocar el claxon"], correcta: 2, explicacion: "Deben reducir la velocidad y extremar la precaución al aproximarse a un paso a nivel." },
-            { id: 12, tema: 1, dificultad: "media", texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Obligación de detenerse", "Preferencia de paso", "Prohibido el paso", "Obligación de ceder el paso a otros vehículos"], correcta: 3, explicacion: "Indica la obligación de ceder el paso a los vehículos que circulan por la vía a la que se aproxima." },
-            { id: 13, tema: 1, dificultad: "dificil", texto: "¿Qué se entiende por 'conducción negligente'?", opciones: ["Conducir a velocidad moderada", "Conducir sin la atención y diligencia debidas", "Conducir sin documentos", "Conducir con exceso de equipaje"], correcta: 1, explicacion: "Es conducir sin la atención y diligencia necesarias, poniendo en riesgo la seguridad vial." },
-            { id: 14, tema: 1, dificultad: "media", texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12 puntos", "10 puntos", "8 puntos", "6 puntos"], correcta: 2, explicacion: "Los conductores noveles disponen inicialmente de 8 puntos." },
-            { id: 15, tema: 1, dificultad: "dificil", texto: "¿Qué documentación NO es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Tarjeta de la ITV", "Justificante del último pago del impuesto de circulación", "Permiso de conducir"], correcta: 2, explicacion: "El justificante del impuesto de circulación no es obligatorio llevarlo en el vehículo." },
-            { id: 16, tema: 1, dificultad: "media", texto: "¿Qué significa una señal circular con fondo rojo y una franja blanca horizontal?", opciones: ["Prohibido girar a la izquierda", "Prohibido el paso", "Prohibido adelantar", "Prohibido estacionar"], correcta: 1, explicacion: "Es la señal de prohibido el paso." },
-            { id: 17, tema: 1, dificultad: "facil", texto: "¿Dónde se debe circular normalmente en una vía de doble sentido?", opciones: ["Por el carril izquierdo", "Por el carril derecho", "Por el centro", "Por el arcén"], correcta: 1, explicacion: "Se debe circular por el carril derecho, dejando el izquierdo para adelantamientos." },
-            { id: 18, tema: 1, dificultad: "media", texto: "¿Qué significa la luz amarilla intermitente de un semáforo?", opciones: ["Paso prohibido", "Paso obligatorio", "Precaución, prioridad de paso", "Fin de prohibición"], correcta: 2, explicacion: "Indica precaución y que se debe ceder el paso." },
-            { id: 19, tema: 1, dificultad: "dificil", texto: "¿Qué se considera conducción temeraria?", opciones: ["Conducir a más de 80 km/h", "Conducir sin cinturón", "Conducir con manifiesto desprecio por la vida de los demás", "Conducir sin luces"], correcta: 2, explicacion: "Es un delito contra la seguridad vial que conlleva penas de prisión." },
-            { id: 20, tema: 1, dificultad: "media", texto: "¿Cuándo debe un conductor encender las luces de cruce?", opciones: ["Solo de noche", "Solo en túneles", "Desde el atardecer hasta el amanecer y en túneles", "Solo cuando llueve"], correcta: 2, explicacion: "Debe encender las luces de cruce desde el atardecer hasta el amanecer y en túneles o condiciones adversas." },
-            { id: 21, tema: 1, dificultad: "media", texto: "¿Qué significa la señal de 'Calle residencial'?", opciones: ["Velocidad máxima 30 km/h", "Velocidad máxima 20 km/h", "Prioridad de los peatones", "Todas son correctas"], correcta: 3, explicacion: "En zona residencial la velocidad máxima es 20 km/h y los peatones tienen prioridad." },
-            { id: 22, tema: 1, dificultad: "facil", texto: "¿Qué debe hacer un conductor si un agente de tráfico le indica que se detenga?", opciones: ["Acelerar para pasar", "Detenerse inmediatamente", "Buscar un lugar seguro para detenerse", "Continuar y detenerse después"], correcta: 1, explicacion: "Debe detenerse inmediatamente siguiendo las indicaciones del agente." },
-            { id: 23, tema: 1, dificultad: "media", texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "500€", "100€ y 2 puntos"], correcta: 1, explicacion: "Es una infracción grave: 200€ de multa y 3 puntos." },
-            { id: 24, tema: 1, dificultad: "facil", texto: "¿Qué indica una señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a motocicletas", "Prohibido adelantar a ciclistas", "Prohibido cambiar de carril"], correcta: 0, explicacion: "Prohíbe adelantar a cualquier vehículo en ese tramo." },
-            { id: 25, tema: 1, dificultad: "media", texto: "¿Qué debe hacer un conductor si se aproxima a un autobús escolar detenido?", opciones: ["Aumentar la velocidad", "Adelantar con precaución", "Reducir velocidad y detenerse si es necesario", "Tocar el claxon"], correcta: 2, explicacion: "Debe reducir la velocidad y detenerse si es necesario para garantizar la seguridad de los niños." },
-            
-            // TEMA 2: SEÑALES DE TRÁFICO
-            { id: 26, tema: 2, dificultad: "facil", texto: "¿Qué color tienen las señales de servicio (hospital, gasolinera)?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 0, explicacion: "Las señales de servicio son de color azul." },
-            { id: 27, tema: 2, dificultad: "facil", texto: "¿Qué indica una señal triangular con borde rojo y fondo blanco?", opciones: ["Prohibición", "Obligación", "Peligro", "Información"], correcta: 2, explicacion: "Las señales triangulares con borde rojo indican peligro." },
-            { id: 28, tema: 2, dificultad: "facil", texto: "¿Qué indica una señal circular de fondo azul con una flecha blanca hacia arriba?", opciones: ["Prohibido girar", "Dirección obligatoria", "Carril exclusivo", "Zona peatonal"], correcta: 1, explicacion: "Indica dirección obligatoria hacia donde apunta la flecha." },
-            { id: 29, tema: 2, dificultad: "media", texto: "¿Qué significa una línea continua amarilla en el bordillo?", opciones: ["Prohibido estacionar", "Prohibido parar", "Zona de carga", "Parada de autobús"], correcta: 1, explicacion: "La línea continua amarilla en el bordillo indica prohibido parar y estacionar." },
-            { id: 30, tema: 2, dificultad: "facil", texto: "¿Qué señal indica 'Ceda el paso'?", opciones: ["Triángulo invertido con borde rojo", "Círculo rojo", "Octógono rojo", "Cuadrado azul"], correcta: 0, explicacion: "La señal de ceda el paso es un triángulo invertido con borde rojo y fondo blanco." },
-            { id: 31, tema: 2, dificultad: "media", texto: "¿Qué indica una señal redonda con fondo rojo y un número?", opciones: ["Velocidad máxima", "Velocidad mínima", "Prohibición de circular a más de esa velocidad", "Fin de prohibición"], correcta: 2, explicacion: "Indica la velocidad máxima permitida, no se puede circular a más de esa velocidad." },
-            { id: 32, tema: 2, dificultad: "facil", texto: "¿Qué color tienen las señales de autopista?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 1, explicacion: "Las señales de autopista y autovía son de fondo verde." },
-            { id: 33, tema: 2, dificultad: "facil", texto: "¿Qué significa una línea discontinua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar si es seguro", "Prohibido cambiar de carril", "Zona de estacionamiento"], correcta: 1, explicacion: "La línea discontinua permite adelantar o cambiar de carril si es seguro." },
-            { id: 34, tema: 2, dificultad: "media", texto: "¿Qué indica una señal de 'Paso a nivel sin barreras'?", opciones: ["Paso a nivel con barreras", "Paso a nivel sin barreras", "Paso inferior", "Paso superior"], correcta: 1, explicacion: "Indica un paso a nivel sin barreras, con especial precaución." },
-            { id: 35, tema: 2, dificultad: "facil", texto: "¿Qué significa la señal de 'Prohibido estacionar'?", opciones: ["No se puede parar", "No se puede estacionar", "No se puede circular", "Zona de carga"], correcta: 1, explicacion: "Prohíbe estacionar, pero permite paradas breves." },
-            { id: 36, tema: 2, dificultad: "media", texto: "¿Qué indica una señal de 'Zona escolar'?", opciones: ["Proximidad de un colegio", "Velocidad máxima 20 km/h", "Precaución con niños", "Todas son correctas"], correcta: 3, explicacion: "Indica proximidad de colegio, velocidad reducida y precaución con niños." },
-            { id: 37, tema: 2, dificultad: "facil", texto: "¿Qué indican las señales de color naranja?", opciones: ["Obras", "Servicios", "Peligro", "Información turística"], correcta: 0, explicacion: "Las señales de color naranja indican obras o situaciones temporales." },
-            { id: 38, tema: 2, dificultad: "facil", texto: "¿Qué indica una señal de 'Prohibido entrar'?", opciones: ["Prohibido el paso", "Prohibido girar", "Prohibido estacionar", "Prohibido adelantar"], correcta: 0, explicacion: "Prohíbe la entrada a una vía." },
-            { id: 39, tema: 2, dificultad: "facil", texto: "¿Qué significa una señal de 'Senda ciclista'?", opciones: ["Vía para bicicletas", "Prohibido circular en bicicleta", "Carril bici", "Zona peatonal"], correcta: 0, explicacion: "Indica una vía reservada para bicicletas." },
-            { id: 40, tema: 2, dificultad: "media", texto: "¿Qué indica una señal de 'Estacionamiento regulado'?", opciones: ["Estacionamiento con parquímetro", "Estacionamiento limitado", "Zona azul o verde", "Todas son correctas"], correcta: 3, explicacion: "Indica zona de estacionamiento regulado con limitación horaria." },
-            
-            // TEMA 3: CIRCULACIÓN
-            { id: 41, tema: 3, dificultad: "facil", texto: "¿Dónde debe circular un turismo en una autovía?", opciones: ["Por el carril izquierdo", "Por el carril derecho", "Por el carril central", "Por el arcén"], correcta: 1, explicacion: "Debe circular por el carril derecho, dejando el izquierdo para adelantar." },
-            { id: 42, tema: 3, dificultad: "facil", texto: "¿Cuándo está permitido utilizar el carril izquierdo en autovía?", opciones: ["Siempre", "Para circular a máxima velocidad", "Para adelantar", "Para circular en sentido contrario"], correcta: 2, explicacion: "El carril izquierdo se utiliza exclusivamente para adelantar." },
-            { id: 43, tema: 3, dificultad: "media", texto: "¿Qué velocidad máxima pueden alcanzar las motocicletas en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "Las motocicletas pueden circular a 120 km/h en autovía." },
-            { id: 44, tema: 3, dificultad: "facil", texto: "¿Cuál es la velocidad máxima en carretera convencional para un turismo?", opciones: ["80 km/h", "90 km/h", "100 km/h", "110 km/h"], correcta: 1, explicacion: "En carretera convencional, la velocidad máxima para turismos es de 90 km/h." },
-            { id: 45, tema: 3, dificultad: "media", texto: "¿Cuál es la velocidad máxima en zona residencial?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 0, explicacion: "En zonas residenciales la velocidad máxima es de 20 km/h." },
-            { id: 46, tema: 3, dificultad: "facil", texto: "¿Qué debe hacer un conductor al aproximarse a una rotonda?", opciones: ["Ceder el paso a los vehículos que circulan en ella", "Tener prioridad siempre", "Acelerar para entrar", "Detenerse siempre"], correcta: 0, explicacion: "Debe ceder el paso a los vehículos que ya circulan por la rotonda." },
-            { id: 47, tema: 3, dificultad: "facil", texto: "¿Está permitido adelantar en un paso de peatones?", opciones: ["Sí, si no hay peatones", "Sí, con precaución", "No, está prohibido", "Solo en vías urbanas"], correcta: 2, explicacion: "Está prohibido adelantar en los pasos de peatones." },
-            { id: 48, tema: 3, dificultad: "media", texto: "¿Está permitido adelantar en una curva sin visibilidad?", opciones: ["Sí, con precaución", "Sí, si no viene nadie", "No, está prohibido", "Solo de noche"], correcta: 2, explicacion: "Está prohibido adelantar en curvas sin visibilidad." },
-            { id: 49, tema: 3, dificultad: "facil", texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "La distancia de seguridad recomendada es de 2 segundos con el vehículo delantero." },
-            { id: 50, tema: 3, dificultad: "facil", texto: "¿Está permitido circular marcha atrás en autovía?", opciones: ["Sí, si es necesario", "Sí, para estacionar", "No, está prohibido", "Solo en caso de emergencia"], correcta: 2, explicacion: "Está totalmente prohibido circular marcha atrás en autovías y autopistas." }
+        const preguntasMulti = [
+            { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
+            { texto: "¿Qué significa una señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Detenerse obligatoriamente." },
+            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "0,3 g/l." },
+            { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 3 puntos." },
+            { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "8 puntos." },
+            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
+            { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Ceder el paso." },
+            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "30 km/h." },
+            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Reducir velocidad." },
+            { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "2 segundos." }
         ];
 
         let salaId = null;
@@ -351,10 +255,59 @@
         let respuestaSeleccionada = false;
         let gameActivo = true;
         let unsubscribe = null;
-        let juegoIniciado = false;
+        let timerInterval = null;
         
-        function obtenerPreguntaAleatoria() {
-            return preguntasReales[Math.floor(Math.random() * preguntasReales.length)];
+        const TOTAL_PREGUNTAS = 10;
+        const TIEMPO_RESPUESTA = 15000; // 15 segundos
+        
+        function iniciarTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            let tiempoRestante = TIEMPO_RESPUESTA / 1000;
+            const timerFill = document.getElementById('timerFill');
+            const startTime = Date.now();
+            
+            timerInterval = setInterval(() => {
+                if (!gameActivo) return;
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, TIEMPO_RESPUESTA - elapsed);
+                const percent = (remaining / TIEMPO_RESPUESTA) * 100;
+                
+                if (timerFill) timerFill.style.width = `${percent}%`;
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    if (!respuestaSeleccionada && gameActivo) {
+                        // Timeout - responder incorrecto automáticamente
+                        manejarTimeout();
+                    }
+                }
+            }, 100);
+        }
+        
+        async function manejarTimeout() {
+            if (!gameActivo || respuestaSeleccionada) return;
+            respuestaSeleccionada = true;
+            
+            // Responder incorrecto automáticamente
+            const turnoActual = salaData.turno;
+            const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
+            
+            if (!esMiTurno) return;
+            
+            const nuevaP1 = salaData.puntuacion1 + (esJugador1 ? 0 : 0);
+            const nuevaP2 = salaData.puntuacion2 + (!esJugador1 ? 0 : 0);
+            const nuevoTurno = turnoActual + 1;
+            
+            await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                puntuacion1: nuevaP1,
+                puntuacion2: nuevaP2,
+                turno: nuevoTurno,
+                ultimoRespuesta: Date.now()
+            });
+            
+            respuestaSeleccionada = false;
+            if (timerInterval) clearInterval(timerInterval);
         }
         
         function mostrarCuentaAtras() {
@@ -371,8 +324,6 @@
                         const text = overlay.querySelector('.countdown-text');
                         num.textContent = count;
                         text.textContent = count === 2 ? "Listos..." : "¡YA!";
-                        num.style.animation = 'none';
-                        setTimeout(() => num.style.animation = 'bounce 0.5s ease', 10);
                     } else {
                         clearInterval(interval);
                         overlay.remove();
@@ -383,17 +334,21 @@
         }
         
         async function iniciarJuego() {
-            const preguntas = [];
-            for (let i = 0; i < 7; i++) {
-                preguntas.push(obtenerPreguntaAleatoria());
+            // Seleccionar 10 preguntas aleatorias
+            const preguntasSeleccionadas = [...preguntasMulti];
+            for (let i = preguntasSeleccionadas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [preguntasSeleccionadas[i], preguntasSeleccionadas[j]] = [preguntasSeleccionadas[j], preguntasSeleccionadas[i]];
             }
+            
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                preguntas: preguntas,
+                preguntas: preguntasSeleccionadas.slice(0, TOTAL_PREGUNTAS),
                 turno: 0,
                 puntuacion1: 0,
-                puntuacion2: 0
+                puntuacion2: 0,
+                estado: "jugando",
+                iniciado: true
             });
-            console.log("✅ Juego iniciado con", preguntas.length, "preguntas reales de la DGT");
         }
         
         async function responder(respuesta) {
@@ -401,9 +356,12 @@
             if (!salaData || salaData.turno !== (esJugador1 ? 0 : 1)) return;
             
             respuestaSeleccionada = true;
+            if (timerInterval) clearInterval(timerInterval);
+            
             const pregunta = salaData.preguntas[salaData.turno];
             const esCorrecto = (respuesta === pregunta.correcta);
             
+            // Marcar visualmente
             const opciones = document.querySelectorAll('.option-btn');
             opciones.forEach((btn, idx) => {
                 btn.classList.add('disabled');
@@ -418,11 +376,12 @@
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
                 puntuacion1: nuevaP1,
                 puntuacion2: nuevaP2,
-                turno: nuevoTurno
+                turno: nuevoTurno,
+                ultimoRespuesta: Date.now()
             });
             
-            if (nuevoTurno >= salaData.preguntas.length) {
-                setTimeout(() => finalizarJuego(), 1500);
+            if (nuevoTurno >= TOTAL_PREGUNTAS) {
+                setTimeout(() => finalizarJuego(), 2000);
             } else {
                 respuestaSeleccionada = false;
             }
@@ -433,44 +392,47 @@
             
             const p1 = salaData.puntuacion1 || 0;
             const p2 = salaData.puntuacion2 || 0;
-            const total = salaData.preguntas.length;
             const turno = salaData.turno;
             
-            if (turno >= total) { finalizarJuego(); return; }
+            if (turno >= TOTAL_PREGUNTAS) {
+                finalizarJuego();
+                return;
+            }
             
             const pregunta = salaData.preguntas[turno];
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
-            const avance1 = (p1 / total) * 100;
-            const avance2 = (p2 / total) * 100;
+            const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
+            const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
             
             document.getElementById('gameContent').innerHTML = `
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
                         <div class="player-name">🏎️ ${salaData.jugador1Nombre}</div>
-                        <div class="car car-azul" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
+                        <div class="car" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
                         <div class="player-name">🏎️ ${salaData.jugador2Nombre}</div>
-                        <div class="car car-rojo" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
+                        <div class="car" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
                 <div class="score-board">
-                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">🏎️ ${salaData.jugador1Nombre}</div></div>
-                    <div class="score-item"><div class="score-value">${turno+1}/${total}</div><div class="score-label">📝 Pregunta</div></div>
-                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">🏎️ ${salaData.jugador2Nombre}</div></div>
+                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${salaData.jugador1Nombre}</div></div>
+                    <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
+                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${salaData.jugador2Nombre}</div></div>
                 </div>
-                ${!esMiTurno ? '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> Esperando respuesta del oponente...</div>' : ''}
+                ${!esMiTurno ? '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> Esperando respuesta del rival...</div>' : 
+                    '<div class="turn-indicator"><i class="fas fa-clock"></i> ¡Tu turno! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'}
                 <div class="question-card">
-                    <div class="question-text">${pregunta.texto}</div>
+                    <div class="question-text">${escapeHtml(pregunta.texto)}</div>
                     <div class="options" id="options">
                         ${pregunta.opciones.map((opt, idx) => `
                             <div class="option-btn" data-opcion="${idx}">
                                 <span class="option-prefix">${String.fromCharCode(65+idx)}.</span>
-                                <span>${opt}</span>
+                                <span>${escapeHtml(opt)}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -481,6 +443,7 @@
                 document.querySelectorAll('.option-btn').forEach(btn => {
                     btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
                 });
+                iniciarTimer();
             } else {
                 document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
             }
@@ -488,6 +451,9 @@
         
         async function finalizarJuego() {
             gameActivo = false;
+            if (timerInterval) clearInterval(timerInterval);
+            if (unsubscribe) unsubscribe();
+            
             const p1 = salaData.puntuacion1 || 0;
             const p2 = salaData.puntuacion2 || 0;
             const ganador = p1 > p2 ? salaData.jugador1Nombre : (p2 > p1 ? salaData.jugador2Nombre : "Empate");
@@ -495,19 +461,28 @@
             
             document.getElementById('gameContent').innerHTML = `
                 <div class="resultado-final">
-                    <i class="fas ${esGanador ? 'fa-trophy' : 'fa-flag-checkered'}" style="color: #fbbf24;"></i>
-                    <h2>🏁 ¡PARTIDA FINALIZADA! 🏁</h2>
+                    <i class="fas ${esGanador ? 'fa-trophy' : 'fa-flag-checkered'}" style="font-size: 4rem; color: #fbbf24;"></i>
+                    <h2 style="margin: 20px 0;">🏁 ¡PARTIDA FINALIZADA! 🏁</h2>
                     <div style="background: rgba(0,0,0,0.3); border-radius: 25px; padding: 20px; margin: 20px 0;">
-                        <p><strong>🏎️ ${salaData.jugador1Nombre}</strong>: ${p1} puntos</p>
-                        <p><strong>🏎️ ${salaData.jugador2Nombre}</strong>: ${p2} puntos</p>
+                        <p><strong>${salaData.jugador1Nombre}</strong>: ${p1} puntos</p>
+                        <p><strong>${salaData.jugador2Nombre}</strong>: ${p2} puntos</p>
                         <div style="height: 2px; background: rgba(255,255,255,0.2); margin: 15px 0;"></div>
-                        <h3 style="background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 ¡GANÓ ${ganador}! 🏆`)}</h3>
+                        <h3 style="color: #fbbf24;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${ganador} 🏆`)}</h3>
                     </div>
                     <button class="btn-reintentar" onclick="window.location.href='lobby.html'"><i class="fas fa-redo"></i> Jugar de nuevo</button>
-                    <a href="../index.html" style="display: inline-block; margin-left: 15px; background: rgba(255,255,255,0.15); color: white; padding: 14px 35px; border-radius: 60px; text-decoration: none; transition: 0.3s;">Volver al menú</a>
+                    <a href="../index.html" style="display: inline-block; margin-left: 15px; background: rgba(255,255,255,0.15); color: white; padding: 14px 35px; border-radius: 60px; text-decoration: none;">Volver al menú</a>
                 </div>
             `;
-            if (unsubscribe) unsubscribe();
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
         
         async function cargarPartida() {
@@ -518,30 +493,27 @@
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
             
-            if (salaData.estado === "esperando") {
-                document.getElementById('gameContent').innerHTML = `<div class="waiting-message"><div class="spinner"></div><p>⏳ Esperando oponente...</p></div>`;
-            } else if (salaData.estado === "en_curso") {
-                if (!salaData.preguntas) {
-                    document.getElementById('gameContent').innerHTML = `<div class="waiting-message"><div class="spinner"></div><p>🎮 Preparando partida...</p></div>`;
-                    await iniciarJuego();
-                    await mostrarCuentaAtras();
-                    const updatedDoc = await getDoc(salaRef);
-                    salaData = updatedDoc.data();
-                    renderizarJuego();
-                } else {
-                    await mostrarCuentaAtras();
-                    renderizarJuego();
-                }
+            if (!salaData.iniciado) {
+                await iniciarJuego();
+                await mostrarCuentaAtras();
+                const updatedDoc = await getDoc(salaRef);
+                salaData = updatedDoc.data();
+                renderizarJuego();
+            } else {
+                await mostrarCuentaAtras();
+                renderizarJuego();
             }
             
             unsubscribe = onSnapshot(salaRef, (doc) => {
-                if (doc.exists()) {
+                if (doc.exists() && gameActivo) {
                     const newData = doc.data();
-                    if (newData.preguntas && (!salaData.preguntas || salaData.turno !== newData.turno)) {
-                        salaData = newData;
-                        if (salaData.preguntas && gameActivo) {
-                            renderizarJuego();
-                        }
+                    const oldTurno = salaData?.turno;
+                    salaData = newData;
+                    
+                    if (oldTurno !== salaData.turno && gameActivo) {
+                        respuestaSeleccionada = false;
+                        if (timerInterval) clearInterval(timerInterval);
+                        renderizarJuego();
                     }
                 }
             });

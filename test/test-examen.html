@@ -67,242 +67,205 @@
 
     <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
 
-   <script type="module">
-    import { auth, onAuthStateChanged } from '../js/firebase-init.js';
-    import { renderUserZone } from '../js/global-auth.js';
-    import { marcarTestCompletado, TIPOS_TEST } from '../js/progreso-tests.js';
-    import { preguntasDGT, obtenerPreguntasAleatorias } from './data/preguntas.js';
-    
-    console.log("📚 Examen Oficial - preguntasDGT cargadas:", preguntasDGT?.length);
-    
-    let preguntasActuales = [];
-    let respuestas = [];
-    let tiempoRestante = 30 * 60;
-    let timerInterval;
-    let testFinalizado = false;
-    let currentUser = null;
-    
-    function mostrarExplicacion(idx) {
-        if (testFinalizado) {
-            const explicacionDiv = document.getElementById(`explicacion_${idx}`);
-            if (explicacionDiv) explicacionDiv.classList.toggle('mostrar');
-        } else {
-            alert('Las explicaciones solo están disponibles después de finalizar el examen.');
-        }
-    }
-    
-    function renderizarPreguntas() {
-        const container = document.getElementById('preguntasContainer');
-        if (!container) return;
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        import { guardarResultadoTest } from '../js/progreso-tests.js';
+        import { preguntasDGT, obtenerPreguntasAleatorias } from './data/preguntas.js';
         
-        container.innerHTML = preguntasActuales.map((p, idx) => `
-            <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
-                <div class="pregunta-texto">${idx + 1}. ${escapeHtml(p.texto)}</div>
-                ${p.opciones.map((opcion, optIdx) => `
-                    <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
-                        <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
-                        <span>${String.fromCharCode(65 + optIdx)}. ${escapeHtml(opcion)}</span>
-                    </label>
-                `).join('')}
-                <button class="btn-ver-explicacion" onclick="window.mostrarExplicacion(${idx})">
-                    <i class="fas fa-lightbulb"></i> Ver explicación (después del examen)
-                </button>
-                <div class="explicacion" id="explicacion_${idx}">
-                    <i class="fas fa-info-circle"></i> ${escapeHtml(p.explicacion || "Sin explicación disponible")}
+        console.log("📚 Examen Oficial - preguntasDGT cargadas:", preguntasDGT?.length);
+        
+        let preguntasActuales = [];
+        let respuestas = [];
+        let tiempoRestante = 30 * 60;
+        let timerInterval;
+        let testFinalizado = false;
+        let currentUser = null;
+        
+        // Mostrar explicación después de finalizar
+        window.mostrarExplicacion = function(idx) {
+            if (testFinalizado) {
+                const explicacionDiv = document.getElementById(`explicacion_${idx}`);
+                if (explicacionDiv) explicacionDiv.classList.toggle('mostrar');
+            } else {
+                alert('Las explicaciones solo están disponibles después de finalizar el examen.');
+            }
+        };
+        
+        function renderizarPreguntas() {
+            const container = document.getElementById('preguntasContainer');
+            if (!container) return;
+            
+            container.innerHTML = preguntasActuales.map((p, idx) => `
+                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
+                    <div class="pregunta-texto">${idx + 1}. ${escapeHtml(p.texto)}</div>
+                    ${p.opciones.map((opcion, optIdx) => `
+                        <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
+                            <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
+                            <span>${String.fromCharCode(65 + optIdx)}. ${escapeHtml(opcion)}</span>
+                        </label>
+                    `).join('')}
+                    <button class="btn-ver-explicacion" onclick="window.mostrarExplicacion(${idx})">
+                        <i class="fas fa-lightbulb"></i> Ver explicación (después del examen)
+                    </button>
+                    <div class="explicacion" id="explicacion_${idx}">
+                        <i class="fas fa-info-circle"></i> ${escapeHtml(p.explicacion || "Sin explicación disponible")}
+                    </div>
                 </div>
-            </div>
-        `).join('');
-        
-        document.querySelectorAll('.opcion input').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const preguntaIndex = parseInt(e.target.name.split('_')[1]);
-                const valor = parseInt(e.target.value);
-                respuestas[preguntaIndex] = valor;
-                const respondidas = respuestas.filter(r => r !== null).length;
-                document.getElementById('respondidas').textContent = respondidas;
+            `).join('');
+            
+            document.querySelectorAll('.opcion input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
+                    const valor = parseInt(e.target.value);
+                    respuestas[preguntaIndex] = valor;
+                    const respondidas = respuestas.filter(r => r !== null).length;
+                    document.getElementById('respondidas').textContent = respondidas;
+                });
             });
-        });
-    }
-    
-    function iniciarTemporizador() {
-        if (timerInterval) clearInterval(timerInterval);
-        const timerElem = document.getElementById('timer');
+        }
         
-        timerInterval = setInterval(() => {
+        function iniciarTemporizador() {
+            if (timerInterval) clearInterval(timerInterval);
+            const timerElem = document.getElementById('timer');
+            
+            timerInterval = setInterval(() => {
+                if (testFinalizado) return;
+                tiempoRestante--;
+                const minutos = Math.floor(tiempoRestante / 60);
+                const segundos = tiempoRestante % 60;
+                timerElem.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+                if (tiempoRestante <= 60) timerElem.classList.add('warning');
+                if (tiempoRestante <= 0) {
+                    clearInterval(timerInterval);
+                    alert('⏰ ¡Tiempo agotado!');
+                    finalizarExamen();
+                }
+            }, 1000);
+        }
+        
+        function iniciarExamen() {
+            if (!preguntasDGT || preguntasDGT.length === 0) {
+                console.error("No hay preguntas disponibles");
+                alert("Error: No se pudieron cargar las preguntas. Recarga la página.");
+                return;
+            }
+            preguntasActuales = obtenerPreguntasAleatorias(30);
+            respuestas = new Array(30).fill(null);
+            document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
+            document.getElementById('respondidas').textContent = '0';
+            document.getElementById('timer').textContent = '30:00';
+            document.getElementById('timer').classList.remove('warning');
+            renderizarPreguntas();
+            iniciarTemporizador();
+            testFinalizado = false;
+        }
+        
+        function mostrarToast(mensaje) {
+            const toast = document.createElement('div');
+            toast.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:9999; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><i class="fas fa-check-circle"></i> ${mensaje}</div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        async function finalizarExamen() {
             if (testFinalizado) return;
+            testFinalizado = true;
+            if (timerInterval) clearInterval(timerInterval);
             
-            tiempoRestante--;
-            const minutos = Math.floor(tiempoRestante / 60);
-            const segundos = tiempoRestante % 60;
-            timerElem.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+            let aciertos = 0;
+            const total = preguntasActuales.length;
             
-            if (tiempoRestante <= 60) {
-                timerElem.classList.add('warning');
+            // Marcar respuestas y contar aciertos
+            preguntasActuales.forEach((pregunta, idx) => {
+                const respuesta = respuestas[idx];
+                const esCorrecto = (respuesta === pregunta.correcta);
+                if (esCorrecto) aciertos++;
+                
+                const preguntaDiv = document.querySelector(`.pregunta[data-id="${pregunta.id}"]`);
+                if (preguntaDiv) preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
+                
+                const opciones = document.querySelectorAll(`.pregunta[data-id="${pregunta.id}"] .opcion`);
+                opciones.forEach((opcion, optIdx) => {
+                    opcion.classList.add('disabled');
+                    if (optIdx === pregunta.correcta) opcion.classList.add('correcta-respuesta');
+                    if (respuesta === optIdx && respuesta !== pregunta.correcta) opcion.classList.add('incorrecta-respuesta');
+                });
+            });
+            
+            const porcentaje = Math.round((aciertos / total) * 100);
+            const aprobado = porcentaje >= 90;
+            const resultadoDiv = document.getElementById('resultado');
+            
+            resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
+            resultadoDiv.innerHTML = `
+                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 2.5rem;"></i>
+                <h3>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h3>
+                <p>Has acertado <strong>${aciertos}</strong> de <strong>${total}</strong> preguntas (${porcentaje}%)</p>
+                <p style="color: ${aprobado ? '#10b981' : '#ef4444'}; font-weight: bold;">${aprobado ? '✅ APTO' : '❌ NO APTO'}</p>
+                <button id="btnVolverMenu" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;">
+                    <i class="fas fa-home"></i> Volver al menú de tests
+                </button>
+                <button onclick="location.reload()" style="background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; margin-left: 10px; cursor: pointer;">
+                    <i class="fas fa-redo"></i> Nuevo examen
+                </button>
+            `;
+            resultadoDiv.style.display = 'block';
+            
+            // Guardar resultado en Firestore usando guardarResultadoTest (similar a test-completo)
+            if (currentUser) {
+                // Usamos un identificador fijo para el examen oficial, por ejemplo 'examen_oficial'
+                await guardarResultadoTest(
+                    currentUser.uid,
+                    'examen',          // nivel simulado
+                    0,                 // testId fijo
+                    'Examen Oficial',
+                    {
+                        aprobado: aprobado,
+                        porcentaje: porcentaje,
+                        aciertos: aciertos,
+                        total: total
+                    }
+                );
+                mostrarToast(`Examen Oficial: ${aprobado ? 'APROBADO' : 'SUSPENDIDO'} (${porcentaje}%)`);
             }
             
-            if (tiempoRestante <= 0) {
-                clearInterval(timerInterval);
-                alert('⏰ ¡Tiempo agotado!');
+            // Botón volver al menú
+            document.getElementById('btnVolverMenu')?.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../login.html';
+            } else {
+                currentUser = user;
+                iniciarExamen();
+            }
+        });
+        
+        document.getElementById('btnEnviar')?.addEventListener('click', () => {
+            if (!testFinalizado && confirm('¿Seguro que quieres finalizar el examen?')) {
                 finalizarExamen();
             }
-        }, 1000);
-    }
-    
-    function iniciarExamen() {
-        if (!preguntasDGT || preguntasDGT.length === 0) {
-            console.error("No hay preguntas disponibles");
-            alert("Error: No se pudieron cargar las preguntas. Recarga la página.");
-            return;
-        }
-        
-        preguntasActuales = obtenerPreguntasAleatorias(30);
-        respuestas = new Array(30).fill(null);
-        
-        document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
-        document.getElementById('respondidas').textContent = '0';
-        document.getElementById('timer').textContent = '30:00';
-        document.getElementById('timer').classList.remove('warning');
-        
-        renderizarPreguntas();
-        iniciarTemporizador();
-        testFinalizado = false;
-    }
-    
-    function mostrarToast(mensaje) {
-        const toast = document.createElement('div');
-        toast.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:9999; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><i class="fas fa-check-circle"></i> ${mensaje}</div>`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    async function finalizarExamen() {
-        if (testFinalizado) return;
-        testFinalizado = true;
-        if (timerInterval) clearInterval(timerInterval);
-        
-        let aciertos = 0;
-        const total = preguntasActuales.length;
-        
-        preguntasActuales.forEach((pregunta, idx) => {
-            const respuesta = respuestas[idx];
-            const esCorrecto = (respuesta === pregunta.correcta);
-            if (esCorrecto) aciertos++;
-            
-            const preguntaDiv = document.querySelector(`.pregunta[data-id="${pregunta.id}"]`);
-            if (preguntaDiv) {
-                preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
-            }
-            
-            const opciones = document.querySelectorAll(`.pregunta[data-id="${pregunta.id}"] .opcion`);
-            opciones.forEach((opcion, optIdx) => {
-                opcion.classList.add('disabled');
-                if (optIdx === pregunta.correcta) {
-                    opcion.classList.add('correcta-respuesta');
-                }
-                if (respuesta === optIdx && respuesta !== pregunta.correcta) {
-                    opcion.classList.add('incorrecta-respuesta');
-                }
-            });
         });
         
-        const porcentaje = Math.round((aciertos / total) * 100);
-        const aprobado = porcentaje >= 90;
-        const resultadoDiv = document.getElementById('resultado');
-        
-        resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
-        resultadoDiv.innerHTML = `
-            <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 2.5rem;"></i>
-            <h3>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h3>
-            <p>Has acertado <strong>${aciertos}</strong> de <strong>${total}</strong> preguntas (${porcentaje}%)</p>
-            <button onclick="reiniciarExamen()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;">
-                <i class="fas fa-redo"></i> Nuevo examen oficial
-            </button>
-        `;
-        resultadoDiv.style.display = 'block';
-        
-        // Guardar estadísticas en localStorage
-        const stats = JSON.parse(localStorage.getItem('aprobadoya_test_stats') || '{}');
-        stats.totalTests = (stats.totalTests || 0) + 1;
-        stats.totalAciertos = (stats.totalAciertos || 0) + aciertos;
-        stats.totalPreguntas = (stats.totalPreguntas || 0) + total;
-        stats.mejorResultado = Math.max(stats.mejorResultado || 0, porcentaje);
-        stats.tasaAciertos = Math.round((stats.totalAciertos / stats.totalPreguntas) * 100);
-        if (aprobado) stats.testsAprobados = (stats.testsAprobados || 0) + 1;
-        localStorage.setItem('aprobadoya_test_stats', JSON.stringify(stats));
-        
-        // ✅ GUARDAR TEST COMO COMPLETADO
-        if (currentUser) {
-            const resultado = { aciertos, total, porcentaje };
-            await marcarTestCompletado(currentUser.uid, TIPOS_TEST.EXAMEN, resultado);
-            mostrarToast('✅ Examen oficial completado. Progreso guardado correctamente.');
-        }
-        
-        // Guardar también en Firestore
-        if (currentUser) {
-            try {
-                const { db, doc, getDoc, updateDoc } = await import('../js/firebase-init.js');
-                const userRef = doc(db, "usuarios", currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    const nuevosTests = (userData.testsRealizados || 0) + 1;
-                    const nuevosAciertos = (userData.totalAciertos || 0) + aciertos;
-                    const nuevasPreguntas = (userData.totalPreguntas || 0) + total;
-                    const nuevaMedia = Math.round((nuevosAciertos / nuevasPreguntas) * 100);
-                    const nuevoMejor = Math.max(userData.mejorResultado || 0, porcentaje);
-                    
-                    await updateDoc(userRef, {
-                        testsRealizados: nuevosTests,
-                        totalAciertos: nuevosAciertos,
-                        totalPreguntas: nuevasPreguntas,
-                        mediaAciertos: nuevaMedia,
-                        mejorResultado: nuevoMejor
-                    });
-                }
-            } catch (error) {
-                console.error("Error guardando en Firestore:", error);
-            }
-        }
-    }
-    
-    function reiniciarExamen() {
-        location.reload();
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.querySelector('.nav-wrapper');
+            if (wrapper) wrapper.classList.toggle('active');
         });
-    }
-    
-    // Exponer funciones globales
-    window.mostrarExplicacion = mostrarExplicacion;
-    window.reiniciarExamen = reiniciarExamen;
-    
-    onAuthStateChanged(auth, (user) => {
-        renderUserZone();
-        if (!user) {
-            window.location.href = '../login.html';
-        } else {
-            currentUser = user;
-            iniciarExamen();
-        }
-    });
-    
-    document.getElementById('btnEnviar')?.addEventListener('click', () => {
-        if (!testFinalizado && confirm('¿Seguro que quieres finalizar el examen?')) {
-            finalizarExamen();
-        }
-    });
-    
-    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-        const wrapper = document.querySelector('.nav-wrapper');
-        if (wrapper) wrapper.classList.toggle('active');
-    });
-</script>
+    </script>
 </body>
 </html>
