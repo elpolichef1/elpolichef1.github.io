@@ -389,6 +389,68 @@
             margin-top: 8px;
         }
 
+        /* Estilos para Tests Completados */
+        .tests-completados-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+
+        .test-completado-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f0fdf4;
+            padding: 14px 18px;
+            border-radius: 20px;
+            border: 1px solid #bbf7d0;
+            transition: all 0.2s;
+        }
+
+        .test-completado-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .test-completado-item i {
+            font-size: 1.5rem;
+            color: #10b981;
+        }
+
+        .test-completado-item strong {
+            color: #166534;
+            font-size: 0.95rem;
+        }
+
+        .test-completado-item small {
+            font-size: 0.7rem;
+            color: #6b7280;
+            display: block;
+            margin-top: 3px;
+        }
+
+        .test-pendiente-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fef3c7;
+            padding: 14px 18px;
+            border-radius: 20px;
+            border: 1px solid #fde68a;
+        }
+
+        .test-pendiente-item i {
+            font-size: 1.5rem;
+            color: #f59e0b;
+        }
+
+        .test-pendiente-item strong {
+            color: #92400e;
+            font-size: 0.95rem;
+        }
+
         .tests-por-tema {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -709,6 +771,7 @@
         @media (max-width: 560px) {
             .stats-grid { grid-template-columns: 1fr; }
             .tests-por-tema { grid-template-columns: 1fr; }
+            .tests-completados-grid { grid-template-columns: 1fr; }
             .profile-main { padding: 24px 20px; }
         }
 
@@ -791,6 +854,14 @@
     
     const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
     
+    // Nombres de los tests para mostrar
+    const NOMBRES_TESTS = {
+        'test-rapido': '🏁 Test Rápido',
+        'test-completo': '📋 Test Completo',
+        'test-por-temas': '📚 Test por Temas',
+        'test-examen': '🎯 Examen Oficial'
+    };
+    
     let chartPie = null;
     let chartBar = null;
     let currentUserData = null;
@@ -809,6 +880,80 @@
             toast.style.transform = 'translateX(100%)';
             setTimeout(() => toast.remove(), 300);
         }, 2500);
+    }
+    
+    // Función para cargar y mostrar los tests completados
+    async function cargarTestsCompletados(userId) {
+        try {
+            const userRef = doc(db, "usuarios", userId);
+            const userDoc = await getDoc(userRef);
+            
+            let testsCompletados = {};
+            if (userDoc.exists()) {
+                testsCompletados = userDoc.data().testsCompletados || {};
+            }
+            
+            const container = document.getElementById('testsCompletadosContainer');
+            if (!container) return;
+            
+            const testsDisponibles = ['test-rapido', 'test-completo', 'test-por-temas', 'test-examen'];
+            
+            let html = '<div class="tests-completados-grid">';
+            
+            for (const testId of testsDisponibles) {
+                const testData = testsCompletados[testId];
+                const nombreTest = NOMBRES_TESTS[testId] || testId;
+                
+                if (testData && testData.completado) {
+                    const fecha = new Date(testData.fecha).toLocaleDateString('es-ES');
+                    const resultado = testData.resultado;
+                    const porcentaje = resultado ? `${resultado.porcentaje}%` : '';
+                    
+                    html += `
+                        <div class="test-completado-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <strong>${nombreTest}</strong>
+                                <small>✅ Completado: ${fecha} ${porcentaje ? `· ${porcentaje} aciertos` : ''}</small>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="test-pendiente-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <strong>${nombreTest}</strong>
+                                <small>⏳ Pendiente de completar</small>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            html += '</div>';
+            
+            // Contador de tests completados
+            const completadosCount = Object.keys(testsCompletados).filter(key => testsCompletados[key]?.completado).length;
+            const totalTests = testsDisponibles.length;
+            
+            html += `
+                <div style="text-align: center; margin-top: 15px; padding: 12px; background: #fefaf2; border-radius: 30px;">
+                    <span style="font-weight: 600;">Progreso total:</span> 
+                    <span style="color: #f5b042; font-weight: 800;">${completadosCount}/${totalTests}</span> 
+                    tests completados
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error("Error cargando tests completados:", error);
+            const container = document.getElementById('testsCompletadosContainer');
+            if (container) {
+                container.innerHTML = '<p class="empty-tests">Error al cargar el progreso de tests</p>';
+            }
+        }
     }
     
     async function renderProfile(user) {
@@ -837,7 +982,8 @@
                     totalAciertos: 0,
                     totalPreguntas: 0,
                     mejorResultado: 0,
-                    mediaAciertos: 0
+                    mediaAciertos: 0,
+                    testsCompletados: {}
                 };
                 await setDoc(userRef, userData);
             }
@@ -870,6 +1016,10 @@
                             <div class="grafico-card"><h4><i class="fas fa-percent"></i> Aciertos totales</h4><canvas id="graficoPastel" width="200" height="200"></canvas></div>
                             <div class="grafico-card"><h4><i class="fas fa-chart-bar"></i> Tests realizados</h4><canvas id="graficoBarras" width="300" height="180"></canvas></div>
                         </div>
+                        
+                        <div class="section-title"><i class="fas fa-check-double"></i> Tests Completados</div>
+                        <div id="testsCompletadosContainer"></div>
+                        
                         <div class="section-title"><i class="fas fa-chart-line"></i> Mis Estadísticas</div>
                         <div class="stats-grid">
                             <div class="stat-card"><div class="stat-number">${userData.testsRealizados || 0}</div><div class="stat-label">Tests realizados</div></div>
@@ -877,11 +1027,13 @@
                             <div class="stat-card"><div class="stat-number">${userData.totalPreguntas || 0}</div><div class="stat-label">Preguntas contestadas</div></div>
                             <div class="stat-card"><div class="stat-number">${userData.mejorResultado || 0}%</div><div class="stat-label">Mejor resultado</div></div>
                         </div>
+                        
                         <div class="section-title"><i class="fas fa-chart-simple"></i> Mi Progreso</div>
                         <div class="progress-item">
                             <div class="progress-header"><span>🏁 Tests realizados (meta 50)</span><span id="testsCount">${userData.testsRealizados || 0}/50</span></div>
                             <div class="progress-bar"><div class="progress-fill" id="testsFill" style="width: ${Math.min(((userData.testsRealizados || 0) / 50) * 100, 100)}%"></div></div>
                         </div>
+                        
                         <div class="btn-recargar" id="refreshStatsBtn"><i class="fas fa-sync-alt"></i> Actualizar estadísticas</div>
                         
                         <div class="delete-account-section">
@@ -891,6 +1043,9 @@
                     </div>
                 </div>
             `;
+            
+            // Cargar los tests completados
+            await cargarTestsCompletados(user.uid);
             
             // Gráficos
             if (chartPie) chartPie.destroy();
@@ -920,16 +1075,13 @@
                 selector.style.display = selector.style.display === 'none' ? 'flex' : 'none';
             });
             
-            // CORREGIDO: Usar updateGlobalAvatar para que se actualice en todas las páginas
             document.querySelectorAll('.avatar-option').forEach(opt => {
                 opt.addEventListener('click', async () => {
                     const newAvatar = opt.dataset.avatar;
                     await updateGlobalAvatar(newAvatar);
                     showToast('Avatar actualizado');
-                    // Actualizar el avatar en el perfil localmente
                     const profileAvatar = document.getElementById('profileAvatar');
                     if (profileAvatar) profileAvatar.textContent = newAvatar;
-                    // Forzar actualización en otras páginas
                     localStorage.setItem('user_update_flag', Date.now().toString());
                 });
             });

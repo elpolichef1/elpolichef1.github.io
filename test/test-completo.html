@@ -462,374 +462,387 @@
         </div>
     </footer>
 
-    <script type="module">
-        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
-        import { renderUserZone } from '../js/global-auth.js';
+   <script type="module">
+    import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+    import { renderUserZone } from '../js/global-auth.js';
+    import { marcarTestCompletado, TIPOS_TEST } from '../js/progreso-tests.js';
+    
+    // ============================================
+    // BANCO DE PREGUNTAS (60+ preguntas por nivel para que no se repitan)
+    // ============================================
+    
+    const bancoPreguntas = {
+        facil: [
+            { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
+            { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Detenerse obligatoriamente." },
+            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "0,3 g/l." },
+            { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 3 puntos." },
+            { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "8 puntos." },
+            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
+            { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Ceder el paso." },
+            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "30 km/h." },
+            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Reducir velocidad." },
+            { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2, explicacion: "Para evitar accidentes." },
+            { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Permiso de conducir", "ITV en vigor", "Todas son correctas"], correcta: 3, explicacion: "Todas son obligatorias." },
+            { texto: "¿Durante cuánto tiempo se es conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "2 años." },
+            { texto: "¿Dónde se debe circular normalmente en una vía de doble sentido?", opciones: ["Por el carril izquierdo", "Por el carril derecho", "Por el centro", "Por el arcén"], correcta: 1, explicacion: "Por el carril derecho." },
+            { texto: "¿Qué significa la luz amarilla intermitente de un semáforo?", opciones: ["Paso prohibido", "Paso obligatorio", "Precaución, prioridad de paso", "Fin de prohibición"], correcta: 2, explicacion: "Precaución y prioridad." },
+            { texto: "¿Qué vehículos tienen prohibido circular por autopistas?", opciones: ["Ciclomotores", "Motocicletas de menos de 125cc", "Vehículos agrícolas", "Todas son correctas"], correcta: 3, explicacion: "Todos ellos." },
+            { texto: "¿Qué significa una señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0, explicacion: "Prohíbe adelantar." },
+            { texto: "¿Cuál es la sanción por no respetar un semáforo en rojo?", opciones: ["100€ y 2 puntos", "200€ y 4 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 4 puntos." },
+            { texto: "¿Qué indica una línea discontinua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar si es seguro", "Prohibido estacionar", "Zona de carga"], correcta: 1, explicacion: "Permite adelantar si es seguro." },
+            { texto: "¿Qué velocidad máxima pueden alcanzar las motocicletas en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
+            { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "2 segundos." },
+            { texto: "¿Qué debe hacer un conductor en un túnel?", opciones: ["Encender luces de cruce", "Reducir velocidad", "No adelantar", "Todas son correctas"], correcta: 3, explicacion: "Todas las anteriores." },
+            { texto: "¿Está permitido circular marcha atrás en autovía?", opciones: ["Sí, si es necesario", "Sí, para estacionar", "No, está prohibido", "Solo en caso de emergencia"], correcta: 2, explicacion: "Prohibido." },
+            { texto: "¿Qué significa una flecha blanca pintada en el pavimento?", opciones: ["Dirección obligatoria", "Zona de estacionamiento", "Prohibido girar", "Carril de aceleración"], correcta: 0, explicacion: "Dirección obligatoria." },
+            { texto: "¿Qué deben hacer los vehículos lentos en carretera?", opciones: ["Circular por el centro", "Circular por la derecha", "Utilizar el arcén", "Aumentar velocidad"], correcta: 1, explicacion: "Circular por la derecha." },
+            { texto: "¿Está permitido parar en autovía?", opciones: ["Sí, en cualquier lugar", "Sí, solo en áreas de descanso", "No, está prohibido", "Solo para emergencias"], correcta: 3, explicacion: "Solo para emergencias." },
+            { texto: "¿Qué debe hacer un conductor si un vehículo quiere adelantarle?", opciones: ["Acelerar", "Mantenerse en su carril", "Cambiar de carril", "Tocar el claxon"], correcta: 1, explicacion: "Mantenerse en su carril." },
+            { texto: "¿Cuándo está permitido utilizar el teléfono móvil al volante?", opciones: ["Siempre con manos libres", "Nunca", "Solo en caso de emergencia", "Con el vehículo detenido"], correcta: 2, explicacion: "Solo en caso de emergencia." },
+            { texto: "¿Qué debe hacer un conductor si el semáforo se pone amarillo?", opciones: ["Acelerar para pasar", "Detenerse si es seguro", "Continuar sin cambios", "Tocar el claxon"], correcta: 1, explicacion: "Detenerse si es seguro." },
+            { texto: "¿Qué debe hacer un conductor en un carril de aceleración?", opciones: ["Detenerse", "Acelerar para incorporarse", "Reducir velocidad", "Circular marcha atrás"], correcta: 1, explicacion: "Acelerar para incorporarse." },
+            { texto: "¿Qué debe hacer un conductor en un carril de deceleración?", opciones: ["Acelerar", "Reducir velocidad para salir", "Detenerse", "Adelantar"], correcta: 1, explicacion: "Reducir velocidad." },
+            { texto: "¿Qué significa una señal de 'Prohibido estacionar'?", opciones: ["No se puede parar", "No se puede estacionar", "No se puede circular", "Zona de carga"], correcta: 1, explicacion: "Prohíbe estacionar." },
+            { texto: "¿Qué indica una señal de 'Curva peligrosa'?", opciones: ["Curva a la izquierda", "Curva a la derecha", "Curva cerrada", "Todas según dibujo"], correcta: 3, explicacion: "Según el dibujo." },
+            { texto: "¿Qué indica una señal de 'Zona escolar'?", opciones: ["Proximidad colegio", "Velocidad 20 km/h", "Precaución niños", "Todas correctas"], correcta: 3, explicacion: "Todas las anteriores." },
+            { texto: "¿Qué indican las señales de color naranja?", opciones: ["Obras", "Servicios", "Peligro", "Información turística"], correcta: 0, explicacion: "Indican obras." },
+            { texto: "¿Qué significa una señal de 'Senda ciclista'?", opciones: ["Vía para bicicletas", "Prohibido bicicletas", "Carril bici", "Zona peatonal"], correcta: 0, explicacion: "Vía para bicicletas." },
+            { texto: "¿Qué significa una señal de 'Sentido obligatorio'?", opciones: ["Dirección obligatoria", "Prohibido girar", "Calle sentido único", "Calle peatonal"], correcta: 0, explicacion: "Dirección obligatoria." },
+            { texto: "¿Qué indica una señal de 'Paso de peatones'?", opciones: ["Prohibido cruzar", "Zona cruce peatones", "Carril bici", "Zona carga"], correcta: 1, explicacion: "Zona de cruce de peatones." },
+            { texto: "¿Qué significa una señal de 'Túnel'?", opciones: ["Paso inferior", "Paso superior", "Proximidad túnel", "Zona obras"], correcta: 2, explicacion: "Proximidad de un túnel." },
+            { texto: "¿Qué indica una señal de 'Glacis'?", opciones: ["Paso elevado", "Resalto", "Lomo de asno", "Todas correctas"], correcta: 3, explicacion: "Resalto en la calzada." },
+            { texto: "¿Qué indica una señal de 'Carril bus'?", opciones: ["Carril exclusivo autobuses", "Carril alta ocupación", "Carril bicicletas", "Carril emergencia"], correcta: 0, explicacion: "Carril exclusivo para autobuses." }
+        ],
+        medio: [
+            { texto: "¿Qué velocidad máxima puede alcanzar un turismo en autopista con lluvia?", opciones: ["100 km/h", "110 km/h", "120 km/h", "80 km/h"], correcta: 0, explicacion: "100 km/h con lluvia." },
+            { texto: "¿Qué significa una señal de 'Paso a nivel sin barreras'?", opciones: ["Paso a nivel con barreras", "Paso a nivel sin barreras", "Paso inferior", "Paso superior"], correcta: 1, explicacion: "Paso a nivel sin barreras." },
+            { texto: "¿Cuántos puntos se pierden por conducir con alcohol >0.60 mg/l?", opciones: ["4 puntos", "6 puntos", "8 puntos", "Pérdida total"], correcta: 1, explicacion: "6 puntos." },
+            { texto: "¿Qué significa una señal de 'Zona de bajas emisiones'?", opciones: ["Restricción circulación", "Prohibido estacionar", "Zona peatonal", "Carril bici"], correcta: 0, explicacion: "Restricción de circulación." },
+            { texto: "¿Qué deben hacer los vehículos lentos en carretera?", opciones: ["Circular centro", "Circular derecha", "Utilizar arcén", "Aumentar velocidad"], correcta: 1, explicacion: "Circular por la derecha." },
+            { texto: "¿Qué indica una señal de 'Carril reversible'?", opciones: ["Carril cambia sentido", "Carril vehículos lentos", "Carril aceleración", "Carril deceleración"], correcta: 0, explicacion: "Cambia de sentido." },
+            { texto: "¿Cuál es la distancia de seguridad con lluvia?", opciones: ["2 segundos", "3 segundos", "4 segundos", "5 segundos"], correcta: 1, explicacion: "3-4 segundos." },
+            { texto: "¿Qué significa una señal de 'Prohibido girar en U'?", opciones: ["Prohibido cambiar sentido", "Prohibido girar izquierda", "Prohibido girar derecha", "Prohibido circular"], correcta: 0, explicacion: "Prohibido cambiar de sentido." },
+            { texto: "¿Qué velocidad máxima pueden alcanzar los camiones en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 1, explicacion: "90 km/h." },
+            { texto: "¿Qué indica una señal de 'Carril bus'?", opciones: ["Carril exclusivo autobuses", "Carril alta ocupación", "Carril bicicletas", "Carril emergencia"], correcta: 0, explicacion: "Exclusivo autobuses." },
+            { texto: "¿Qué velocidad máxima con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h." },
+            { texto: "¿Distancia a 120 km/h en 2 segundos?", opciones: ["33.3 m", "66.6 m", "100 m", "120 m"], correcta: 1, explicacion: "66.6 metros." },
+            { texto: "¿Metros mínimos al estacionar en paso de peatones?", opciones: ["5 m", "10 m", "15 m", "20 m"], correcta: 0, explicacion: "5 metros." },
+            { texto: "¿Tasa de alcohol que constituye delito penal?", opciones: ["0.5 g/l", "0.8 g/l", "1.0 g/l", "1.2 g/l"], correcta: 3, explicacion: "1.2 g/l." },
+            { texto: "¿Sanción por superar velocidad en más de 50 km/h?", opciones: ["200€", "300€", "500€ y 6 puntos", "600€ y 6 puntos"], correcta: 2, explicacion: "500€ y 6 puntos." },
+            { texto: "¿Cuándo está permitido adelantar por la derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas varios carriles." },
+            { texto: "¿Qué indica señal de 'Carril de aceleración'?", opciones: ["Aumentar velocidad", "Disminuir velocidad", "Adelantar", "Estacionar"], correcta: 0, explicacion: "Aumentar velocidad." },
+            { texto: "¿Qué indican señales de color marrón?", opciones: ["Información turística", "Obras", "Peligro", "Servicios"], correcta: 0, explicacion: "Lugares turísticos." },
+            { texto: "¿Qué indica 'Peligro por viento lateral'?", opciones: ["Viento fuerte", "Curva peligrosa", "Desprendimiento", "Pavimento deslizante"], correcta: 0, explicacion: "Viento lateral." },
+            { texto: "¿Qué indica 'Zona de prioridad peatonal'?", opciones: ["Peatones prioridad", "Prohibido peatones", "Velocidad 50", "Carril peatones"], correcta: 0, explicacion: "Prioridad peatones." },
+            { texto: "¿Qué significa una línea continua amarilla en el bordillo?", opciones: ["Prohibido estacionar", "Prohibido parar", "Zona carga", "Parada bus"], correcta: 1, explicacion: "Prohibido parar y estacionar." },
+            { texto: "¿Qué indica un semáforo con flecha verde?", opciones: ["Prohibido paso", "Paso permitido dirección", "Precaución", "Fin prohibición"], correcta: 1, explicacion: "Paso en esa dirección." },
+            { texto: "¿Qué señal indica 'Ceda el paso'?", opciones: ["Triángulo invertido", "Círculo rojo", "Octógono rojo", "Cuadrado azul"], correcta: 0, explicacion: "Triángulo invertido." },
+            { texto: "¿Qué color tienen las señales de autopista?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 1, explicacion: "Fondo verde." },
+            { texto: "¿Qué indica señal cuadrada o rectangular azul?", opciones: ["Prohibición", "Peligro", "Información o servicio", "Obligación"], correcta: 2, explicacion: "Información o servicio." },
+            { texto: "¿Qué significa señal con peatón dentro triángulo?", opciones: ["Paso peatones", "Zona peatonal", "Peligro peatones", "Prohibido peatones"], correcta: 2, explicacion: "Peligro por peatones." },
+            { texto: "¿Qué indica señal de 'Carril adicional'?", opciones: ["Carril lentos", "Carril adelantar", "Carril incorporarse", "Carril exclusivo"], correcta: 2, explicacion: "Carril para incorporarse." },
+            { texto: "¿Qué significa señal de 'Prohibido girar izquierda'?", opciones: ["Prohibido girar U", "Prohibido girar izquierda", "Prohibido girar derecha", "Prohibido circular"], correcta: 1, explicacion: "Prohíbe girar izquierda." },
+            { texto: "¿Qué significa señal de 'Velocidad mínima'?", opciones: ["Velocidad máxima", "Velocidad mínima obligatoria", "Velocidad recomendada", "Fin velocidad mínima"], correcta: 1, explicacion: "Velocidad mínima obligatoria." },
+            { texto: "¿Qué indica señal de 'Peligro por desprendimiento'?", opciones: ["Caída piedras", "Curva peligrosa", "Derrumbes", "Mal estado"], correcta: 0, explicacion: "Posible caída de piedras." }
+        ],
+        dificil: [
+            { texto: "¿Qué velocidad máxima con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h con remolque." },
+            { texto: "¿Distancia a 120 km/h en 2 segundos?", opciones: ["33.3 m", "66.6 m", "100 m", "120 m"], correcta: 1, explicacion: "66.6 metros." },
+            { texto: "¿Metros mínimos al estacionar en paso de peatones?", opciones: ["5 m", "10 m", "15 m", "20 m"], correcta: 0, explicacion: "5 metros." },
+            { texto: "¿Tasa de alcohol que constituye delito penal?", opciones: ["0.5 g/l", "0.8 g/l", "1.0 g/l", "1.2 g/l"], correcta: 3, explicacion: "1.2 g/l o 0.60 mg/l." },
+            { texto: "¿Sanción por superar velocidad en más de 50 km/h?", opciones: ["200€", "300€", "500€ y 6 puntos", "600€ y 6 puntos"], correcta: 2, explicacion: "500€ y 6 puntos." },
+            { texto: "¿Cuándo está permitido adelantar por la derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas con varios carriles." },
+            { texto: "¿Qué indica señal de 'Carril de aceleración'?", opciones: ["Aumentar velocidad", "Disminuir velocidad", "Adelantar", "Estacionar"], correcta: 0, explicacion: "Aumentar velocidad para incorporarse." },
+            { texto: "¿Qué indican señales de color marrón?", opciones: ["Información turística", "Obras", "Peligro", "Servicios"], correcta: 0, explicacion: "Lugares de interés turístico." },
+            { texto: "¿Qué indica 'Peligro por viento lateral'?", opciones: ["Viento fuerte", "Curva peligrosa", "Desprendimiento", "Pavimento deslizante"], correcta: 0, explicacion: "Viento lateral fuerte." },
+            { texto: "¿Qué indica 'Zona de prioridad peatonal'?", opciones: ["Peatones prioridad", "Prohibido peatones", "Velocidad 50 km/h", "Carril peatones"], correcta: 0, explicacion: "Los peatones tienen prioridad." },
+            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["Prohibido adelantar desde continua", "Prohibido adelantar desde discontinua", "Permite adelantar ambos", "Prohibido adelantar ambos"], correcta: 0, explicacion: "No se puede adelantar desde el lado de la continua." },
+            { texto: "¿Qué significa flecha blanca pintada hacia izquierda?", opciones: ["Prohibido girar izquierda", "Dirección obligatoria izquierda", "Adelantamiento izquierda", "Carril aceleración"], correcta: 1, explicacion: "Dirección obligatoria hacia la izquierda." },
+            { texto: "¿Cuántos puntos se pierden por alcohol >0.60 mg/l?", opciones: ["4 puntos", "6 puntos", "8 puntos", "Pérdida total"], correcta: 1, explicacion: "6 puntos." },
+            { texto: "¿En qué casos está permitido adelantar por derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas con varios carriles." },
+            { texto: "¿Qué significa señal de 'Carril reversible'?", opciones: ["Carril cambia sentido", "Carril lentos", "Carril aceleración", "Carril deceleración"], correcta: 0, explicacion: "Cambia de sentido." },
+            { texto: "¿Qué velocidad máxima puede alcanzar un turismo en autovía con nieve?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h con nieve." },
+            { texto: "¿Qué sanción tiene superar velocidad máxima entre 20-30 km/h?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€"], correcta: 1, explicacion: "200€ y 2 puntos." },
+            { texto: "¿Qué velocidad máxima en autopista con niebla?", opciones: ["60 km/h", "70 km/h", "80 km/h", "90 km/h"], correcta: 0, explicacion: "60 km/h con niebla densa." },
+            { texto: "¿Cómo se calcula la distancia de seguridad?", opciones: ["Regla 2 segundos", "Regla 3 segundos", "Regla 5 segundos", "Regla 10 segundos"], correcta: 0, explicacion: "Regla de los 2 segundos." },
+            { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida adherencia agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0, explicacion: "Pérdida de adherencia por agua." },
+            { texto: "¿Cómo actuar en aquaplaning?", opciones: ["Frenar brusco", "Acelerar", "Mantener dirección no frenar", "Girar volante"], correcta: 2, explicacion: "Mantener dirección y no frenar." },
+            { texto: "¿Qué luces con niebla densa?", opciones: ["Luz larga", "Luz cruce", "Luz antiniebla", "Luz emergencia"], correcta: 2, explicacion: "Luces antiniebla." },
+            { texto: "¿Está permitido luz larga con niebla?", opciones: ["Sí recomendable", "Sí sin tráfico", "No empeora visión", "Solo carretera"], correcta: 2, explicacion: "Empeora la visibilidad." },
+            { texto: "¿Qué hacer con lluvia intensa?", opciones: ["Aumentar velocidad", "Reducir velocidad distancia", "Detenerse", "Usar luz larga"], correcta: 1, explicacion: "Reducir velocidad y aumentar distancia." },
+            { texto: "¿Qué hacer con hielo calzada?", opciones: ["Frenar brusco", "Marchas largas", "Acelerar", "Freno mano"], correcta: 1, explicacion: "Circular con marchas largas." },
+            { texto: "¿Cuándo usar cadenas obligatorio?", opciones: ["Cuando nieva", "Cuando hielo", "Cuando indique señal", "Siempre invierno"], correcta: 2, explicacion: "Cuando lo indique la señal." },
+            { texto: "¿Velocidad máxima con niebla densa?", opciones: ["Mitad límite", "30 km/h", "50 km/h", "80 km/h"], correcta: 0, explicacion: "Mitad del límite genérico." },
+            { texto: "¿Qué hacer con granizada?", opciones: ["Acelerar", "Buscar refugio", "Detenerse arcén", "Continuar"], correcta: 1, explicacion: "Buscar refugio." },
+            { texto: "¿Qué hacer en túnel largo?", opciones: ["Luces cruce", "Quitar gafas sol", "Aumentar distancia", "Todas"], correcta: 3, explicacion: "Todas las anteriores." },
+            { texto: "¿Qué hacer si sol deslumbra?", opciones: ["Cerrar ojos", "Usar visera", "Acelerar", "Detenerse"], correcta: 1, explicacion: "Usar la visera parasol." }
+        ]
+    };
+    
+    // Generar 100 tests por nivel (cada test tiene 30 preguntas ÚNICAS sin repetir)
+    function generarTests() {
+        const tests = { facil: [], medio: [], dificil: [] };
         
-        // ============================================
-        // BANCO DE PREGUNTAS (60+ preguntas por nivel para que no se repitan)
-        // ============================================
-        
-        const bancoPreguntas = {
-            facil: [
-                { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
-                { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Detenerse obligatoriamente." },
-                { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "0,3 g/l." },
-                { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 3 puntos." },
-                { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "8 puntos." },
-                { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
-                { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Ceder el paso." },
-                { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "30 km/h." },
-                { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Reducir velocidad." },
-                { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2, explicacion: "Para evitar accidentes." },
-                { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Permiso de conducir", "ITV en vigor", "Todas son correctas"], correcta: 3, explicacion: "Todas son obligatorias." },
-                { texto: "¿Durante cuánto tiempo se es conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "2 años." },
-                { texto: "¿Dónde se debe circular normalmente en una vía de doble sentido?", opciones: ["Por el carril izquierdo", "Por el carril derecho", "Por el centro", "Por el arcén"], correcta: 1, explicacion: "Por el carril derecho." },
-                { texto: "¿Qué significa la luz amarilla intermitente de un semáforo?", opciones: ["Paso prohibido", "Paso obligatorio", "Precaución, prioridad de paso", "Fin de prohibición"], correcta: 2, explicacion: "Precaución y prioridad." },
-                { texto: "¿Qué vehículos tienen prohibido circular por autopistas?", opciones: ["Ciclomotores", "Motocicletas de menos de 125cc", "Vehículos agrícolas", "Todas son correctas"], correcta: 3, explicacion: "Todos ellos." },
-                { texto: "¿Qué significa una señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0, explicacion: "Prohíbe adelantar." },
-                { texto: "¿Cuál es la sanción por no respetar un semáforo en rojo?", opciones: ["100€ y 2 puntos", "200€ y 4 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 4 puntos." },
-                { texto: "¿Qué indica una línea discontinua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar si es seguro", "Prohibido estacionar", "Zona de carga"], correcta: 1, explicacion: "Permite adelantar si es seguro." },
-                { texto: "¿Qué velocidad máxima pueden alcanzar las motocicletas en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
-                { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "2 segundos." },
-                { texto: "¿Qué debe hacer un conductor en un túnel?", opciones: ["Encender luces de cruce", "Reducir velocidad", "No adelantar", "Todas son correctas"], correcta: 3, explicacion: "Todas las anteriores." },
-                { texto: "¿Está permitido circular marcha atrás en autovía?", opciones: ["Sí, si es necesario", "Sí, para estacionar", "No, está prohibido", "Solo en caso de emergencia"], correcta: 2, explicacion: "Prohibido." },
-                { texto: "¿Qué significa una flecha blanca pintada en el pavimento?", opciones: ["Dirección obligatoria", "Zona de estacionamiento", "Prohibido girar", "Carril de aceleración"], correcta: 0, explicacion: "Dirección obligatoria." },
-                { texto: "¿Qué deben hacer los vehículos lentos en carretera?", opciones: ["Circular por el centro", "Circular por la derecha", "Utilizar el arcén", "Aumentar velocidad"], correcta: 1, explicacion: "Circular por la derecha." },
-                { texto: "¿Está permitido parar en autovía?", opciones: ["Sí, en cualquier lugar", "Sí, solo en áreas de descanso", "No, está prohibido", "Solo para emergencias"], correcta: 3, explicacion: "Solo para emergencias." },
-                { texto: "¿Qué debe hacer un conductor si un vehículo quiere adelantarle?", opciones: ["Acelerar", "Mantenerse en su carril", "Cambiar de carril", "Tocar el claxon"], correcta: 1, explicacion: "Mantenerse en su carril." },
-                { texto: "¿Cuándo está permitido utilizar el teléfono móvil al volante?", opciones: ["Siempre con manos libres", "Nunca", "Solo en caso de emergencia", "Con el vehículo detenido"], correcta: 2, explicacion: "Solo en caso de emergencia." },
-                { texto: "¿Qué debe hacer un conductor si el semáforo se pone amarillo?", opciones: ["Acelerar para pasar", "Detenerse si es seguro", "Continuar sin cambios", "Tocar el claxon"], correcta: 1, explicacion: "Detenerse si es seguro." },
-                { texto: "¿Qué debe hacer un conductor en un carril de aceleración?", opciones: ["Detenerse", "Acelerar para incorporarse", "Reducir velocidad", "Circular marcha atrás"], correcta: 1, explicacion: "Acelerar para incorporarse." },
-                { texto: "¿Qué debe hacer un conductor en un carril de deceleración?", opciones: ["Acelerar", "Reducir velocidad para salir", "Detenerse", "Adelantar"], correcta: 1, explicacion: "Reducir velocidad." },
-                { texto: "¿Qué significa una señal de 'Prohibido estacionar'?", opciones: ["No se puede parar", "No se puede estacionar", "No se puede circular", "Zona de carga"], correcta: 1, explicacion: "Prohíbe estacionar." },
-                { texto: "¿Qué indica una señal de 'Curva peligrosa'?", opciones: ["Curva a la izquierda", "Curva a la derecha", "Curva cerrada", "Todas según dibujo"], correcta: 3, explicacion: "Según el dibujo." },
-                { texto: "¿Qué indica una señal de 'Zona escolar'?", opciones: ["Proximidad colegio", "Velocidad 20 km/h", "Precaución niños", "Todas correctas"], correcta: 3, explicacion: "Todas las anteriores." },
-                { texto: "¿Qué indican las señales de color naranja?", opciones: ["Obras", "Servicios", "Peligro", "Información turística"], correcta: 0, explicacion: "Indican obras." },
-                { texto: "¿Qué significa una señal de 'Senda ciclista'?", opciones: ["Vía para bicicletas", "Prohibido bicicletas", "Carril bici", "Zona peatonal"], correcta: 0, explicacion: "Vía para bicicletas." },
-                { texto: "¿Qué significa una señal de 'Sentido obligatorio'?", opciones: ["Dirección obligatoria", "Prohibido girar", "Calle sentido único", "Calle peatonal"], correcta: 0, explicacion: "Dirección obligatoria." },
-                { texto: "¿Qué indica una señal de 'Paso de peatones'?", opciones: ["Prohibido cruzar", "Zona cruce peatones", "Carril bici", "Zona carga"], correcta: 1, explicacion: "Zona de cruce de peatones." },
-                { texto: "¿Qué significa una señal de 'Túnel'?", opciones: ["Paso inferior", "Paso superior", "Proximidad túnel", "Zona obras"], correcta: 2, explicacion: "Proximidad de un túnel." },
-                { texto: "¿Qué indica una señal de 'Glacis'?", opciones: ["Paso elevado", "Resalto", "Lomo de asno", "Todas correctas"], correcta: 3, explicacion: "Resalto en la calzada." },
-                { texto: "¿Qué indica una señal de 'Carril bus'?", opciones: ["Carril exclusivo autobuses", "Carril alta ocupación", "Carril bicicletas", "Carril emergencia"], correcta: 0, explicacion: "Carril exclusivo para autobuses." }
-            ],
-            medio: [
-                { texto: "¿Qué velocidad máxima puede alcanzar un turismo en autopista con lluvia?", opciones: ["100 km/h", "110 km/h", "120 km/h", "80 km/h"], correcta: 0, explicacion: "100 km/h con lluvia." },
-                { texto: "¿Qué significa una señal de 'Paso a nivel sin barreras'?", opciones: ["Paso a nivel con barreras", "Paso a nivel sin barreras", "Paso inferior", "Paso superior"], correcta: 1, explicacion: "Paso a nivel sin barreras." },
-                { texto: "¿Cuántos puntos se pierden por conducir con alcohol >0.60 mg/l?", opciones: ["4 puntos", "6 puntos", "8 puntos", "Pérdida total"], correcta: 1, explicacion: "6 puntos." },
-                { texto: "¿Qué significa una señal de 'Zona de bajas emisiones'?", opciones: ["Restricción circulación", "Prohibido estacionar", "Zona peatonal", "Carril bici"], correcta: 0, explicacion: "Restricción de circulación." },
-                { texto: "¿Qué deben hacer los vehículos lentos en carretera?", opciones: ["Circular centro", "Circular derecha", "Utilizar arcén", "Aumentar velocidad"], correcta: 1, explicacion: "Circular por la derecha." },
-                { texto: "¿Qué indica una señal de 'Carril reversible'?", opciones: ["Carril cambia sentido", "Carril vehículos lentos", "Carril aceleración", "Carril deceleración"], correcta: 0, explicacion: "Cambia de sentido." },
-                { texto: "¿Cuál es la distancia de seguridad con lluvia?", opciones: ["2 segundos", "3 segundos", "4 segundos", "5 segundos"], correcta: 1, explicacion: "3-4 segundos." },
-                { texto: "¿Qué significa una señal de 'Prohibido girar en U'?", opciones: ["Prohibido cambiar sentido", "Prohibido girar izquierda", "Prohibido girar derecha", "Prohibido circular"], correcta: 0, explicacion: "Prohibido cambiar de sentido." },
-                { texto: "¿Qué velocidad máxima pueden alcanzar los camiones en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 1, explicacion: "90 km/h." },
-                { texto: "¿Qué indica una señal de 'Carril bus'?", opciones: ["Carril exclusivo autobuses", "Carril alta ocupación", "Carril bicicletas", "Carril emergencia"], correcta: 0, explicacion: "Exclusivo autobuses." },
-                { texto: "¿Qué velocidad máxima con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h." },
-                { texto: "¿Distancia a 120 km/h en 2 segundos?", opciones: ["33.3 m", "66.6 m", "100 m", "120 m"], correcta: 1, explicacion: "66.6 metros." },
-                { texto: "¿Metros mínimos al estacionar en paso de peatones?", opciones: ["5 m", "10 m", "15 m", "20 m"], correcta: 0, explicacion: "5 metros." },
-                { texto: "¿Tasa de alcohol que constituye delito penal?", opciones: ["0.5 g/l", "0.8 g/l", "1.0 g/l", "1.2 g/l"], correcta: 3, explicacion: "1.2 g/l." },
-                { texto: "¿Sanción por superar velocidad en más de 50 km/h?", opciones: ["200€", "300€", "500€ y 6 puntos", "600€ y 6 puntos"], correcta: 2, explicacion: "500€ y 6 puntos." },
-                { texto: "¿Cuándo está permitido adelantar por la derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas varios carriles." },
-                { texto: "¿Qué indica señal de 'Carril de aceleración'?", opciones: ["Aumentar velocidad", "Disminuir velocidad", "Adelantar", "Estacionar"], correcta: 0, explicacion: "Aumentar velocidad." },
-                { texto: "¿Qué indican señales de color marrón?", opciones: ["Información turística", "Obras", "Peligro", "Servicios"], correcta: 0, explicacion: "Lugares turísticos." },
-                { texto: "¿Qué indica 'Peligro por viento lateral'?", opciones: ["Viento fuerte", "Curva peligrosa", "Desprendimiento", "Pavimento deslizante"], correcta: 0, explicacion: "Viento lateral." },
-                { texto: "¿Qué indica 'Zona de prioridad peatonal'?", opciones: ["Peatones prioridad", "Prohibido peatones", "Velocidad 50", "Carril peatones"], correcta: 0, explicacion: "Prioridad peatones." },
-                { texto: "¿Qué significa una línea continua amarilla en el bordillo?", opciones: ["Prohibido estacionar", "Prohibido parar", "Zona carga", "Parada bus"], correcta: 1, explicacion: "Prohibido parar y estacionar." },
-                { texto: "¿Qué indica un semáforo con flecha verde?", opciones: ["Prohibido paso", "Paso permitido dirección", "Precaución", "Fin prohibición"], correcta: 1, explicacion: "Paso en esa dirección." },
-                { texto: "¿Qué señal indica 'Ceda el paso'?", opciones: ["Triángulo invertido", "Círculo rojo", "Octógono rojo", "Cuadrado azul"], correcta: 0, explicacion: "Triángulo invertido." },
-                { texto: "¿Qué color tienen las señales de autopista?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 1, explicacion: "Fondo verde." },
-                { texto: "¿Qué indica señal cuadrada o rectangular azul?", opciones: ["Prohibición", "Peligro", "Información o servicio", "Obligación"], correcta: 2, explicacion: "Información o servicio." },
-                { texto: "¿Qué significa señal con peatón dentro triángulo?", opciones: ["Paso peatones", "Zona peatonal", "Peligro peatones", "Prohibido peatones"], correcta: 2, explicacion: "Peligro por peatones." },
-                { texto: "¿Qué indica señal de 'Carril adicional'?", opciones: ["Carril lentos", "Carril adelantar", "Carril incorporarse", "Carril exclusivo"], correcta: 2, explicacion: "Carril para incorporarse." },
-                { texto: "¿Qué significa señal de 'Prohibido girar izquierda'?", opciones: ["Prohibido girar U", "Prohibido girar izquierda", "Prohibido girar derecha", "Prohibido circular"], correcta: 1, explicacion: "Prohíbe girar izquierda." },
-                { texto: "¿Qué significa señal de 'Velocidad mínima'?", opciones: ["Velocidad máxima", "Velocidad mínima obligatoria", "Velocidad recomendada", "Fin velocidad mínima"], correcta: 1, explicacion: "Velocidad mínima obligatoria." },
-                { texto: "¿Qué indica señal de 'Peligro por desprendimiento'?", opciones: ["Caída piedras", "Curva peligrosa", "Derrumbes", "Mal estado"], correcta: 0, explicacion: "Posible caída de piedras." }
-            ],
-            dificil: [
-                { texto: "¿Qué velocidad máxima con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h con remolque." },
-                { texto: "¿Distancia a 120 km/h en 2 segundos?", opciones: ["33.3 m", "66.6 m", "100 m", "120 m"], correcta: 1, explicacion: "66.6 metros." },
-                { texto: "¿Metros mínimos al estacionar en paso de peatones?", opciones: ["5 m", "10 m", "15 m", "20 m"], correcta: 0, explicacion: "5 metros." },
-                { texto: "¿Tasa de alcohol que constituye delito penal?", opciones: ["0.5 g/l", "0.8 g/l", "1.0 g/l", "1.2 g/l"], correcta: 3, explicacion: "1.2 g/l o 0.60 mg/l." },
-                { texto: "¿Sanción por superar velocidad en más de 50 km/h?", opciones: ["200€", "300€", "500€ y 6 puntos", "600€ y 6 puntos"], correcta: 2, explicacion: "500€ y 6 puntos." },
-                { texto: "¿Cuándo está permitido adelantar por la derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas con varios carriles." },
-                { texto: "¿Qué indica señal de 'Carril de aceleración'?", opciones: ["Aumentar velocidad", "Disminuir velocidad", "Adelantar", "Estacionar"], correcta: 0, explicacion: "Aumentar velocidad para incorporarse." },
-                { texto: "¿Qué indican señales de color marrón?", opciones: ["Información turística", "Obras", "Peligro", "Servicios"], correcta: 0, explicacion: "Lugares de interés turístico." },
-                { texto: "¿Qué indica 'Peligro por viento lateral'?", opciones: ["Viento fuerte", "Curva peligrosa", "Desprendimiento", "Pavimento deslizante"], correcta: 0, explicacion: "Viento lateral fuerte." },
-                { texto: "¿Qué indica 'Zona de prioridad peatonal'?", opciones: ["Peatones prioridad", "Prohibido peatones", "Velocidad 50 km/h", "Carril peatones"], correcta: 0, explicacion: "Los peatones tienen prioridad." },
-                { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["Prohibido adelantar desde continua", "Prohibido adelantar desde discontinua", "Permite adelantar ambos", "Prohibido adelantar ambos"], correcta: 0, explicacion: "No se puede adelantar desde el lado de la continua." },
-                { texto: "¿Qué significa flecha blanca pintada hacia izquierda?", opciones: ["Prohibido girar izquierda", "Dirección obligatoria izquierda", "Adelantamiento izquierda", "Carril aceleración"], correcta: 1, explicacion: "Dirección obligatoria hacia la izquierda." },
-                { texto: "¿Cuántos puntos se pierden por alcohol >0.60 mg/l?", opciones: ["4 puntos", "6 puntos", "8 puntos", "Pérdida total"], correcta: 1, explicacion: "6 puntos." },
-                { texto: "¿En qué casos está permitido adelantar por derecha?", opciones: ["Autopistas", "Vías urbanas varios carriles", "Carreteras convencionales", "Nunca"], correcta: 1, explicacion: "Vías urbanas con varios carriles." },
-                { texto: "¿Qué significa señal de 'Carril reversible'?", opciones: ["Carril cambia sentido", "Carril lentos", "Carril aceleración", "Carril deceleración"], correcta: 0, explicacion: "Cambia de sentido." },
-                { texto: "¿Qué velocidad máxima puede alcanzar un turismo en autovía con nieve?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0, explicacion: "80 km/h con nieve." },
-                { texto: "¿Qué sanción tiene superar velocidad máxima entre 20-30 km/h?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€"], correcta: 1, explicacion: "200€ y 2 puntos." },
-                { texto: "¿Qué velocidad máxima en autopista con niebla?", opciones: ["60 km/h", "70 km/h", "80 km/h", "90 km/h"], correcta: 0, explicacion: "60 km/h con niebla densa." },
-                { texto: "¿Cómo se calcula la distancia de seguridad?", opciones: ["Regla 2 segundos", "Regla 3 segundos", "Regla 5 segundos", "Regla 10 segundos"], correcta: 0, explicacion: "Regla de los 2 segundos." },
-                { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida adherencia agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0, explicacion: "Pérdida de adherencia por agua." },
-                { texto: "¿Cómo actuar en aquaplaning?", opciones: ["Frenar brusco", "Acelerar", "Mantener dirección no frenar", "Girar volante"], correcta: 2, explicacion: "Mantener dirección y no frenar." },
-                { texto: "¿Qué luces con niebla densa?", opciones: ["Luz larga", "Luz cruce", "Luz antiniebla", "Luz emergencia"], correcta: 2, explicacion: "Luces antiniebla." },
-                { texto: "¿Está permitido luz larga con niebla?", opciones: ["Sí recomendable", "Sí sin tráfico", "No empeora visión", "Solo carretera"], correcta: 2, explicacion: "Empeora la visibilidad." },
-                { texto: "¿Qué hacer con lluvia intensa?", opciones: ["Aumentar velocidad", "Reducir velocidad distancia", "Detenerse", "Usar luz larga"], correcta: 1, explicacion: "Reducir velocidad y aumentar distancia." },
-                { texto: "¿Qué hacer con hielo calzada?", opciones: ["Frenar brusco", "Marchas largas", "Acelerar", "Freno mano"], correcta: 1, explicacion: "Circular con marchas largas." },
-                { texto: "¿Cuándo usar cadenas obligatorio?", opciones: ["Cuando nieva", "Cuando hielo", "Cuando indique señal", "Siempre invierno"], correcta: 2, explicacion: "Cuando lo indique la señal." },
-                { texto: "¿Velocidad máxima con niebla densa?", opciones: ["Mitad límite", "30 km/h", "50 km/h", "80 km/h"], correcta: 0, explicacion: "Mitad del límite genérico." },
-                { texto: "¿Qué hacer con granizada?", opciones: ["Acelerar", "Buscar refugio", "Detenerse arcén", "Continuar"], correcta: 1, explicacion: "Buscar refugio." },
-                { texto: "¿Qué hacer en túnel largo?", opciones: ["Luces cruce", "Quitar gafas sol", "Aumentar distancia", "Todas"], correcta: 3, explicacion: "Todas las anteriores." },
-                { texto: "¿Qué hacer si sol deslumbra?", opciones: ["Cerrar ojos", "Usar visera", "Acelerar", "Detenerse"], correcta: 1, explicacion: "Usar la visera parasol." }
-            ]
-        };
-        
-        // Generar 100 tests por nivel (cada test tiene 30 preguntas ÚNICAS sin repetir)
-        function generarTests() {
-            const tests = { facil: [], medio: [], dificil: [] };
+        for (let nivel of ['facil', 'medio', 'dificil']) {
+            const banco = [...bancoPreguntas[nivel]];
             
-            for (let nivel of ['facil', 'medio', 'dificil']) {
-                const banco = [...bancoPreguntas[nivel]];
+            for (let i = 1; i <= 100; i++) {
+                const mezcladas = [...banco];
+                for (let j = mezcladas.length - 1; j > 0; j--) {
+                    const k = Math.floor(Math.random() * (j + 1));
+                    [mezcladas[j], mezcladas[k]] = [mezcladas[k], mezcladas[j]];
+                }
                 
-                for (let i = 1; i <= 100; i++) {
-                    // Mezclar el banco de preguntas
-                    const mezcladas = [...banco];
-                    for (let j = mezcladas.length - 1; j > 0; j--) {
-                        const k = Math.floor(Math.random() * (j + 1));
-                        [mezcladas[j], mezcladas[k]] = [mezcladas[k], mezcladas[j]];
-                    }
-                    
-                    // Tomar 30 preguntas (son únicas porque el banco tiene más de 30)
-                    const preguntasTest = mezcladas.slice(0, 30).map((p, idx) => ({
-                        id: idx,
-                        texto: p.texto,
-                        opciones: [...p.opciones],
-                        correcta: p.correcta,
-                        explicacion: p.explicacion
-                    }));
-                    
-                    tests[nivel].push({
-                        id: i,
-                        numero: i,
-                        nombre: `Test ${nivel === 'facil' ? 'Fácil' : nivel === 'medio' ? 'Medio' : 'Difícil'} ${i}`,
-                        nivel: nivel,
-                        preguntas: preguntasTest
-                    });
-                }
-            }
-            return tests;
-        }
-        
-        const TESTS = generarTests();
-        
-        let testActual = null;
-        let indiceActual = 0;
-        let aciertos = 0;
-        let fallos = 0;
-        let respuestaSeleccionada = false;
-        let testActivo = false;
-        let nivelSeleccionadoActual = null;
-        let currentUser = null;
-        
-        function mostrarTestsPorNivel(nivel) {
-            nivelSeleccionadoActual = nivel;
-            const tests = TESTS[nivel];
-            const titulo = nivel === 'facil' ? '📋 Tests Fáciles' : nivel === 'medio' ? '📋 Tests Medios' : '📋 Tests Difíciles';
-            document.getElementById('nivelSeleccionadoTitle').textContent = titulo;
-            
-            const grid = document.getElementById('testsGrid');
-            grid.innerHTML = tests.map(test => `
-                <div class="test-item" data-test-id="${test.id}" data-test-nivel="${nivel}">
-                    <div class="test-numero">Test ${test.numero}</div>
-                    <div class="test-titulo">30 preguntas</div>
-                </div>
-            `).join('');
-            
-            document.querySelectorAll('.test-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const testId = parseInt(item.dataset.testId);
-                    const testNivel = item.dataset.testNivel;
-                    iniciarTest(testNivel, testId);
+                const preguntasTest = mezcladas.slice(0, 30).map((p, idx) => ({
+                    id: idx,
+                    texto: p.texto,
+                    opciones: [...p.opciones],
+                    correcta: p.correcta,
+                    explicacion: p.explicacion
+                }));
+                
+                tests[nivel].push({
+                    id: i,
+                    numero: i,
+                    nombre: `Test ${nivel === 'facil' ? 'Fácil' : nivel === 'medio' ? 'Medio' : 'Difícil'} ${i}`,
+                    nivel: nivel,
+                    preguntas: preguntasTest
                 });
+            }
+        }
+        return tests;
+    }
+    
+    const TESTS = generarTests();
+    
+    let testActual = null;
+    let indiceActual = 0;
+    let aciertos = 0;
+    let fallos = 0;
+    let respuestaSeleccionada = false;
+    let testActivo = false;
+    let nivelSeleccionadoActual = null;
+    let currentUser = null;
+    
+    function mostrarToast(mensaje) {
+        const toast = document.createElement('div');
+        toast.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:9999; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><i class="fas fa-check-circle"></i> ${mensaje}</div>`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function mostrarTestsPorNivel(nivel) {
+        nivelSeleccionadoActual = nivel;
+        const tests = TESTS[nivel];
+        const titulo = nivel === 'facil' ? '📋 Tests Fáciles' : nivel === 'medio' ? '📋 Tests Medios' : '📋 Tests Difíciles';
+        document.getElementById('nivelSeleccionadoTitle').textContent = titulo;
+        
+        const grid = document.getElementById('testsGrid');
+        grid.innerHTML = tests.map(test => `
+            <div class="test-item" data-test-id="${test.id}" data-test-nivel="${nivel}">
+                <div class="test-numero">Test ${test.numero}</div>
+                <div class="test-titulo">30 preguntas</div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.test-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const testId = parseInt(item.dataset.testId);
+                const testNivel = item.dataset.testNivel;
+                iniciarTest(testNivel, testId);
             });
-            
-            document.getElementById('nivelSection').style.display = 'none';
-            document.getElementById('testsSection').style.display = 'block';
-            document.getElementById('statsTest').style.display = 'none';
-            document.getElementById('questionCard').style.display = 'none';
-            document.getElementById('resultadoFinal').style.display = 'none';
+        });
+        
+        document.getElementById('nivelSection').style.display = 'none';
+        document.getElementById('testsSection').style.display = 'block';
+        document.getElementById('statsTest').style.display = 'none';
+        document.getElementById('questionCard').style.display = 'none';
+        document.getElementById('resultadoFinal').style.display = 'none';
+    }
+    
+    function iniciarTest(nivel, testId) {
+        const tests = TESTS[nivel];
+        testActual = tests.find(t => t.id === testId);
+        if (!testActual) return;
+        
+        indiceActual = 0;
+        aciertos = 0;
+        fallos = 0;
+        respuestaSeleccionada = false;
+        testActivo = true;
+        
+        document.getElementById('totalPreguntas').textContent = testActual.preguntas.length;
+        document.getElementById('aciertos').textContent = aciertos;
+        document.getElementById('fallos').textContent = fallos;
+        document.getElementById('statsTest').style.display = 'flex';
+        document.getElementById('testsSection').style.display = 'none';
+        document.getElementById('resultadoFinal').style.display = 'none';
+        
+        cargarPregunta();
+    }
+    
+    function cargarPregunta() {
+        if (indiceActual >= testActual.preguntas.length) {
+            finalizarTest();
+            return;
         }
         
-        function iniciarTest(nivel, testId) {
-            const tests = TESTS[nivel];
-            testActual = tests.find(t => t.id === testId);
-            if (!testActual) return;
-            
-            indiceActual = 0;
-            aciertos = 0;
-            fallos = 0;
-            respuestaSeleccionada = false;
-            testActivo = true;
-            
-            document.getElementById('totalPreguntas').textContent = testActual.preguntas.length;
+        const pregunta = testActual.preguntas[indiceActual];
+        document.getElementById('preguntaActual').textContent = indiceActual + 1;
+        actualizarProgreso();
+        
+        const questionCard = document.getElementById('questionCard');
+        questionCard.style.display = 'block';
+        questionCard.innerHTML = `
+            <div class="question-header">
+                <div class="pregunta-numero">Pregunta ${indiceActual + 1}</div>
+            </div>
+            <div class="question-text">${escapeHtml(pregunta.texto)}</div>
+            <div class="options" id="optionsContainer">
+                ${pregunta.opciones.map((opt, idx) => `
+                    <div class="option-btn" data-opcion="${idx}">
+                        <span class="option-prefix">${String.fromCharCode(65 + idx)}.</span>
+                        <span>${escapeHtml(opt)}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div id="feedback" class="feedback"></div>
+            <button class="btn-siguiente" id="btnSiguiente">Siguiente pregunta →</button>
+        `;
+        
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
+        });
+        
+        document.getElementById('btnSiguiente').addEventListener('click', () => {
+            if (respuestaSeleccionada) {
+                indiceActual++;
+                respuestaSeleccionada = false;
+                cargarPregunta();
+            }
+        });
+        
+        respuestaSeleccionada = false;
+        document.getElementById('btnSiguiente').style.display = 'none';
+    }
+    
+    function responder(opcion) {
+        if (respuestaSeleccionada || !testActivo) return;
+        
+        const pregunta = testActual.preguntas[indiceActual];
+        const esCorrecto = (opcion === pregunta.correcta);
+        
+        respuestaSeleccionada = true;
+        
+        if (esCorrecto) {
+            aciertos++;
             document.getElementById('aciertos').textContent = aciertos;
+            mostrarFeedback(true, pregunta.explicacion || "¡Respuesta correcta!");
+        } else {
+            fallos++;
             document.getElementById('fallos').textContent = fallos;
-            document.getElementById('statsTest').style.display = 'flex';
-            document.getElementById('testsSection').style.display = 'none';
-            document.getElementById('resultadoFinal').style.display = 'none';
-            
-            cargarPregunta();
+            const letraCorrecta = String.fromCharCode(65 + pregunta.correcta);
+            mostrarFeedback(false, `Respuesta incorrecta. La correcta era ${letraCorrecta}. ${pregunta.explicacion || ''}`);
         }
         
-        function cargarPregunta() {
-            if (indiceActual >= testActual.preguntas.length) {
-                finalizarTest();
-                return;
-            }
-            
-            const pregunta = testActual.preguntas[indiceActual];
-            document.getElementById('preguntaActual').textContent = indiceActual + 1;
-            actualizarProgreso();
-            
-            const questionCard = document.getElementById('questionCard');
-            questionCard.style.display = 'block';
-            questionCard.innerHTML = `
-                <div class="question-header">
-                    <div class="pregunta-numero">Pregunta ${indiceActual + 1}</div>
-                </div>
-                <div class="question-text">${escapeHtml(pregunta.texto)}</div>
-                <div class="options" id="optionsContainer">
-                    ${pregunta.opciones.map((opt, idx) => `
-                        <div class="option-btn" data-opcion="${idx}">
-                            <span class="option-prefix">${String.fromCharCode(65 + idx)}.</span>
-                            <span>${escapeHtml(opt)}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                <div id="feedback" class="feedback"></div>
-                <button class="btn-siguiente" id="btnSiguiente">Siguiente pregunta →</button>
-            `;
-            
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
-            });
-            
-            document.getElementById('btnSiguiente').addEventListener('click', () => {
-                if (respuestaSeleccionada) {
-                    indiceActual++;
-                    respuestaSeleccionada = false;
-                    cargarPregunta();
-                }
-            });
-            
-            respuestaSeleccionada = false;
-            document.getElementById('btnSiguiente').style.display = 'none';
-        }
+        actualizarProgreso();
         
-        function responder(opcion) {
-            if (respuestaSeleccionada || !testActivo) return;
-            
-            const pregunta = testActual.preguntas[indiceActual];
-            const esCorrecto = (opcion === pregunta.correcta);
-            
-            respuestaSeleccionada = true;
-            
-            if (esCorrecto) {
-                aciertos++;
-                document.getElementById('aciertos').textContent = aciertos;
-                mostrarFeedback(true, pregunta.explicacion || "¡Respuesta correcta!");
-            } else {
-                fallos++;
-                document.getElementById('fallos').textContent = fallos;
-                const letraCorrecta = String.fromCharCode(65 + pregunta.correcta);
-                mostrarFeedback(false, `Respuesta incorrecta. La correcta era ${letraCorrecta}. ${pregunta.explicacion || ''}`);
-            }
-            
-            actualizarProgreso();
-            
-            const opciones = document.querySelectorAll('.option-btn');
-            opciones.forEach((btn, idx) => {
-                btn.classList.add('disabled');
-                if (idx === pregunta.correcta) btn.classList.add('correct');
-                if (idx === opcion && opcion !== pregunta.correcta) btn.classList.add('incorrect');
-            });
-            
-            document.getElementById('btnSiguiente').style.display = 'block';
-        }
-        
-        function mostrarFeedback(esCorrecto, mensaje) {
-            const feedbackDiv = document.getElementById('feedback');
-            feedbackDiv.className = `feedback ${esCorrecto ? 'correct' : 'wrong'}`;
-            feedbackDiv.innerHTML = `<i class="fas ${esCorrecto ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${mensaje}`;
-            feedbackDiv.style.display = 'block';
-        }
-        
-        function actualizarProgreso() {
-            const porcentaje = ((indiceActual + 1) / testActual.preguntas.length) * 100;
-            document.getElementById('progressFill').style.width = `${porcentaje}%`;
-        }
-        
-        async function finalizarTest() {
-            testActivo = false;
-            const porcentaje = Math.round((aciertos / testActual.preguntas.length) * 100);
-            const aprobado = porcentaje >= 90;
-            
-            if (currentUser) {
-                await window.actualizarEstadisticasTest(currentUser.uid, aciertos, testActual.preguntas.length, testActual.nombre);
-            }
-            
-            const resultadoDiv = document.getElementById('resultadoFinal');
-            resultadoDiv.style.display = 'block';
-            resultadoDiv.innerHTML = `
-                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 4rem; color: #f5b042;"></i>
-                <h2>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h2>
-                <div class="puntuacion-final">${porcentaje}%</div>
-                <p>Has acertado <strong>${aciertos}</strong> de <strong>${testActual.preguntas.length}</strong> preguntas</p>
-                <p>Test: <strong>${testActual.nombre}</strong> - Nivel: ${testActual.nivel === 'facil' ? '🌱 Fácil' : testActual.nivel === 'medio' ? '⚡ Medio' : '🔥 Difícil'}</p>
-                <button class="btn-reiniciar" id="btnReiniciar"><i class="fas fa-redo"></i> Volver a tests</button>
-            `;
-            
-            document.getElementById('questionCard').style.display = 'none';
-            document.getElementById('statsTest').style.display = 'none';
-            
-            document.getElementById('btnReiniciar').addEventListener('click', () => {
-                mostrarTestsPorNivel(testActual.nivel);
-            });
-        }
-        
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-        
-        document.querySelectorAll('.nivel-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const nivel = card.dataset.nivel;
-                mostrarTestsPorNivel(nivel);
-            });
+        const opciones = document.querySelectorAll('.option-btn');
+        opciones.forEach((btn, idx) => {
+            btn.classList.add('disabled');
+            if (idx === pregunta.correcta) btn.classList.add('correct');
+            if (idx === opcion && opcion !== pregunta.correcta) btn.classList.add('incorrect');
         });
         
-        document.getElementById('btnVolverNivel').addEventListener('click', () => {
-            document.getElementById('nivelSection').style.display = 'block';
-            document.getElementById('testsSection').style.display = 'none';
-            document.getElementById('statsTest').style.display = 'none';
-            document.getElementById('questionCard').style.display = 'none';
-            document.getElementById('resultadoFinal').style.display = 'none';
+        document.getElementById('btnSiguiente').style.display = 'block';
+    }
+    
+    function mostrarFeedback(esCorrecto, mensaje) {
+        const feedbackDiv = document.getElementById('feedback');
+        feedbackDiv.className = `feedback ${esCorrecto ? 'correct' : 'wrong'}`;
+        feedbackDiv.innerHTML = `<i class="fas ${esCorrecto ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${mensaje}`;
+        feedbackDiv.style.display = 'block';
+    }
+    
+    function actualizarProgreso() {
+        const porcentaje = ((indiceActual + 1) / testActual.preguntas.length) * 100;
+        document.getElementById('progressFill').style.width = `${porcentaje}%`;
+    }
+    
+    async function finalizarTest() {
+        testActivo = false;
+        const porcentaje = Math.round((aciertos / testActual.preguntas.length) * 100);
+        const aprobado = porcentaje >= 90;
+        
+        if (currentUser) {
+            await window.actualizarEstadisticasTest(currentUser.uid, aciertos, testActual.preguntas.length, testActual.nombre);
+        }
+        
+        const resultadoDiv = document.getElementById('resultadoFinal');
+        resultadoDiv.style.display = 'block';
+        resultadoDiv.innerHTML = `
+            <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 4rem; color: #f5b042;"></i>
+            <h2>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h2>
+            <div class="puntuacion-final">${porcentaje}%</div>
+            <p>Has acertado <strong>${aciertos}</strong> de <strong>${testActual.preguntas.length}</strong> preguntas</p>
+            <p>Test: <strong>${testActual.nombre}</strong> - Nivel: ${testActual.nivel === 'facil' ? '🌱 Fácil' : testActual.nivel === 'medio' ? '⚡ Medio' : '🔥 Difícil'}</p>
+            <button class="btn-reiniciar" id="btnReiniciar"><i class="fas fa-redo"></i> Volver a tests</button>
+        `;
+        
+        document.getElementById('questionCard').style.display = 'none';
+        document.getElementById('statsTest').style.display = 'none';
+        
+        document.getElementById('btnReiniciar').addEventListener('click', () => {
+            mostrarTestsPorNivel(testActual.nivel);
         });
         
-        onAuthStateChanged(auth, (user) => {
-            renderUserZone();
-            if (!user) {
-                window.location.href = '../login.html';
-            } else {
-                currentUser = user;
-            }
+        // ✅ GUARDAR TEST COMO COMPLETADO
+        if (currentUser) {
+            const resultado = { aciertos, total: testActual.preguntas.length, porcentaje };
+            await marcarTestCompletado(currentUser.uid, TIPOS_TEST.COMPLETO, resultado);
+            mostrarToast('✅ Test completo finalizado. Progreso guardado correctamente.');
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
         });
-        
-        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-            const wrapper = document.getElementById('navWrapper');
-            if (wrapper) wrapper.classList.toggle('active');
+    }
+    
+    document.querySelectorAll('.nivel-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const nivel = card.dataset.nivel;
+            mostrarTestsPorNivel(nivel);
         });
-    </script>
+    });
+    
+    document.getElementById('btnVolverNivel').addEventListener('click', () => {
+        document.getElementById('nivelSection').style.display = 'block';
+        document.getElementById('testsSection').style.display = 'none';
+        document.getElementById('statsTest').style.display = 'none';
+        document.getElementById('questionCard').style.display = 'none';
+        document.getElementById('resultadoFinal').style.display = 'none';
+    });
+    
+    onAuthStateChanged(auth, (user) => {
+        renderUserZone();
+        if (!user) {
+            window.location.href = '../login.html';
+        } else {
+            currentUser = user;
+        }
+    });
+    
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+        const wrapper = document.getElementById('navWrapper');
+        if (wrapper) wrapper.classList.toggle('active');
+    });
+</script>
 </body>
 </html>

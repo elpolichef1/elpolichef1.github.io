@@ -219,6 +219,34 @@
         .test-card:nth-child(2) { animation-delay: 0.1s; }
         .test-card:nth-child(3) { animation-delay: 0.15s; }
         .test-card:nth-child(4) { animation-delay: 0.2s; }
+    
+    /* Añade esto al final del style */
+.test-card.completado {
+    border: 2px solid #10b981;
+    background: linear-gradient(135deg, #ffffff, #f0fdf4);
+}
+
+.test-card.completado::before {
+    background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.badge-completado {
+    display: inline-block;
+    background: #10b981;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-completado i {
+    margin-right: 5px;
+}
+
+.test-card.completado .test-badge {
+    display: none;
+}
     </style>
 </head>
 <body>
@@ -329,83 +357,62 @@
     </footer>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc } from '../js/firebase-init.js';
-        import { renderUserZone } from '../js/global-auth.js';
+    import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+    import { renderUserZone } from '../js/global-auth.js';
+    import { obtenerProgresoTest, TIPOS_TEST } from '../js/progreso-tests.js';
+    
+    // Mapeo de IDs de test
+    const testIds = {
+        'test-rapido.html': TIPOS_TEST.RAPIDO,
+        'test-completo.html': TIPOS_TEST.COMPLETO,
+        'test-por-temas.html': TIPOS_TEST.POR_TEMAS,
+        'test-examen.html': TIPOS_TEST.EXAMEN
+    };
+    
+    // Función para marcar tests completados en la interfaz
+    async function marcarTestsCompletados(userId) {
+        if (!userId) return;
         
-        // Clave para estadísticas en localStorage
-        const STATS_KEY = 'aprobadoya_test_stats';
+        const progreso = await obtenerProgresoTest(userId);
         
-        // Cargar estadísticas desde localStorage
-        function cargarEstadisticas() {
-            const stats = JSON.parse(localStorage.getItem(STATS_KEY) || '{}');
-            document.getElementById('totalTests').textContent = stats.totalTests || 0;
-            document.getElementById('testsAprobados').textContent = stats.testsAprobados || 0;
-            document.getElementById('tasaAciertos').textContent = `${stats.tasaAciertos || 0}%`;
-            document.getElementById('mejorResultado').textContent = `${stats.mejorResultado || 0}%`;
-        }
-        
-        // Guardar estadísticas en localStorage y sincronizar con Firestore
-        async function guardarEstadisticas(userId, aciertos, total, testNombre) {
-            const porcentaje = Math.round((aciertos / total) * 100);
-            const aprobado = porcentaje >= 90;
+        // Recorrer cada tarjeta de test
+        document.querySelectorAll('.test-card').forEach(card => {
+            const onclickAttr = card.getAttribute('onclick');
+            let testPage = '';
             
-            // Actualizar localStorage
-            const stats = JSON.parse(localStorage.getItem(STATS_KEY) || '{}');
-            stats.totalTests = (stats.totalTests || 0) + 1;
-            if (aprobado) stats.testsAprobados = (stats.testsAprobados || 0) + 1;
+            if (onclickAttr) {
+                const match = onclickAttr.match(/'(.*?)'/);
+                if (match) testPage = match[1];
+            }
             
-            // Calcular nueva tasa de aciertos
-            const nuevosAciertosTotales = (stats.totalAciertos || 0) + aciertos;
-            const nuevasPreguntasTotales = (stats.totalPreguntas || 0) + total;
-            stats.tasaAciertos = Math.round((nuevosAciertosTotales / nuevasPreguntasTotales) * 100);
-            stats.mejorResultado = Math.max(stats.mejorResultado || 0, porcentaje);
-            stats.totalAciertos = nuevosAciertosTotales;
-            stats.totalPreguntas = nuevasPreguntasTotales;
-            
-            localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-            
-            // Actualizar también en Firestore
-            if (userId) {
-                const userRef = doc(db, "usuarios", userId);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    const nuevosTests = (userData.testsRealizados || 0) + 1;
-                    const nuevosAciertosFirestore = (userData.totalAciertos || 0) + aciertos;
-                    const nuevasPreguntasFirestore = (userData.totalPreguntas || 0) + total;
-                    const nuevaMedia = Math.round((nuevosAciertosFirestore / nuevasPreguntasFirestore) * 100);
-                    const nuevoMejor = Math.max(userData.mejorResultado || 0, porcentaje);
-                    
-                    await updateDoc(userRef, {
-                        testsRealizados: nuevosTests,
-                        totalAciertos: nuevosAciertosFirestore,
-                        totalPreguntas: nuevasPreguntasFirestore,
-                        mediaAciertos: nuevaMedia,
-                        mejorResultado: nuevoMejor,
-                        ultimoTest: new Date().toISOString()
-                    });
+            const testId = testIds[testPage];
+            if (testId && progreso[testId]?.completado) {
+                card.classList.add('completado');
+                
+                // Cambiar el botón por un badge de completado
+                const badge = card.querySelector('.test-badge');
+                if (badge) {
+                    badge.innerHTML = '<i class="fas fa-check-circle"></i> Finalizado';
+                    badge.classList.add('badge-completado');
+                    badge.classList.remove('test-badge');
                 }
             }
-            
-            cargarEstadisticas();
-            return porcentaje;
+        });
+    }
+    
+    onAuthStateChanged(auth, (user) => {
+        renderUserZone();
+        if (user) {
+            marcarTestsCompletados(user.uid);
+        } else {
+            window.location.href = '../login.html';
         }
-        
-        // Exponer función global para que test-completo.html la use
-        window.actualizarEstadisticasTest = guardarEstadisticas;
-        
-        onAuthStateChanged(auth, (user) => {
-            renderUserZone();
-            cargarEstadisticas();
-            if (!user) {
-                window.location.href = '../login.html';
-            }
-        });
-        
-        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-            const wrapper = document.querySelector('.nav-wrapper');
-            if (wrapper) wrapper.classList.toggle('active');
-        });
-    </script>
+    });
+    
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+        const wrapper = document.querySelector('.nav-wrapper');
+        if (wrapper) wrapper.classList.toggle('active');
+    });
+</script>
 </body>
 </html>
