@@ -850,7 +850,7 @@
 <script type="module">
     import { auth, onAuthStateChanged, signOut, db, doc, getDoc, updateDoc, deleteDoc, setDoc } from '../js/firebase-init.js';
     import { renderUserZone, updateGlobalAvatar } from '../js/global-auth.js';
-    import { obtenerTestsCompletados } from '../js/progreso-tests.js';
+    import { obtenerResultadosTests } from '../js/progreso-tests.js';
     
     const avataresDisponibles = ["🚗", "🚘", "🏎️", "🚙", "🛞", "🚦", "🛣️", "🚸", "⚠️", "🅿️", "🚥", "🚧", "🎯", "📍", "🧭", "🚔", "🚓", "🚕", "🚑", "🚒", "🚌", "🚎"];
     
@@ -883,11 +883,10 @@
     }
     
     // Función para cargar y mostrar los tests completados (CORREGIDA)
-    async function cargarTestsCompletados(userId) {
-        try {
-            // Usar la función importada que entiende las claves compuestas
-            const testsCompletados = await obtenerTestsCompletados(userId);
-            
+   async function cargarTestsCompletados(userId) {
+    try {
+        const testsCompletados = await obtenerResultadosTests(userId);
+
             const container = document.getElementById('testsCompletadosContainer');
             if (!container) return;
             

@@ -2,21 +2,110 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Test por Temas | AprobadoYa</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f5f3 0%, #e0ece8 100%);
+            min-height: 100vh;
+            color: #0f2b2d;
+        }
+        header {
+            background: #0a2f2a;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px;
+            flex-wrap: wrap;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo i { font-size: 2rem; color: #f5b042; }
+        .logo h1 { font-size: 1.7rem; font-weight: 800; color: white; }
+        .logo span { color: #f5b042; }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #eef2f5;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #f5b042; }
+        .user-zone { display: flex; align-items: center; }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255,255,255,0.12);
+            padding: 6px 20px;
+            border-radius: 60px;
+        }
+        .user-avatar { font-size: 1.6rem; }
+        .user-name { color: white; font-weight: 500; }
+        .btn-profile, .btn-logout {
+            background: #f5b042;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #0a2f2a;
+        }
+        .btn-logout { background: #e2e8f0; color: #1e293b; }
+        .btn-login {
+            background: #f5b042;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #0a2f2a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+        }
+        
         .page-header {
-            text-align: center;
+            background: linear-gradient(125deg, #0f3b2c 0%, #1b5a44 100%);
             padding: 40px 0;
-            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            text-align: center;
             color: white;
             margin-bottom: 30px;
         }
         .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .page-header h1 i { color: #f5b042; margin-right: 12px; }
         
+        /* Selector de temas */
         .selector-tema {
             background: white;
             border-radius: 25px;
@@ -26,7 +115,11 @@
             border: 1px solid #e2e8f0;
         }
         .selector-tema h3 { margin-bottom: 15px; color: #1e293b; }
-        .temas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .temas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
         .tema-btn {
             background: #f8fafc;
             border: 2px solid #e2e8f0;
@@ -37,39 +130,108 @@
             transition: all 0.3s;
             font-weight: 500;
         }
-        .tema-btn:hover { border-color: #fbbf24; background: #fef3c7; transform: translateY(-2px); }
-        .tema-btn.active { border-color: #fbbf24; background: #fef3c7; }
-        .tema-numero { font-weight: 800; color: #fbbf24; }
-        .tema-nombre { font-size: 0.7rem; margin-top: 4px; color: #475569; }
+        .tema-btn:hover {
+            border-color: #fbbf24;
+            background: #fef3c7;
+            transform: translateY(-2px);
+        }
+        .tema-btn.active {
+            border-color: #fbbf24;
+            background: #fef3c7;
+        }
+        .tema-numero {
+            font-weight: 800;
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+        .tema-nombre {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            color: #475569;
+        }
+        .tema-total {
+            font-size: 0.65rem;
+            margin-top: 6px;
+            color: #94a3b8;
+        }
         
-        .configuracion-test {
+        /* Info del tema seleccionado */
+        .tema-info {
             background: white;
             border-radius: 25px;
-            padding: 25px;
+            padding: 20px 30px;
             margin-bottom: 30px;
-            display: flex;
+            display: none;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
         }
-        .config-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .config-group label { font-weight: 600; color: #1e293b; }
-        .config-group select { padding: 10px 20px; border-radius: 12px; border: 2px solid #e2e8f0; background: white; cursor: pointer; }
-        .btn-iniciar {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a472a;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 50px;
+        .tema-info h2 { color: #1a472a; }
+        .tema-info p { color: #64748b; }
+        .nota-corte {
+            background: #fef3c7;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: #b45309;
             font-weight: 600;
+        }
+        
+        /* Tests del tema */
+        .tests-tema-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .test-card {
+            background: white;
+            border-radius: 28px;
+            padding: 25px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-        .btn-iniciar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251,191,36,0.3); }
+        .test-card:hover {
+            transform: translateY(-5px);
+            border-color: #f5b042;
+            box-shadow: 0 15px 30px rgba(245,176,66,0.15);
+        }
+        .test-numero {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f5b042;
+            margin-bottom: 10px;
+        }
+        .test-card h3 { font-size: 1.3rem; margin-bottom: 10px; color: #1e293b; }
+        .test-card p { color: #64748b; font-size: 0.85rem; margin-bottom: 15px; }
+        .test-badge {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #f5b042;
+        }
         
+        .btn-volver {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        .btn-volver:hover { background: #cbd5e1; }
+        
+        /* Test container */
         .test-container {
             background: white;
             border-radius: 30px;
@@ -77,7 +239,6 @@
             margin-bottom: 60px;
             display: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 1px solid #e2e8f0;
         }
         .test-header {
             display: flex;
@@ -99,7 +260,6 @@
             align-items: center;
             gap: 8px;
         }
-        .test-info-item i { color: #fbbf24; }
         .timer {
             font-size: 1.5rem;
             font-weight: 700;
@@ -110,7 +270,7 @@
             border-radius: 50px;
         }
         .timer.warning { background: #ef4444; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
+        @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
         
         .pregunta {
             margin-bottom: 30px;
@@ -187,45 +347,10 @@
         }
         .resultado-stat { text-align: center; }
         .resultado-stat-number { font-size: 2rem; font-weight: 800; }
-        .resultado-preguntas {
-            margin-top: 20px;
-            text-align: left;
-            max-height: 400px;
-            overflow-y: auto;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 20px;
-        }
-        .resultado-pregunta {
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 12px;
-            background: #f8fafc;
-        }
-        .resultado-pregunta.correcta { background: #d1fae5; border-left: 4px solid #10b981; }
-        .resultado-pregunta.incorrecta { background: #fee2e2; border-left: 4px solid #ef4444; }
-        .btn-ver-resultados {
-            background: #f1f5f9;
-            color: #1e293b;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-        .btn-ver-resultados:hover { background: #e2e8f0; }
-        .volver {
-            display: inline-block;
-            margin-top: 20px;
-            color: #64748b;
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
+        
         @media (max-width: 768px) {
-            .configuracion-test { flex-direction: column; align-items: stretch; }
             .temas-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+            .tests-tema-grid { grid-template-columns: 1fr; }
             .test-info { flex-wrap: wrap; justify-content: center; }
         }
     </style>
@@ -233,120 +358,244 @@
 <body>
     <header>
         <div class="container">
-            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="index.html" class="active">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="logo" onclick="window.location.href='../index.html'">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper" id="navWrapper">
+                    <nav>
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="../temas/index.html">Temas</a></li>
+                            <li><a href="index.html" class="active">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
             <div class="user-zone" id="userZone"></div>
             <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
         </div>
     </header>
 
-    <div class="page-header"><div class="container"><h1><i class="fas fa-book"></i> Test por Temas</h1><p>Elige el tema que quieres practicar</p></div></div>
-
-    <main><div class="container">
-        <div class="selector-tema"><h3><i class="fas fa-layer-group"></i> Selecciona un tema:</h3><div class="temas-grid" id="temasGrid"></div></div>
-        <div class="configuracion-test">
-            <div class="config-group"><label><i class="fas fa-question-circle"></i> Nº preguntas:</label><select id="numPreguntas"><option value="5">5 preguntas</option><option value="10" selected>10 preguntas</option><option value="15">15 preguntas</option><option value="20">20 preguntas</option><option value="30">30 preguntas</option></select></div>
-            <div class="config-group"><label><i class="fas fa-clock"></i> Tiempo límite:</label><select id="tiempoLimite"><option value="0">Sin límite</option><option value="5">5 minutos</option><option value="10">10 minutos</option><option value="15">15 minutos</option><option value="20">20 minutos</option><option value="30">30 minutos</option></select></div>
-            <button class="btn-iniciar" id="btnIniciarTest"><i class="fas fa-play"></i> Iniciar Test</button>
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-book"></i> Test por Temas</h1>
+            <p>Elige un tema y completa sus 4 tests de 25 preguntas</p>
         </div>
-        <div class="test-container" id="testContainer">
-            <div class="test-header">
-                <h3 id="testTitle"><i class="fas fa-book-open"></i> Test del tema</h3>
-                <div class="timer" id="timer">--:--</div>
-            </div>
-            <div class="test-info" style="margin-bottom: 20px;">
-                <div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">0</span></div>
-                <div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div>
-            </div>
-            <div id="preguntasContainer"></div>
-            <button class="btn-enviar" id="btnEnviar">Finalizar test</button>
-            <div id="resultado" class="resultado"></div>
-            <button onclick="document.getElementById('testContainer').style.display='none'" class="volver"><i class="fas fa-arrow-left"></i> Volver a selección</button>
-        </div>
-    </div></main>
+    </div>
 
-    <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
+    <main>
+        <div class="container">
+            <!-- Selector de temas -->
+            <div class="selector-tema" id="selectorTema">
+                <h3><i class="fas fa-layer-group"></i> Selecciona un tema:</h3>
+                <div class="temas-grid" id="temasGrid"></div>
+            </div>
+
+            <!-- Info del tema seleccionado -->
+            <div class="tema-info" id="temaInfo">
+                <div>
+                    <h2 id="temaNombre"><i class="fas fa-gavel"></i> Normas Generales</h2>
+                    <p id="temaDescripcion">Documentación, sanciones, tasas de alcohol, permisos...</p>
+                </div>
+                <div class="nota-corte">
+                    <i class="fas fa-info-circle"></i> Aprobado: mínimo 22 aciertos (máx 3 fallos)
+                </div>
+            </div>
+
+            <!-- Tests del tema seleccionado -->
+            <div id="testsTemaSection" style="display: none;">
+                <div class="tests-tema-grid" id="testsTemaGrid"></div>
+                <button class="btn-volver" id="btnVolverTemas">
+                    <i class="fas fa-arrow-left"></i> Volver a temas
+                </button>
+            </div>
+
+            <!-- Contenedor del test -->
+            <div class="test-container" id="testContainer">
+                <div class="test-header">
+                    <h3 id="testTitle"><i class="fas fa-book-open"></i> Test del tema</h3>
+                    <div class="timer" id="timer">--:--</div>
+                </div>
+                <div class="test-info" style="margin-bottom: 20px;">
+                    <div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">0</span></div>
+                    <div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div>
+                </div>
+                <div id="preguntasContainer"></div>
+                <button class="btn-enviar" id="btnEnviar">Finalizar test</button>
+                <div id="resultado" class="resultado"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
 
     <script type="module">
         import { auth, onAuthStateChanged } from '../js/firebase-init.js';
         import { renderUserZone } from '../js/global-auth.js';
-        import { preguntasDGT, obtenerPreguntasPorTema } from './data/preguntas.js';
+        import { obtenerPreguntasPorTema, obtenerTemas, guardarResultadoTest } from './data/preguntas-completas.js';
         
-        console.log("📚 preguntasDGT cargadas:", preguntasDGT?.length);
-        
-        const temasList = [
-            { numero: 1, nombre: "Normas generales" },{ numero: 2, nombre: "Señales" },{ numero: 3, nombre: "Circulación" },{ numero: 4, nombre: "Maniobras" },{ numero: 5, nombre: "Velocidad" },
-            { numero: 6, nombre: "Adversas" },{ numero: 7, nombre: "Vehículos" },{ numero: 8, nombre: "Conductores" },{ numero: 9, nombre: "Alcoholemia" },{ numero: 10, nombre: "Seguridad vial" },
-            { numero: 11, nombre: "Transporte" },{ numero: 12, nombre: "Vehículos especiales" },{ numero: 13, nombre: "Accidentes" },{ numero: 14, nombre: "Factores de riesgo" },{ numero: 15, nombre: "Medio ambiente" },
-            { numero: 16, nombre: "Permiso por puntos" },{ numero: 17, nombre: "ITV" },{ numero: 18, nombre: "Seguros" },{ numero: 19, nombre: "Movilidad" },{ numero: 20, nombre: "Legislación" }
-        ];
-        
-        let temaSeleccionado = 1;
+        let temaSeleccionado = null;
         let preguntasActuales = [];
         let respuestas = [];
         let timerInterval;
-        let tiempoRestante = 0;
         let testActivo = false;
+        let currentUser = null;
+        
+        // Configuración
+        const APROBADO_MINIMO = 22;
+        const TOTAL_PREGUNTAS_POR_TEST = 25;
+        
+        // Los 4 tests por tema
+        const testsPorTema = [
+            { id: 1, nombre: "Test 1 - Conceptos básicos" },
+            { id: 2, nombre: "Test 2 - Desarrollo" },
+            { id: 3, nombre: "Test 3 - Avanzado" },
+            { id: 4, nombre: "Test 4 - Repaso general" }
+        ];
+        
+        // Descripciones de los temas
+        const descripcionesTemas = {
+            1: "Documentación, sanciones, tasas de alcohol, permisos, normativa general...",
+            2: "Señales de peligro, prohibición, obligación, marcas viales...",
+            3: "Normas de circulación, prioridades, rotondas, túneles...",
+            4: "Adelantamientos, cambios de carril, incorporaciones, estacionamiento...",
+            5: "Límites de velocidad en autovía, carretera, ciudad, condiciones adversas...",
+            6: "Conducción con lluvia, niebla, nieve, hielo, viento...",
+            7: "ITV, documentación, seguro, neumáticos, luces, cinturón...",
+            8: "Permisos, puntos, alcoholemia, drogas, fatiga...",
+            9: "Tasas, sanciones, delitos, efectos del alcohol y drogas...",
+            10: "Distancia de seguridad, cinturón, casco, ABS, ESP...",
+            11: "Pérdida y recuperación de puntos, cursos de sensibilización...",
+            12: "Señalización en zonas de obras, balizas, desvíos...",
+            13: "Transporte de viajeros, mercancías, ADR, escolar...",
+            14: "Factores humanos, velocidad, distracciones, fatiga...",
+            15: "Contaminación, etiquetas ambientales, conducción eficiente...",
+            16: "Periodicidad, documentación, resultados, sanciones...",
+            17: "Seguro obligatorio, tipos de seguro, bonus-malus, partes...",
+            18: "Movilidad urbana, sostenible, eléctrica, compartida...",
+            19: "Leyes, reglamentos, autoridades, infracciones, sanciones...",
+            20: "Repaso general de todos los temas para el examen final..."
+        };
+        
+        function mostrarToast(mensaje) {
+            const toast = document.createElement('div');
+            toast.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:9999; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><i class="fas fa-check-circle"></i> ${mensaje}</div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
         
         function renderizarTemas() {
+            const temas = obtenerTemas();
             const grid = document.getElementById('temasGrid');
-            grid.innerHTML = temasList.map(t => `
-                <div class="tema-btn ${t.numero === temaSeleccionado ? 'active' : ''}" data-tema="${t.numero}">
+            
+            if (temas.length === 0) {
+                grid.innerHTML = '<div style="text-align:center; padding:20px;">No hay preguntas disponibles</div>';
+                return;
+            }
+            
+            grid.innerHTML = temas.map(t => `
+                <div class="tema-btn" data-tema="${t.numero}">
                     <div class="tema-numero">Tema ${t.numero}</div>
                     <div class="tema-nombre">${t.nombre}</div>
+                    <div class="tema-total">${t.totalPreguntas} preguntas</div>
                 </div>
             `).join('');
             
             document.querySelectorAll('.tema-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    temaSeleccionado = parseInt(btn.dataset.tema);
-                    renderizarTemas();
+                    const tema = parseInt(btn.dataset.tema);
+                    seleccionarTema(tema);
                 });
             });
         }
         
-        function obtenerPreguntasPorTemaFiltrado(tema) {
-            if (!preguntasDGT || preguntasDGT.length === 0) {
-                console.error("No hay preguntas cargadas");
-                return [];
-            }
-            const filtradas = preguntasDGT.filter(p => p.tema === tema);
-            console.log(`Tema ${tema}: ${filtradas.length} preguntas encontradas`);
-            return filtradas;
+        function seleccionarTema(temaNumero) {
+            temaSeleccionado = temaNumero;
+            const temas = obtenerTemas();
+            const tema = temas.find(t => t.numero === temaNumero);
+            
+            if (!tema) return;
+            
+            // Mostrar info del tema
+            document.getElementById('temaNombre').innerHTML = `<i class="fas fa-gavel"></i> ${tema.nombre}`;
+            document.getElementById('temaDescripcion').textContent = descripcionesTemas[temaNumero] || "Selecciona un test para comenzar";
+            document.getElementById('temaInfo').style.display = 'flex';
+            
+            // Mostrar los 4 tests
+            const testsGrid = document.getElementById('testsTemaGrid');
+            testsGrid.innerHTML = testsPorTema.map(test => `
+                <div class="test-card" data-test-id="${test.id}">
+                    <div class="test-numero">${test.id}</div>
+                    <h3>${test.nombre}</h3>
+                    <p>📝 ${TOTAL_PREGUNTAS_POR_TEST} preguntas</p>
+                    <p>🎯 Aprobado: ${APROBADO_MINIMO}/${TOTAL_PREGUNTAS_POR_TEST} aciertos</p>
+                    <span class="test-badge"><i class="fas fa-play"></i> Comenzar test</span>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.test-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const testId = parseInt(card.dataset.testId);
+                    iniciarTest(temaNumero, testId);
+                });
+            });
+            
+            document.getElementById('selectorTema').style.display = 'none';
+            document.getElementById('testsTemaSection').style.display = 'block';
+            document.getElementById('testContainer').style.display = 'none';
+            document.getElementById('resultado').style.display = 'none';
         }
         
-        function iniciarTest() {
-            const num = parseInt(document.getElementById('numPreguntas').value);
-            const tiempoMin = parseInt(document.getElementById('tiempoLimite').value);
+        function volverATemas() {
+            document.getElementById('selectorTema').style.display = 'block';
+            document.getElementById('testsTemaSection').style.display = 'none';
+            document.getElementById('temaInfo').style.display = 'none';
+            document.getElementById('testContainer').style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+        }
+        
+        async function iniciarTest(temaNumero, testId) {
+            const todasPreguntas = obtenerPreguntasPorTema(temaNumero, 200);
             
-            const todas = obtenerPreguntasPorTemaFiltrado(temaSeleccionado);
-            if (todas.length === 0) {
-                alert(`No hay preguntas disponibles para el tema ${temaSeleccionado}.`);
+            if (todasPreguntas.length < TOTAL_PREGUNTAS_POR_TEST) {
+                alert(`No hay suficientes preguntas para este tema. Disponibles: ${todasPreguntas.length}`);
                 return;
             }
             
-            const mezcladas = [...todas];
+            const mezcladas = [...todasPreguntas];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
             }
-            preguntasActuales = mezcladas.slice(0, Math.min(num, mezcladas.length));
-            respuestas = new Array(preguntasActuales.length).fill(null);
+            
+            preguntasActuales = mezcladas.slice(0, TOTAL_PREGUNTAS_POR_TEST);
+            respuestas = new Array(TOTAL_PREGUNTAS_POR_TEST).fill(null);
             
             if (timerInterval) clearInterval(timerInterval);
-            if (tiempoMin > 0) {
-                tiempoRestante = tiempoMin * 60;
-                iniciarTemporizador();
-            } else {
-                document.getElementById('timer').textContent = 'Sin límite';
-                document.getElementById('timer').classList.remove('warning');
-            }
+            document.getElementById('timer').textContent = 'Sin límite';
+            document.getElementById('timer').classList.remove('warning');
             
-            const temaNombre = temasList.find(t => t.numero === temaSeleccionado)?.nombre || `Tema ${temaSeleccionado}`;
-            document.getElementById('testTitle').innerHTML = `<i class="fas fa-book-open"></i> Tema ${temaSeleccionado}: ${temaNombre} (${preguntasActuales.length} preguntas)`;
-            document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
+            const temas = obtenerTemas();
+            const tema = temas.find(t => t.numero === temaNumero);
+            const testNombre = testsPorTema.find(t => t.id === testId)?.nombre || `Test ${testId}`;
+            
+            document.getElementById('testTitle').innerHTML = `<i class="fas fa-book-open"></i> ${tema?.nombre} - ${testNombre}`;
+            document.getElementById('totalPreguntas').textContent = TOTAL_PREGUNTAS_POR_TEST;
             document.getElementById('respondidas').textContent = '0';
             renderizarPreguntas();
+            document.getElementById('testsTemaSection').style.display = 'none';
+            document.getElementById('temaInfo').style.display = 'none';
             document.getElementById('testContainer').style.display = 'block';
             document.getElementById('resultado').style.display = 'none';
             testActivo = true;
@@ -356,7 +605,7 @@
         function renderizarPreguntas() {
             const container = document.getElementById('preguntasContainer');
             container.innerHTML = preguntasActuales.map((p, idx) => `
-                <div class="pregunta" data-id="${p.id || idx}" data-correcta="${p.correcta}">
+                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
                     <div class="pregunta-texto">${idx + 1}. ${p.texto}</div>
                     ${p.opciones.map((opcion, optIdx) => `
                         <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
@@ -378,124 +627,118 @@
             });
         }
         
-        function iniciarTemporizador() {
-            if (timerInterval) clearInterval(timerInterval);
-            const timerElem = document.getElementById('timer');
-            timerInterval = setInterval(() => {
-                if (!testActivo) return;
-                tiempoRestante--;
-                const m = Math.floor(tiempoRestante / 60), s = tiempoRestante % 60;
-                timerElem.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                if (tiempoRestante <= 60) timerElem.classList.add('warning');
-                if (tiempoRestante <= 0) {
-                    clearInterval(timerInterval);
-                    alert('⏰ ¡Tiempo agotado!');
-                    finalizarTest();
-                }
-            }, 1000);
-        }
-        
-        function finalizarTest() {
+        async function finalizarTest() {
             if (!testActivo) return;
             testActivo = false;
             if (timerInterval) clearInterval(timerInterval);
             
             let aciertos = 0;
-            const resultadosPreguntas = [];
+            const total = preguntasActuales.length;
             
             preguntasActuales.forEach((p, idx) => {
                 const respuesta = respuestas[idx];
                 const esCorrecto = (respuesta === p.correcta);
                 if (esCorrecto) aciertos++;
                 
-                resultadosPreguntas.push({
-                    texto: p.texto,
-                    opciones: p.opciones,
-                    correcta: p.correcta,
-                    seleccionada: respuesta,
-                    esCorrecto: esCorrecto,
-                    explicacion: p.explicacion || "Sin explicación"
-                });
-                
-                const preguntaDiv = document.querySelector(`.pregunta[data-id="${p.id || idx}"]`);
+                const preguntaDiv = document.querySelector(`.pregunta[data-id="${p.id}"]`);
                 if (preguntaDiv) preguntaDiv.classList.add(esCorrecto ? 'correcta' : 'incorrecta');
                 
-                document.querySelectorAll(`.pregunta[data-id="${p.id || idx}"] .opcion`).forEach((op, optIdx) => {
+                document.querySelectorAll(`.pregunta[data-id="${p.id}"] .opcion`).forEach((op, optIdx) => {
                     op.classList.add('disabled');
                     if (optIdx === p.correcta) op.classList.add('correcta-respuesta');
                     if (respuesta === optIdx && respuesta !== p.correcta) op.classList.add('incorrecta-respuesta');
                 });
             });
             
-            const porcentaje = Math.round((aciertos / preguntasActuales.length) * 100);
-            const aprobado = porcentaje >= 90;
+            const porcentaje = Math.round((aciertos / total) * 100);
+            const aprobado = aciertos >= APROBADO_MINIMO;
             const resultadoDiv = document.getElementById('resultado');
             
             resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
             resultadoDiv.innerHTML = `
                 <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 2.5rem;"></i>
-                <h3>${aprobado ? '🎉 ¡Aprobado! 🎉' : '📚 No aprobado'}</h3>
+                <h3>${aprobado ? '🎉 ¡APROBADO! 🎉' : '❌ NO APROBADO'}</h3>
                 <div class="resultado-stats">
-                    <div class="resultado-stat"><div class="resultado-stat-number">${aciertos}/${preguntasActuales.length}</div><div>Aciertos</div></div>
+                    <div class="resultado-stat"><div class="resultado-stat-number">${aciertos}/${total}</div><div>Aciertos</div></div>
                     <div class="resultado-stat"><div class="resultado-stat-number">${porcentaje}%</div><div>Porcentaje</div></div>
                     <div class="resultado-stat"><div class="resultado-stat-number">${aprobado ? 'APTO' : 'NO APTO'}</div><div>Resultado</div></div>
                 </div>
-                <button class="btn-ver-resultados" id="btnVerResultados"><i class="fas fa-eye"></i> Ver respuestas correctas</button>
-                <div id="detalleResultados" style="display: none; margin-top: 20px;"></div>
-                <button onclick="reiniciarTest()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;"><i class="fas fa-redo"></i> Nuevo test</button>
+                <p style="margin-top: 10px; font-size: 0.9rem;">
+                    ${aprobado ? '✅ ¡Has superado el test!' : '❌ Necesitas al menos 22 aciertos para aprobar'}
+                </p>
+                <div style="margin-top: 20px;">
+                    <button id="btnReintentar" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-right: 10px; cursor: pointer;">
+                        <i class="fas fa-redo"></i> Reintentar
+                    </button>
+                    <button id="btnVolverTema" style="background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer;">
+                        <i class="fas fa-arrow-left"></i> Volver al tema
+                    </button>
+                </div>
             `;
             resultadoDiv.style.display = 'block';
+            document.getElementById('btnEnviar').style.display = 'none';
             
-            document.getElementById('btnVerResultados').addEventListener('click', () => {
-                const detalleDiv = document.getElementById('detalleResultados');
-                if (detalleDiv.style.display === 'none') {
-                    detalleDiv.innerHTML = `<h4 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Respuestas correctas:</h4>` + 
-                        resultadosPreguntas.map((p, idx) => `
-                            <div class="resultado-pregunta ${p.esCorrecto ? 'correcta' : 'incorrecta'}">
-                                <strong>${idx + 1}. ${p.texto}</strong><br>
-                                <span style="color: ${p.esCorrecto ? '#10b981' : '#ef4444'}">
-                                    ${p.esCorrecto ? '✅ Correcta' : '❌ Incorrecta'} - 
-                                    Respuesta correcta: ${String.fromCharCode(65 + p.correcta)}. ${p.opciones[p.correcta]}
-                                </span>
-                                <div style="font-size: 0.8rem; color: #64748b; margin-top: 5px;">
-                                    <i class="fas fa-info-circle"></i> ${p.explicacion}
-                                </div>
-                            </div>
-                        `).join('');
-                    detalleDiv.style.display = 'block';
-                    document.getElementById('btnVerResultados').innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar respuestas';
-                } else {
-                    detalleDiv.style.display = 'none';
-                    document.getElementById('btnVerResultados').innerHTML = '<i class="fas fa-eye"></i> Ver respuestas correctas';
-                }
+            // Guardar resultado
+            if (currentUser && temaSeleccionado) {
+                const temas = obtenerTemas();
+                const tema = temas.find(t => t.numero === temaSeleccionado);
+                await guardarResultadoTest(
+                    currentUser.uid,
+                    `tema_${temaSeleccionado}`,
+                    0,
+                    `${tema?.nombre || `Tema ${temaSeleccionado}`}`,
+                    {
+                        aprobado: aprobado,
+                        porcentaje: porcentaje,
+                        aciertos: aciertos,
+                        total: total
+                    }
+                );
+                mostrarToast(`${tema?.nombre}: ${aprobado ? 'APROBADO' : 'SUSPENDIDO'} (${aciertos}/${total})`);
+            }
+            
+            document.getElementById('btnReintentar').addEventListener('click', () => {
+                location.reload();
             });
             
-            // Guardar estadísticas en localStorage
-            const stats = JSON.parse(localStorage.getItem('aprobadoya_test_stats') || '{}');
-            stats.totalTests = (stats.totalTests || 0) + 1;
-            stats.totalAciertos = (stats.totalAciertos || 0) + aciertos;
-            stats.totalPreguntas = (stats.totalPreguntas || 0) + preguntasActuales.length;
-            stats.mejorResultado = Math.max(stats.mejorResultado || 0, porcentaje);
-            localStorage.setItem('aprobadoya_test_stats', JSON.stringify(stats));
+            document.getElementById('btnVolverTema').addEventListener('click', () => {
+                if (temaSeleccionado) {
+                    seleccionarTema(temaSeleccionado);
+                } else {
+                    volverATemas();
+                }
+            });
         }
         
-        function reiniciarTest() {
-            location.reload();
-        }
+        document.getElementById('btnEnviar').addEventListener('click', () => {
+            const respondidas = respuestas.filter(r => r !== null).length;
+            if (respondidas < TOTAL_PREGUNTAS_POR_TEST) {
+                if (confirm(`⚠️ Solo has respondido ${respondidas} de ${TOTAL_PREGUNTAS_POR_TEST} preguntas.\n¿Seguro que quieres finalizar?`)) {
+                    finalizarTest();
+                }
+            } else {
+                if (confirm('¿Seguro que quieres finalizar el test?')) {
+                    finalizarTest();
+                }
+            }
+        });
+        
+        document.getElementById('btnVolverTemas').addEventListener('click', () => {
+            volverATemas();
+        });
         
         onAuthStateChanged(auth, (user) => {
             renderUserZone();
             if (!user) {
                 window.location.href = '../login.html';
+            } else {
+                currentUser = user;
+                renderizarTemas();
             }
         });
         
-        renderizarTemas();
-        document.getElementById('btnIniciarTest').addEventListener('click', iniciarTest);
-        document.getElementById('btnEnviar').addEventListener('click', finalizarTest);
-        
         document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-            const wrapper = document.querySelector('.nav-wrapper');
+            const wrapper = document.getElementById('navWrapper');
             if (wrapper) wrapper.classList.toggle('active');
         });
     </script>

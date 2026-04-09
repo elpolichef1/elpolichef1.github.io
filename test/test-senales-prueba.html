@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Test Rápido | AprobadoYa</title>
+    <title>Test de Señales | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -100,12 +101,12 @@
             color: white;
             margin-bottom: 30px;
         }
-        .page-header h1 { font-size: 2rem; font-weight: 800; }
+        .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
         .page-header h1 i { color: #f5b042; margin-right: 12px; }
         
         .test-container {
             background: white;
-            border-radius: 32px;
+            border-radius: 30px;
             padding: 35px;
             margin-bottom: 40px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
@@ -120,10 +121,7 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        .test-info {
-            display: flex;
-            gap: 20px;
-        }
+        .test-info { display: flex; gap: 20px; }
         .test-info-item {
             background: #f8fafc;
             padding: 8px 18px;
@@ -133,124 +131,80 @@
             align-items: center;
             gap: 8px;
         }
-        .timer {
-            font-size: 1.5rem;
-            font-weight: 700;
-            font-family: monospace;
-            background: #1e293b;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 50px;
-        }
-        .timer.warning { background: #ef4444; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.9; transform: scale(1.02); } }
         
-        /* Preguntas sin imágenes */
         .pregunta-card {
-            background: white;
+            background: #f8fafc;
             border-radius: 24px;
             padding: 25px;
             margin-bottom: 25px;
             border: 1px solid #e2e8f0;
             transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .pregunta-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .pregunta-card.correcta { 
-            border-left: 4px solid #10b981; 
-            background: #f0fdf4; 
-        }
-        .pregunta-card.incorrecta { 
-            border-left: 4px solid #ef4444; 
-            background: #fef2f2; 
-        }
+        .pregunta-card.correcta { border-left: 4px solid #10b981; background: #f0fdf4; }
+        .pregunta-card.incorrecta { border-left: 4px solid #ef4444; background: #fef2f2; }
         .pregunta-numero {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #f5b042;
             font-weight: 600;
             margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
         .pregunta-texto {
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             color: #1e293b;
-            font-size: 1.05rem;
-            line-height: 1.4;
+            font-size: 1rem;
+        }
+        .senal-imagen {
+            text-align: center;
+            margin: 15px 0;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .senal-imagen img {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: contain;
         }
         .opciones {
             display: grid;
             gap: 10px;
-            margin-top: 5px;
+            margin-top: 15px;
         }
         .opcion {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 12px 18px;
-            background: #f8fafc;
+            background: white;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
+            transition: all 0.2s;
         }
         .opcion:hover:not(.disabled) {
             background: #fef3c7;
             border-color: #fbbf24;
             transform: translateX(5px);
         }
-        .opcion.disabled { 
-            cursor: not-allowed; 
-            opacity: 0.7; 
-        }
-        .opcion.correcta-respuesta { 
-            background: #d1fae5; 
-            border-color: #10b981; 
-        }
-        .opcion.incorrecta-respuesta { 
-            background: #fee2e2; 
-            border-color: #ef4444; 
-        }
-        .opcion-letra {
-            font-weight: 800;
-            color: #f5b042;
-            width: 30px;
-            font-size: 0.9rem;
-        }
-        
-        .explicacion {
-            margin-top: 15px;
-            padding: 12px 15px;
-            background: #f1f5f9;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            color: #475569;
-            display: none;
-            border-left: 3px solid #f5b042;
-        }
-        .explicacion.mostrar { display: block; }
+        .opcion.disabled { cursor: not-allowed; opacity: 0.7; }
+        .opcion.correcta-respuesta { background: #d1fae5; border-color: #10b981; }
+        .opcion.incorrecta-respuesta { background: #fee2e2; border-color: #ef4444; }
         
         .btn-enviar {
-            background: linear-gradient(135deg, #f5b042, #f59e0b);
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #1a472a;
             border: none;
-            padding: 14px 30px;
+            padding: 12px 30px;
             border-radius: 50px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            width: 100%;
             margin-top: 20px;
             transition: all 0.3s;
         }
-        .btn-enviar:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 20px rgba(245,176,66,0.4); 
-        }
+        .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(251,191,36,0.3); }
         
         .resultado {
             margin-top: 25px;
@@ -268,15 +222,12 @@
             margin-top: 20px;
             color: #64748b;
             text-decoration: none;
-            transition: 0.2s;
         }
         .volver:hover { color: #f5b042; }
         
         @media (max-width: 768px) {
             .test-container { padding: 20px; }
-            .test-header { flex-direction: column; text-align: center; }
-            .pregunta-texto { font-size: 0.95rem; }
-            .opcion { padding: 10px 14px; }
+            .senal-imagen img { max-width: 100px; }
         }
     </style>
 </head>
@@ -308,8 +259,8 @@
 
     <div class="page-header">
         <div class="container">
-            <h1><i class="fas fa-bolt"></i> Test Rápido</h1>
-            <p>10 preguntas de teoría - Un solo clic para responder</p>
+            <h1><i class="fas fa-traffic-light"></i> Test de Señales</h1>
+            <p>Prueba de 8 señales de tráfico</p>
         </div>
     </div>
 
@@ -318,10 +269,9 @@
             <div class="test-container">
                 <div class="test-header">
                     <div class="test-info">
-                        <div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">10</span></div>
+                        <div class="test-info-item"><i class="fas fa-question-circle"></i> Preguntas: <span id="totalPreguntas">8</span></div>
                         <div class="test-info-item"><i class="fas fa-check-circle"></i> Respondidas: <span id="respondidas">0</span></div>
                     </div>
-                    <div class="timer" id="timer">10:00</div>
                 </div>
                 <div id="preguntasContainer"></div>
                 <button class="btn-enviar" id="btnEnviar">Finalizar test</button>
@@ -342,29 +292,79 @@
     <script type="module">
         import { auth, onAuthStateChanged } from '../js/firebase-init.js';
         import { renderUserZone } from '../js/global-auth.js';
-        import { guardarResultadoTest } from '../js/progreso-tests.js';
         
-        // ==================== PREGUNTAS SIN IMÁGENES ====================
+        // ==================== PREGUNTAS CON IMÁGENES ====================
         const preguntas = [
-            { id: 1, texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "La velocidad máxima para turismos en autovía es de 120 km/h." },
-            { id: 2, texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de STOP obliga a detenerse completamente antes de continuar." },
-            { id: 3, texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "Los conductores noveles tienen un límite de 0,3 g/l en sangre." },
-            { id: 4, texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "Usar el móvil al volante: 200€ de multa y 3 puntos." },
-            { id: 5, texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "Los conductores noveles tienen 8 puntos iniciales." },
-            { id: 6, texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "La línea continua prohíbe adelantar y cruzar sobre ella." },
-            { id: 7, texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de CEDA EL PASO obliga a ceder el paso a los vehículos de la vía preferente." },
-            { id: 8, texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "En vías urbanas de un solo carril, la velocidad máxima es 30 km/h." },
-            { id: 9, texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Debe reducir la velocidad y ceder el paso a los peatones." },
-            { id: 10, texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "La distancia de seguridad recomendada es de 2 segundos con el vehículo delantero." }
+            {
+                id: 1,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/entrada-prohibida-a vehículos-de motor.png",
+                opciones: ["Prohibido el paso a vehículos de motor", "Prohibido el paso a camiones", "Prohibido el paso a motos", "Prohibido el paso a ciclomotores"],
+                correcta: 0,
+                explicacion: "Prohíbe la entrada a todo vehículo de motor."
+            },
+            {
+                id: 2,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/giro-obligatorio-a-la-derecha.png",
+                opciones: ["Giro obligatorio a la derecha", "Prohibido girar a la derecha", "Dirección recomendada", "Carril obligatorio"],
+                correcta: 0,
+                explicacion: "Indica que hay que girar obligatoriamente a la derecha."
+            },
+            {
+                id: 3,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/Parking.png",
+                opciones: ["Estacionamiento", "Prohibido estacionar", "Parada de autobús", "Zona de carga"],
+                correcta: 0,
+                explicacion: "Indica zona de estacionamiento permitido."
+            },
+            {
+                id: 4,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/Prohibido-adelantar.png",
+                opciones: ["Prohibido adelantar", "Prohibido circular", "Fin de prohibición de adelantar", "Prohibido cambiar de carril"],
+                correcta: 0,
+                explicacion: "Prohíbe adelantar a cualquier vehículo en ese tramo."
+            },
+            {
+                id: 5,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/Prohibido el paso a peatones.png",
+                opciones: ["Prohibido el paso a peatones", "Paso de peatones", "Zona peatonal", "Prohibido el paso a bicicletas"],
+                correcta: 0,
+                explicacion: "Prohíbe el paso a peatones."
+            },
+            {
+                id: 6,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/Prohibido-el-paso.png",
+                opciones: ["Prohibido el paso", "Prohibido adelantar", "Prohibido estacionar", "Prohibido girar"],
+                correcta: 0,
+                explicacion: "Prohíbe la entrada a vehículos en ese sentido."
+            },
+            {
+                id: 7,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/Prohibido-girar-a-la-derecha.png",
+                opciones: ["Prohibido girar a la derecha", "Prohibido girar a la izquierda", "Prohibido cambiar de sentido", "Prohibido circular"],
+                correcta: 0,
+                explicacion: "Prohíbe girar a la derecha."
+            },
+            {
+                id: 8,
+                texto: "¿Qué indica esta señal?",
+                imagen: "../img/stop.png",
+                opciones: ["STOP - Detención obligatoria", "Ceda el paso", "Prohibido el paso", "Prioridad"],
+                correcta: 0,
+                explicacion: "La señal de STOP obliga a detenerse completamente antes de continuar."
+            }
         ];
 
         let preguntasActuales = [];
         let respuestasUsuario = [];
-        let tiempoRestante = 10 * 60;
-        let timerInterval;
-        let testActivo = true;
-        let currentUser = null;
         let testFinalizado = false;
+        let currentUser = null;
         
         function mezclarArray(array) {
             const mezclado = [...array];
@@ -376,63 +376,14 @@
         }
         
         function iniciarTest() {
-            preguntasActuales = mezclarArray(preguntas).slice(0, 10);
+            preguntasActuales = mezclarArray(preguntas);
             respuestasUsuario = new Array(preguntasActuales.length).fill(null);
             
             document.getElementById('totalPreguntas').textContent = preguntasActuales.length;
             document.getElementById('respondidas').textContent = '0';
-            document.getElementById('timer').textContent = '10:00';
-            document.getElementById('timer').classList.remove('warning');
             
-            iniciarTemporizador();
             renderizarPreguntas();
             testFinalizado = false;
-            testActivo = true;
-        }
-        
-        function iniciarTemporizador() {
-            if (timerInterval) clearInterval(timerInterval);
-            const timerElement = document.getElementById('timer');
-            tiempoRestante = 10 * 60;
-            
-            timerInterval = setInterval(() => {
-                if (testFinalizado) return;
-                
-                tiempoRestante--;
-                const minutos = Math.floor(tiempoRestante / 60);
-                const segundos = tiempoRestante % 60;
-                timerElement.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-                
-                if (tiempoRestante <= 60) timerElement.classList.add('warning');
-                if (tiempoRestante <= 0) {
-                    clearInterval(timerInterval);
-                    alert('⏰ ¡Se acabó el tiempo!');
-                    finalizarTest();
-                }
-            }, 1000);
-        }
-        
-        function seleccionarRespuesta(preguntaIdx, opcionIdx) {
-            if (testFinalizado) return;
-            if (respuestasUsuario[preguntaIdx] !== null) return;
-            
-            respuestasUsuario[preguntaIdx] = opcionIdx;
-            const respondidas = respuestasUsuario.filter(r => r !== null).length;
-            document.getElementById('respondidas').textContent = respondidas;
-            
-            // Marcar visualmente la opción seleccionada
-            const opciones = document.querySelectorAll(`#opciones_${preguntaIdx} .opcion`);
-            opciones.forEach((opt, idx) => {
-                if (idx === opcionIdx) {
-                    opt.style.background = '#fef3c7';
-                    opt.style.borderColor = '#fbbf24';
-                }
-            });
-            
-            // Si todas las preguntas están respondidas, mostrar notificación
-            if (respondidas === preguntasActuales.length) {
-                mostrarToast('✅ ¡Has respondido todas las preguntas! Haz clic en "Finalizar test"');
-            }
         }
         
         function renderizarPreguntas() {
@@ -440,30 +391,32 @@
             
             container.innerHTML = preguntasActuales.map((pregunta, idx) => `
                 <div class="pregunta-card" data-id="${idx}">
-                    <div class="pregunta-numero">Pregunta ${idx + 1} de ${preguntasActuales.length}</div>
-                    <div class="pregunta-texto">${escapeHtml(pregunta.texto)}</div>
+                    <div class="pregunta-numero">Pregunta ${idx + 1}</div>
+                    <div class="pregunta-texto">${pregunta.texto}</div>
+                    <div class="senal-imagen">
+                        <img src="${pregunta.imagen}" alt="Señal de tráfico" onerror="this.src='https://placehold.co/150x150/f0f0f0/cccccc?text=Se%C3%B1al'">
+                    </div>
                     <div class="opciones" id="opciones_${idx}">
                         ${pregunta.opciones.map((opcion, optIdx) => `
-                            <div class="opcion" data-pregunta="${idx}" data-opcion="${optIdx}">
-                                <span class="opcion-letra">${String.fromCharCode(65 + optIdx)}.</span>
-                                <span>${escapeHtml(opcion)}</span>
-                            </div>
+                            <label class="opcion" data-pregunta="${idx}" data-opcion="${optIdx}">
+                                <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestasUsuario[idx] === optIdx ? 'checked' : ''}>
+                                <span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span>
+                            </label>
                         `).join('')}
                     </div>
-                    <div class="explicacion" id="explicacion_${idx}">
+                    <div class="explicacion" id="explicacion_${idx}" style="display: none; margin-top: 12px; padding: 12px; background: #f1f5f9; border-radius: 12px; font-size: 0.8rem;">
                         <i class="fas fa-info-circle"></i> ${pregunta.explicacion}
                     </div>
                 </div>
             `).join('');
             
-            // Añadir event listeners a las opciones - UN SOLO CLIC
-            document.querySelectorAll('.opcion').forEach(opcion => {
-                opcion.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const preguntaIdx = parseInt(opcion.dataset.pregunta);
-                    const opcionIdx = parseInt(opcion.dataset.opcion);
-                    seleccionarRespuesta(preguntaIdx, opcionIdx);
+            document.querySelectorAll('.opcion input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
+                    const valor = parseInt(e.target.value);
+                    respuestasUsuario[preguntaIndex] = valor;
+                    const respondidas = respuestasUsuario.filter(r => r !== null).length;
+                    document.getElementById('respondidas').textContent = respondidas;
                 });
             });
         }
@@ -478,12 +431,10 @@
         async function finalizarTest() {
             if (testFinalizado) return;
             testFinalizado = true;
-            if (timerInterval) clearInterval(timerInterval);
             
             let aciertos = 0;
             const total = preguntasActuales.length;
             
-            // Marcar respuestas y contar aciertos
             preguntasActuales.forEach((pregunta, idx) => {
                 const respuesta = respuestasUsuario[idx];
                 const esCorrecto = (respuesta === pregunta.correcta);
@@ -508,12 +459,12 @@
                 // Mostrar explicación
                 const explicacionDiv = document.getElementById(`explicacion_${idx}`);
                 if (explicacionDiv) {
-                    explicacionDiv.classList.add('mostrar');
+                    explicacionDiv.style.display = 'block';
                 }
             });
             
             const porcentaje = Math.round((aciertos / total) * 100);
-            const aprobado = porcentaje >= 90;
+            const aprobado = porcentaje >= 70;
             const resultadoDiv = document.getElementById('resultado');
             
             resultadoDiv.className = `resultado ${aprobado ? 'exito' : 'error'}`;
@@ -522,59 +473,28 @@
                 <h3>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h3>
                 <div class="puntuacion-final">${porcentaje}%</div>
                 <p>Has acertado <strong>${aciertos}</strong> de <strong>${total}</strong> preguntas</p>
-                <p style="color: ${aprobado ? '#10b981' : '#ef4444'}; font-weight: bold;">${aprobado ? '✅ NOTA: APTO' : '❌ NOTA: NO APTO'}</p>
-                <div style="margin-top: 20px;">
-                    <button id="btnVolverMenu" style="background: #f5b042; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-right: 10px; cursor: pointer;">
-                        <i class="fas fa-home"></i> Volver al menú
-                    </button>
-                    <button id="btnReintentar" style="background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer;">
-                        <i class="fas fa-redo"></i> Reintentar
-                    </button>
-                </div>
+                <button onclick="location.reload()" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;">
+                    <i class="fas fa-redo"></i> Nuevo test
+                </button>
             `;
             resultadoDiv.style.display = 'block';
             document.getElementById('btnEnviar').style.display = 'none';
             
-            // GUARDAR RESULTADO EN FIRESTORE
-            if (currentUser) {
-                await guardarResultadoTest(
-                    currentUser.uid,
-                    'test-rapido',
-                    0,
-                    'Test Rápido',
-                    {
-                        aprobado: aprobado,
-                        porcentaje: porcentaje,
-                        aciertos: aciertos,
-                        total: total
-                    }
-                );
-                mostrarToast(`Test Rápido: ${aprobado ? 'APROBADO' : 'SUSPENDIDO'} (${porcentaje}%)`);
-            }
-            
-            document.getElementById('btnVolverMenu').addEventListener('click', () => {
-                window.location.href = 'index.html';
-            });
-            
-            document.getElementById('btnReintentar').addEventListener('click', () => {
-                location.reload();
-            });
-        }
-        
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+            // Guardar estadísticas en localStorage
+            const stats = JSON.parse(localStorage.getItem('aprobadoya_test_stats') || '{}');
+            stats.totalTests = (stats.totalTests || 0) + 1;
+            stats.totalAciertos = (stats.totalAciertos || 0) + aciertos;
+            stats.totalPreguntas = (stats.totalPreguntas || 0) + total;
+            stats.mejorResultado = Math.max(stats.mejorResultado || 0, porcentaje);
+            stats.tasaAciertos = Math.round((stats.totalAciertos / stats.totalPreguntas) * 100);
+            if (aprobado) stats.testsAprobados = (stats.testsAprobados || 0) + 1;
+            localStorage.setItem('aprobadoya_test_stats', JSON.stringify(stats));
         }
         
         document.getElementById('btnEnviar').addEventListener('click', () => {
             const respondidas = respuestasUsuario.filter(r => r !== null).length;
             if (respondidas < preguntasActuales.length) {
-                if (confirm(`⚠️ Solo has respondido ${respondidas} de ${preguntasActuales.length} preguntas.\n¿Seguro que quieres finalizar el test?`)) {
+                if (confirm(`⚠️ Solo has respondido ${respondidas} de ${preguntasActuales.length} preguntas.\n¿Seguro que quieres finalizar?`)) {
                     finalizarTest();
                 }
             } else {

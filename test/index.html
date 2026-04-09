@@ -365,55 +365,256 @@
         </div>
     </footer>
 
-    <script type="module">
+  <script type="module">
     import { auth, onAuthStateChanged } from '../js/firebase-init.js';
     import { renderUserZone } from '../js/global-auth.js';
+    import { generarTestsPorNivel, guardarResultadoTest } from './data/preguntas-completas.js';
     
-    let unsubscribeSnapshot = null;
+    // Generar 100 tests por nivel
+    const TESTS = {
+        facil: generarTestsPorNivel('facil', 100, 30),
+        medio: generarTestsPorNivel('medio', 100, 30),
+        dificil: generarTestsPorNivel('dificil', 100, 30)
+    };
     
-    // Cargar estadísticas y escuchar cambios en tiempo real
-    async function cargarEstadisticasConRealtime(userId) {
-        try {
-            const { db, doc, onSnapshot } = await import('../js/firebase-init.js');
-            const userRef = doc(db, "usuarios", userId);
-            
-            // Si ya había una suscripción, la cancelamos
-            if (unsubscribeSnapshot) {
-                unsubscribeSnapshot();
-            }
-            
-            // Escuchar cambios en tiempo real
-            unsubscribeSnapshot = onSnapshot(userRef, (doc) => {
-                if (doc.exists()) {
-                    const data = doc.data();
-                    document.getElementById('totalTests').textContent = data.testsRealizados || 0;
-                    document.getElementById('testsAprobados').textContent = data.testsAprobados || 0;
-                    document.getElementById('tasaAciertos').textContent = `${data.mediaAciertos || 0}%`;
-                    document.getElementById('mejorResultado').textContent = `${data.mejorResultado || 0}%`;
-                    console.log("📊 Estadísticas actualizadas en tiempo real:", data.testsRealizados);
-                }
-            }, (error) => {
-                console.error("Error en snapshot:", error);
-            });
-            
-        } catch (error) {
-            console.error("Error cargando estadísticas:", error);
-        }
+    let testActual = null;
+    let indiceActual = 0;
+    let aciertos = 0;
+    let fallos = 0;
+    let respuestaSeleccionada = false;
+    let testActivo = false;
+    let nivelSeleccionadoActual = null;
+    let currentUser = null;
+    
+    function mostrarToast(mensaje) {
+        const toast = document.createElement('div');
+        toast.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:9999; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><i class="fas fa-check-circle"></i> ${mensaje}</div>`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
     
-    onAuthStateChanged(auth, async (user) => {
-        renderUserZone();
+    function mostrarTestsPorNivel(nivel) {
+        nivelSeleccionadoActual = nivel;
+        const tests = TESTS[nivel];
+        const titulo = nivel === 'facil' ? '📋 Tests Fáciles' : nivel === 'medio' ? '📋 Tests Medios' : '📋 Tests Difíciles';
+        document.getElementById('nivelSeleccionadoTitle').textContent = titulo;
         
-        if (!user) {
-            window.location.href = '../login.html';
+        const grid = document.getElementById('testsGrid');
+        grid.innerHTML = tests.map(test => `
+            <div class="test-item" data-test-id="${test.id}" data-test-nivel="${nivel}">
+                <div class="test-numero">Test ${test.numero}</div>
+                <div class="test-titulo">30 preguntas</div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.test-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const testId = parseInt(item.dataset.testId);
+                const testNivel = item.dataset.testNivel;
+                iniciarTest(testNivel, testId);
+            });
+        });
+        
+        document.getElementById('nivelSection').style.display = 'none';
+        document.getElementById('testsSection').style.display = 'block';
+        document.getElementById('statsTest').style.display = 'none';
+        document.getElementById('questionCard').style.display = 'none';
+        document.getElementById('resultadoFinal').style.display = 'none';
+    }
+    
+    function iniciarTest(nivel, testId) {
+        const tests = TESTS[nivel];
+        testActual = tests.find(t => t.id === testId);
+        if (!testActual) return;
+        
+        indiceActual = 0;
+        aciertos = 0;
+        fallos = 0;
+        respuestaSeleccionada = false;
+        testActivo = true;
+        
+        document.getElementById('totalPreguntas').textContent = testActual.preguntas.length;
+        document.getElementById('aciertos').textContent = aciertos;
+        document.getElementById('fallos').textContent = fallos;
+        document.getElementById('statsTest').style.display = 'flex';
+        document.getElementById('testsSection').style.display = 'none';
+        document.getElementById('resultadoFinal').style.display = 'none';
+        
+        cargarPregunta();
+    }
+    
+    function cargarPregunta() {
+        if (indiceActual >= testActual.preguntas.length) {
+            finalizarTest();
             return;
         }
         
-        await cargarEstadisticasConRealtime(user.uid);
+        const pregunta = testActual.preguntas[indiceActual];
+        document.getElementById('preguntaActual').textContent = indiceActual + 1;
+        actualizarProgreso();
+        
+        const questionCard = document.getElementById('questionCard');
+        questionCard.style.display = 'block';
+        questionCard.innerHTML = `
+            <div class="question-header">
+                <div class="pregunta-numero">Pregunta ${indiceActual + 1}</div>
+            </div>
+            <div class="question-text">${escapeHtml(pregunta.texto)}</div>
+            <div class="options" id="optionsContainer">
+                ${pregunta.opciones.map((opt, idx) => `
+                    <div class="option-btn" data-opcion="${idx}">
+                        <span class="option-prefix">${String.fromCharCode(65 + idx)}.</span>
+                        <span>${escapeHtml(opt)}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div id="feedback" class="feedback"></div>
+            <button class="btn-siguiente" id="btnSiguiente">Siguiente pregunta →</button>
+        `;
+        
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
+        });
+        
+        document.getElementById('btnSiguiente').addEventListener('click', () => {
+            if (respuestaSeleccionada) {
+                indiceActual++;
+                respuestaSeleccionada = false;
+                cargarPregunta();
+            }
+        });
+        
+        respuestaSeleccionada = false;
+        document.getElementById('btnSiguiente').style.display = 'none';
+    }
+    
+    function responder(opcion) {
+        if (respuestaSeleccionada || !testActivo) return;
+        
+        const pregunta = testActual.preguntas[indiceActual];
+        const esCorrecto = (opcion === pregunta.correcta);
+        
+        respuestaSeleccionada = true;
+        
+        if (esCorrecto) {
+            aciertos++;
+            document.getElementById('aciertos').textContent = aciertos;
+            mostrarFeedback(true, pregunta.explicacion || "¡Respuesta correcta!");
+        } else {
+            fallos++;
+            document.getElementById('fallos').textContent = fallos;
+            const letraCorrecta = String.fromCharCode(65 + pregunta.correcta);
+            mostrarFeedback(false, `Respuesta incorrecta. La correcta era ${letraCorrecta}. ${pregunta.explicacion || ''}`);
+        }
+        
+        actualizarProgreso();
+        
+        const opciones = document.querySelectorAll('.option-btn');
+        opciones.forEach((btn, idx) => {
+            btn.classList.add('disabled');
+            if (idx === pregunta.correcta) btn.classList.add('correct');
+            if (idx === opcion && opcion !== pregunta.correcta) btn.classList.add('incorrect');
+        });
+        
+        document.getElementById('btnSiguiente').style.display = 'block';
+    }
+    
+    function mostrarFeedback(esCorrecto, mensaje) {
+        const feedbackDiv = document.getElementById('feedback');
+        feedbackDiv.className = `feedback ${esCorrecto ? 'correct' : 'wrong'}`;
+        feedbackDiv.innerHTML = `<i class="fas ${esCorrecto ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${mensaje}`;
+        feedbackDiv.style.display = 'block';
+    }
+    
+    function actualizarProgreso() {
+        const porcentaje = ((indiceActual + 1) / testActual.preguntas.length) * 100;
+        document.getElementById('progressFill').style.width = `${porcentaje}%`;
+    }
+    
+    async function finalizarTest() {
+        testActivo = false;
+        const porcentaje = Math.round((aciertos / testActual.preguntas.length) * 100);
+        const aprobado = porcentaje >= 90;
+        
+        const resultadoDiv = document.getElementById('resultadoFinal');
+        resultadoDiv.style.display = 'block';
+        resultadoDiv.innerHTML = `
+            <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 4rem; color: #f5b042;"></i>
+            <h2>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h2>
+            <div class="puntuacion-final">${porcentaje}%</div>
+            <p>Has acertado <strong>${aciertos}</strong> de <strong>${testActual.preguntas.length}</strong> preguntas</p>
+            <p>Test: <strong>${testActual.nombre}</strong> - Nivel: ${testActual.nivel === 'facil' ? '🌱 Fácil' : testActual.nivel === 'medio' ? '⚡ Medio' : '🔥 Difícil'}</p>
+            <div style="margin-top: 20px;">
+                <button class="btn-reiniciar" id="btnReiniciar"><i class="fas fa-redo"></i> Volver a tests</button>
+                <button id="btnVolverMenu" style="background: #64748b; margin-left: 10px;"><i class="fas fa-home"></i> Volver al inicio</button>
+            </div>
+        `;
+        
+        document.getElementById('questionCard').style.display = 'none';
+        document.getElementById('statsTest').style.display = 'none';
+        
+        document.getElementById('btnReiniciar').addEventListener('click', () => {
+            mostrarTestsPorNivel(testActual.nivel);
+        });
+        
+        document.getElementById('btnVolverMenu').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+        
+        // Guardar resultado
+        if (currentUser) {
+            await guardarResultadoTest(
+                currentUser.uid,
+                `test-completo_${testActual.nivel}`,
+                testActual.id,
+                testActual.nombre,
+                {
+                    aprobado: aprobado,
+                    porcentaje: porcentaje,
+                    aciertos: aciertos,
+                    total: testActual.preguntas.length
+                }
+            );
+            mostrarToast(`${testActual.nombre}: ${aprobado ? 'APROBADO' : 'SUSPENDIDO'} (${porcentaje}%)`);
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    document.querySelectorAll('.nivel-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const nivel = card.dataset.nivel;
+            mostrarTestsPorNivel(nivel);
+        });
+    });
+    
+    document.getElementById('btnVolverNivel').addEventListener('click', () => {
+        document.getElementById('nivelSection').style.display = 'block';
+        document.getElementById('testsSection').style.display = 'none';
+        document.getElementById('statsTest').style.display = 'none';
+        document.getElementById('questionCard').style.display = 'none';
+        document.getElementById('resultadoFinal').style.display = 'none';
+    });
+    
+    onAuthStateChanged(auth, (user) => {
+        renderUserZone();
+        if (!user) {
+            window.location.href = '../login.html';
+        } else {
+            currentUser = user;
+        }
     });
     
     document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-        const wrapper = document.querySelector('.nav-wrapper');
+        const wrapper = document.getElementById('navWrapper');
         if (wrapper) wrapper.classList.toggle('active');
     });
 </script>
