@@ -190,15 +190,26 @@
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .opcion:active {
+            transform: scale(0.98);
         }
         .opcion:hover:not(.disabled) {
             background: #fef3c7;
             border-color: #fbbf24;
             transform: translateX(5px);
         }
-        .opcion.disabled { cursor: not-allowed; opacity: 0.7; }
+        .opcion.disabled { cursor: not-allowed; opacity: 0.7; pointer-events: none; }
         .opcion.correcta-respuesta { background: #d1fae5; border-color: #10b981; }
         .opcion.incorrecta-respuesta { background: #fee2e2; border-color: #ef4444; }
+        
+        /* Ocultar radio buttons pero mantener funcionalidad */
+        .opcion input {
+            display: none;
+        }
+        
         .explicacion {
             margin-top: 12px;
             padding: 12px;
@@ -320,22 +331,22 @@
     </footer>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc } from '../js/firebase-init.js';
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
         import { renderUserZone } from '../js/global-auth.js';
         import { guardarResultadoTest } from '../js/progreso-tests.js';
         
-        // ==================== PREGUNTAS ====================
+        // ==================== PREGUNTAS CON EMOJIS FIJOS ====================
         const preguntas = [
-            { id: 1, texto: "¿Qué indica esta señal?", emoji: "🛑", emojiDescripcion: "Octógono rojo con la palabra STOP", opciones: ["Ceda el paso", "STOP - Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de STOP es un octógono rojo que obliga a detenerse completamente antes de continuar." },
-            { id: 2, texto: "¿Qué indica esta señal?", emoji: "⚠️", emojiDescripcion: "Triángulo rojo con signo de exclamación", opciones: ["Prohibido el paso", "Peligro", "Ceda el paso", "Dirección obligatoria"], correcta: 1, explicacion: "Las señales triangulares con borde rojo indican ADVERTENCIA DE PELIGRO." },
-            { id: 3, texto: "¿Qué indica esta señal?", emoji: "🚫", emojiDescripcion: "Círculo rojo con una línea diagonal", opciones: ["Prohibición", "Obligación", "Peligro", "Información"], correcta: 0, explicacion: "Las señales circulares con fondo blanco y borde rojo indican PROHIBICIÓN." },
-            { id: 4, texto: "¿Qué indica esta señal?", emoji: "🔵", emojiDescripcion: "Círculo azul", opciones: ["Prohibición", "Peligro", "Obligación o dirección", "Información"], correcta: 2, explicacion: "Las señales circulares de color azul indican OBLIGACIÓN o DIRECCIÓN OBLIGATORIA." },
-            { id: 5, texto: "¿Qué indica esta señal?", emoji: "🔄", emojiDescripcion: "Flecha circular", opciones: ["Prohibido girar", "Sentido obligatorio", "Rotonda", "Ceda el paso"], correcta: 2, explicacion: "Indica la proximidad de una GLORIETA o ROTONDA." },
-            { id: 6, texto: "¿Qué indica esta señal?", emoji: "🚗➡️", emojiDescripcion: "Coche con flecha hacia la derecha", opciones: ["Prohibido circular", "Dirección obligatoria", "Carril exclusivo", "Adelantamiento permitido"], correcta: 1, explicacion: "Indica la DIRECCIÓN OBLIGATORIA que deben seguir los vehículos." },
-            { id: 7, texto: "¿Qué indica esta señal?", emoji: "🚶‍♂️", emojiDescripcion: "Peatón caminando", opciones: ["Paso de peatones", "Zona peatonal", "Prohibido el paso a peatones", "Carril bici"], correcta: 0, explicacion: "Indica la proximidad de un PASO DE PEATONES." },
-            { id: 8, texto: "¿Qué indica esta señal?", emoji: "🚲", emojiDescripcion: "Bicicleta", opciones: ["Prohibido circular en bicicleta", "Carril bici", "Senda ciclista", "Las dos últimas son correctas"], correcta: 3, explicacion: "Indica una VÍA CICLISTA o CARRIL BICI." },
-            { id: 9, texto: "¿Qué indica esta señal?", emoji: "🅿️", emojiDescripcion: "Letra P mayúscula", opciones: ["Prohibido estacionar", "Estacionamiento", "Parada de autobús", "Zona de carga"], correcta: 1, explicacion: "Indica ZONA DE ESTACIONAMIENTO permitido." },
-            { id: 10, texto: "¿Qué indica esta señal?", emoji: "🏥", emojiDescripcion: "Cruz blanca sobre fondo azul", opciones: ["Hospital", "Farmacia", "Primeros auxilios", "Cruz Roja"], correcta: 0, explicacion: "Indica la proximidad de un HOSPITAL o centro sanitario." }
+            { id: 1, texto: "¿Qué indica esta señal?", emoji: "&#128683;", emojiDescripcion: "Octógono rojo con la palabra STOP", opciones: ["Ceda el paso", "STOP - Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de STOP es un octógono rojo que obliga a detenerse completamente antes de continuar." },
+            { id: 2, texto: "¿Qué indica esta señal?", emoji: "&#9888;&#65039;", emojiDescripcion: "Triángulo rojo con signo de exclamación", opciones: ["Prohibido el paso", "Peligro", "Ceda el paso", "Dirección obligatoria"], correcta: 1, explicacion: "Las señales triangulares con borde rojo indican ADVERTENCIA DE PELIGRO." },
+            { id: 3, texto: "¿Qué indica esta señal?", emoji: "&#128683;", emojiDescripcion: "Círculo rojo con una línea diagonal", opciones: ["Prohibición", "Obligación", "Peligro", "Información"], correcta: 0, explicacion: "Las señales circulares con fondo blanco y borde rojo indican PROHIBICIÓN." },
+            { id: 4, texto: "¿Qué indica esta señal?", emoji: "&#128309;", emojiDescripcion: "Círculo azul", opciones: ["Prohibición", "Peligro", "Obligación o dirección", "Información"], correcta: 2, explicacion: "Las señales circulares de color azul indican OBLIGACIÓN o DIRECCIÓN OBLIGATORIA." },
+            { id: 5, texto: "¿Qué indica esta señal?", emoji: "&#128259;", emojiDescripcion: "Flecha circular", opciones: ["Prohibido girar", "Sentido obligatorio", "Rotonda", "Ceda el paso"], correcta: 2, explicacion: "Indica la proximidad de una GLORIETA o ROTONDA." },
+            { id: 6, texto: "¿Qué indica esta señal?", emoji: "&#128663;", emojiDescripcion: "Coche con flecha hacia la derecha", opciones: ["Prohibido circular", "Dirección obligatoria", "Carril exclusivo", "Adelantamiento permitido"], correcta: 1, explicacion: "Indica la DIRECCIÓN OBLIGATORIA que deben seguir los vehículos." },
+            { id: 7, texto: "¿Qué indica esta señal?", emoji: "&#128694;", emojiDescripcion: "Peatón caminando", opciones: ["Paso de peatones", "Zona peatonal", "Prohibido el paso a peatones", "Carril bici"], correcta: 0, explicacion: "Indica la proximidad de un PASO DE PEATONES." },
+            { id: 8, texto: "¿Qué indica esta señal?", emoji: "&#128690;", emojiDescripcion: "Bicicleta", opciones: ["Prohibido circular en bicicleta", "Carril bici", "Senda ciclista", "Las dos últimas son correctas"], correcta: 3, explicacion: "Indica una VÍA CICLISTA o CARRIL BICI." },
+            { id: 9, texto: "¿Qué indica esta señal?", emoji: "&#128359;", emojiDescripcion: "Letra P mayúscula", opciones: ["Prohibido estacionar", "Estacionamiento", "Parada de autobús", "Zona de carga"], correcta: 1, explicacion: "Indica ZONA DE ESTACIONAMIENTO permitido." },
+            { id: 10, texto: "¿Qué indica esta señal?", emoji: "&#127973;", emojiDescripcion: "Cruz blanca sobre fondo azul", opciones: ["Hospital", "Farmacia", "Primeros auxilios", "Cruz Roja"], correcta: 0, explicacion: "Indica la proximidad de un HOSPITAL o centro sanitario." }
         ];
 
         let preguntasActuales = [];
@@ -392,6 +403,24 @@
             }, 1000);
         }
         
+        function seleccionarRespuesta(preguntaIdx, opcionIdx) {
+            if (testFinalizado) return;
+            if (respuestasUsuario[preguntaIdx] !== null) return;
+            
+            respuestasUsuario[preguntaIdx] = opcionIdx;
+            const respondidas = respuestasUsuario.filter(r => r !== null).length;
+            document.getElementById('respondidas').textContent = respondidas;
+            
+            // Marcar visualmente la opción seleccionada
+            const opciones = document.querySelectorAll(`#opciones_${preguntaIdx} .opcion`);
+            opciones.forEach((opt, idx) => {
+                if (idx === opcionIdx) {
+                    opt.style.background = '#fef3c7';
+                    opt.style.borderColor = '#fbbf24';
+                }
+            });
+        }
+        
         function renderizarPreguntas() {
             const container = document.getElementById('preguntasContainer');
             
@@ -400,45 +429,33 @@
                     <div class="pregunta-numero">Pregunta ${idx + 1}</div>
                     <div class="pregunta-texto">${escapeHtml(pregunta.texto)}</div>
                     <div class="senal-emojis">
-                        <span style="font-size: 3rem;">${pregunta.emoji}</span>
+                        <span style="font-size: 3rem; display: inline-block;">${pregunta.emoji}</span>
                         <p style="font-size: 0.7rem; color: #64748b; margin-top: 8px;">${pregunta.emojiDescripcion}</p>
                     </div>
                     <div class="opciones" id="opciones_${idx}">
                         ${pregunta.opciones.map((opcion, optIdx) => `
-                            <label class="opcion" data-pregunta="${idx}" data-opcion="${optIdx}">
-                                <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestasUsuario[idx] === optIdx ? 'checked' : ''}>
-                                <span>${String.fromCharCode(65 + optIdx)}. ${escapeHtml(opcion)}</span>
-                            </label>
+                            <div class="opcion" data-pregunta="${idx}" data-opcion="${optIdx}">
+                                <span class="opcion-letra" style="font-weight: 800; color: #f5b042; width: 30px;">${String.fromCharCode(65 + optIdx)}.</span>
+                                <span>${escapeHtml(opcion)}</span>
+                            </div>
                         `).join('')}
                     </div>
-                    <button class="btn-ver-explicacion" onclick="window.mostrarExplicacion(${idx})">
-                        <i class="fas fa-lightbulb"></i> Ver explicación (después del test)
-                    </button>
                     <div class="explicacion" id="explicacion_${idx}">
                         <i class="fas fa-info-circle"></i> ${pregunta.explicacion}
                     </div>
                 </div>
             `).join('');
             
-            document.querySelectorAll('.opcion input').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
-                    const valor = parseInt(e.target.value);
-                    respuestasUsuario[preguntaIndex] = valor;
-                    const respondidas = respuestasUsuario.filter(r => r !== null).length;
-                    document.getElementById('respondidas').textContent = respondidas;
+            // Añadir event listeners a las opciones
+            document.querySelectorAll('.opcion').forEach(opcion => {
+                opcion.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const preguntaIdx = parseInt(opcion.dataset.pregunta);
+                    const opcionIdx = parseInt(opcion.dataset.opcion);
+                    seleccionarRespuesta(preguntaIdx, opcionIdx);
                 });
             });
         }
-        
-        window.mostrarExplicacion = function(idx) {
-            if (testFinalizado) {
-                const explicacionDiv = document.getElementById(`explicacion_${idx}`);
-                if (explicacionDiv) explicacionDiv.classList.toggle('mostrar');
-            } else {
-                alert('Las explicaciones solo están disponibles después de finalizar el test.');
-            }
-        };
         
         function mostrarToast(mensaje) {
             const toast = document.createElement('div');
@@ -468,14 +485,22 @@
                 
                 const opciones = document.querySelectorAll(`#opciones_${idx} .opcion`);
                 opciones.forEach((opcion, optIdx) => {
-                    opcion.classList.add('disabled');
+                    opcion.style.pointerEvents = 'none';
                     if (optIdx === pregunta.correcta) {
-                        opcion.classList.add('correcta-respuesta');
+                        opcion.style.background = '#d1fae5';
+                        opcion.style.borderColor = '#10b981';
                     }
                     if (respuesta === optIdx && respuesta !== pregunta.correcta) {
-                        opcion.classList.add('incorrecta-respuesta');
+                        opcion.style.background = '#fee2e2';
+                        opcion.style.borderColor = '#ef4444';
                     }
                 });
+                
+                // Mostrar explicación
+                const explicacionDiv = document.getElementById(`explicacion_${idx}`);
+                if (explicacionDiv) {
+                    explicacionDiv.style.display = 'block';
+                }
             });
             
             const porcentaje = Math.round((aciertos / total) * 100);
@@ -499,7 +524,7 @@
             resultadoDiv.style.display = 'block';
             document.getElementById('btnEnviar').style.display = 'none';
             
-            // ✅ GUARDAR RESULTADO EN FIRESTORE
+            // GUARDAR RESULTADO EN FIRESTORE
             if (currentUser) {
                 await guardarResultadoTest(
                     currentUser.uid,
