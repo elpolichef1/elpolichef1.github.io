@@ -145,78 +145,94 @@
         .timer.warning { background: #ef4444; animation: pulse 1s infinite; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.9; transform: scale(1.02); } }
         
+        /* Preguntas sin imágenes */
         .pregunta-card {
-            background: #f8fafc;
+            background: white;
             border-radius: 24px;
             padding: 25px;
             margin-bottom: 25px;
             border: 1px solid #e2e8f0;
             transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .pregunta-card.correcta { border-left: 4px solid #10b981; background: #f0fdf4; }
-        .pregunta-card.incorrecta { border-left: 4px solid #ef4444; background: #fef2f2; }
+        .pregunta-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .pregunta-card.correcta { 
+            border-left: 4px solid #10b981; 
+            background: #f0fdf4; 
+        }
+        .pregunta-card.incorrecta { 
+            border-left: 4px solid #ef4444; 
+            background: #fef2f2; 
+        }
         .pregunta-numero {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #f5b042;
             font-weight: 600;
             margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .pregunta-texto {
             font-weight: 600;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             color: #1e293b;
-            font-size: 1rem;
-        }
-        .senal-emojis {
-            font-size: 3rem;
-            text-align: center;
-            margin: 15px 0;
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 15px;
+            font-size: 1.05rem;
+            line-height: 1.4;
         }
         .opciones {
             display: grid;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 5px;
         }
         .opcion {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 12px 18px;
-            background: white;
+            background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            font-weight: 500;
         }
         .opcion:hover:not(.disabled) {
             background: #fef3c7;
             border-color: #fbbf24;
             transform: translateX(5px);
         }
-        .opcion.disabled { cursor: not-allowed; opacity: 0.7; }
-        .opcion.correcta-respuesta { background: #d1fae5; border-color: #10b981; }
-        .opcion.incorrecta-respuesta { background: #fee2e2; border-color: #ef4444; }
+        .opcion.disabled { 
+            cursor: not-allowed; 
+            opacity: 0.7; 
+        }
+        .opcion.correcta-respuesta { 
+            background: #d1fae5; 
+            border-color: #10b981; 
+        }
+        .opcion.incorrecta-respuesta { 
+            background: #fee2e2; 
+            border-color: #ef4444; 
+        }
+        .opcion-letra {
+            font-weight: 800;
+            color: #f5b042;
+            width: 30px;
+            font-size: 0.9rem;
+        }
+        
         .explicacion {
-            margin-top: 12px;
-            padding: 12px;
+            margin-top: 15px;
+            padding: 12px 15px;
             background: #f1f5f9;
             border-radius: 12px;
             font-size: 0.8rem;
             color: #475569;
             display: none;
+            border-left: 3px solid #f5b042;
         }
         .explicacion.mostrar { display: block; }
-        .btn-ver-explicacion {
-            background: none;
-            border: none;
-            color: #f5b042;
-            cursor: pointer;
-            font-size: 0.7rem;
-            margin-top: 10px;
-        }
         
         .btn-enviar {
             background: linear-gradient(135deg, #f5b042, #f59e0b);
@@ -231,7 +247,10 @@
             margin-top: 20px;
             transition: all 0.3s;
         }
-        .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(245,176,66,0.4); }
+        .btn-enviar:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 20px rgba(245,176,66,0.4); 
+        }
         
         .resultado {
             margin-top: 25px;
@@ -256,7 +275,8 @@
         @media (max-width: 768px) {
             .test-container { padding: 20px; }
             .test-header { flex-direction: column; text-align: center; }
-            .senal-emojis { font-size: 2rem; }
+            .pregunta-texto { font-size: 0.95rem; }
+            .opcion { padding: 10px 14px; }
         }
     </style>
 </head>
@@ -289,7 +309,7 @@
     <div class="page-header">
         <div class="container">
             <h1><i class="fas fa-bolt"></i> Test Rápido</h1>
-            <p>10 preguntas aleatorias para practicar rápidamente</p>
+            <p>10 preguntas de teoría - Un solo clic para responder</p>
         </div>
     </div>
 
@@ -320,22 +340,22 @@
     </footer>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc } from '../js/firebase-init.js';
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
         import { renderUserZone } from '../js/global-auth.js';
         import { guardarResultadoTest } from '../js/progreso-tests.js';
         
-        // ==================== PREGUNTAS ====================
+        // ==================== PREGUNTAS SIN IMÁGENES ====================
         const preguntas = [
-            { id: 1, texto: "¿Qué indica esta señal?", emoji: "🛑", emojiDescripcion: "Octógono rojo con la palabra STOP", opciones: ["Ceda el paso", "STOP - Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de STOP es un octógono rojo que obliga a detenerse completamente antes de continuar." },
-            { id: 2, texto: "¿Qué indica esta señal?", emoji: "⚠️", emojiDescripcion: "Triángulo rojo con signo de exclamación", opciones: ["Prohibido el paso", "Peligro", "Ceda el paso", "Dirección obligatoria"], correcta: 1, explicacion: "Las señales triangulares con borde rojo indican ADVERTENCIA DE PELIGRO." },
-            { id: 3, texto: "¿Qué indica esta señal?", emoji: "🚫", emojiDescripcion: "Círculo rojo con una línea diagonal", opciones: ["Prohibición", "Obligación", "Peligro", "Información"], correcta: 0, explicacion: "Las señales circulares con fondo blanco y borde rojo indican PROHIBICIÓN." },
-            { id: 4, texto: "¿Qué indica esta señal?", emoji: "🔵", emojiDescripcion: "Círculo azul", opciones: ["Prohibición", "Peligro", "Obligación o dirección", "Información"], correcta: 2, explicacion: "Las señales circulares de color azul indican OBLIGACIÓN o DIRECCIÓN OBLIGATORIA." },
-            { id: 5, texto: "¿Qué indica esta señal?", emoji: "🔄", emojiDescripcion: "Flecha circular", opciones: ["Prohibido girar", "Sentido obligatorio", "Rotonda", "Ceda el paso"], correcta: 2, explicacion: "Indica la proximidad de una GLORIETA o ROTONDA." },
-            { id: 6, texto: "¿Qué indica esta señal?", emoji: "🚗➡️", emojiDescripcion: "Coche con flecha hacia la derecha", opciones: ["Prohibido circular", "Dirección obligatoria", "Carril exclusivo", "Adelantamiento permitido"], correcta: 1, explicacion: "Indica la DIRECCIÓN OBLIGATORIA que deben seguir los vehículos." },
-            { id: 7, texto: "¿Qué indica esta señal?", emoji: "🚶‍♂️", emojiDescripcion: "Peatón caminando", opciones: ["Paso de peatones", "Zona peatonal", "Prohibido el paso a peatones", "Carril bici"], correcta: 0, explicacion: "Indica la proximidad de un PASO DE PEATONES." },
-            { id: 8, texto: "¿Qué indica esta señal?", emoji: "🚲", emojiDescripcion: "Bicicleta", opciones: ["Prohibido circular en bicicleta", "Carril bici", "Senda ciclista", "Las dos últimas son correctas"], correcta: 3, explicacion: "Indica una VÍA CICLISTA o CARRIL BICI." },
-            { id: 9, texto: "¿Qué indica esta señal?", emoji: "🅿️", emojiDescripcion: "Letra P mayúscula", opciones: ["Prohibido estacionar", "Estacionamiento", "Parada de autobús", "Zona de carga"], correcta: 1, explicacion: "Indica ZONA DE ESTACIONAMIENTO permitido." },
-            { id: 10, texto: "¿Qué indica esta señal?", emoji: "🏥", emojiDescripcion: "Cruz blanca sobre fondo azul", opciones: ["Hospital", "Farmacia", "Primeros auxilios", "Cruz Roja"], correcta: 0, explicacion: "Indica la proximidad de un HOSPITAL o centro sanitario." }
+            { id: 1, texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "La velocidad máxima para turismos en autovía es de 120 km/h." },
+            { id: 2, texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de STOP obliga a detenerse completamente antes de continuar." },
+            { id: 3, texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "Los conductores noveles tienen un límite de 0,3 g/l en sangre." },
+            { id: 4, texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "Usar el móvil al volante: 200€ de multa y 3 puntos." },
+            { id: 5, texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "Los conductores noveles tienen 8 puntos iniciales." },
+            { id: 6, texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "La línea continua prohíbe adelantar y cruzar sobre ella." },
+            { id: 7, texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "La señal de CEDA EL PASO obliga a ceder el paso a los vehículos de la vía preferente." },
+            { id: 8, texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "En vías urbanas de un solo carril, la velocidad máxima es 30 km/h." },
+            { id: 9, texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Debe reducir la velocidad y ceder el paso a los peatones." },
+            { id: 10, texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "La distancia de seguridad recomendada es de 2 segundos con el vehículo delantero." }
         ];
 
         let preguntasActuales = [];
@@ -392,53 +412,61 @@
             }, 1000);
         }
         
+        function seleccionarRespuesta(preguntaIdx, opcionIdx) {
+            if (testFinalizado) return;
+            if (respuestasUsuario[preguntaIdx] !== null) return;
+            
+            respuestasUsuario[preguntaIdx] = opcionIdx;
+            const respondidas = respuestasUsuario.filter(r => r !== null).length;
+            document.getElementById('respondidas').textContent = respondidas;
+            
+            // Marcar visualmente la opción seleccionada
+            const opciones = document.querySelectorAll(`#opciones_${preguntaIdx} .opcion`);
+            opciones.forEach((opt, idx) => {
+                if (idx === opcionIdx) {
+                    opt.style.background = '#fef3c7';
+                    opt.style.borderColor = '#fbbf24';
+                }
+            });
+            
+            // Si todas las preguntas están respondidas, mostrar notificación
+            if (respondidas === preguntasActuales.length) {
+                mostrarToast('✅ ¡Has respondido todas las preguntas! Haz clic en "Finalizar test"');
+            }
+        }
+        
         function renderizarPreguntas() {
             const container = document.getElementById('preguntasContainer');
             
             container.innerHTML = preguntasActuales.map((pregunta, idx) => `
                 <div class="pregunta-card" data-id="${idx}">
-                    <div class="pregunta-numero">Pregunta ${idx + 1}</div>
+                    <div class="pregunta-numero">Pregunta ${idx + 1} de ${preguntasActuales.length}</div>
                     <div class="pregunta-texto">${escapeHtml(pregunta.texto)}</div>
-                    <div class="senal-emojis">
-                        <span style="font-size: 3rem;">${pregunta.emoji}</span>
-                        <p style="font-size: 0.7rem; color: #64748b; margin-top: 8px;">${pregunta.emojiDescripcion}</p>
-                    </div>
                     <div class="opciones" id="opciones_${idx}">
                         ${pregunta.opciones.map((opcion, optIdx) => `
-                            <label class="opcion" data-pregunta="${idx}" data-opcion="${optIdx}">
-                                <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestasUsuario[idx] === optIdx ? 'checked' : ''}>
-                                <span>${String.fromCharCode(65 + optIdx)}. ${escapeHtml(opcion)}</span>
-                            </label>
+                            <div class="opcion" data-pregunta="${idx}" data-opcion="${optIdx}">
+                                <span class="opcion-letra">${String.fromCharCode(65 + optIdx)}.</span>
+                                <span>${escapeHtml(opcion)}</span>
+                            </div>
                         `).join('')}
                     </div>
-                    <button class="btn-ver-explicacion" onclick="window.mostrarExplicacion(${idx})">
-                        <i class="fas fa-lightbulb"></i> Ver explicación (después del test)
-                    </button>
                     <div class="explicacion" id="explicacion_${idx}">
                         <i class="fas fa-info-circle"></i> ${pregunta.explicacion}
                     </div>
                 </div>
             `).join('');
             
-            document.querySelectorAll('.opcion input').forEach(input => {
-                input.addEventListener('change', (e) => {
-                    const preguntaIndex = parseInt(e.target.name.split('_')[1]);
-                    const valor = parseInt(e.target.value);
-                    respuestasUsuario[preguntaIndex] = valor;
-                    const respondidas = respuestasUsuario.filter(r => r !== null).length;
-                    document.getElementById('respondidas').textContent = respondidas;
+            // Añadir event listeners a las opciones - UN SOLO CLIC
+            document.querySelectorAll('.opcion').forEach(opcion => {
+                opcion.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const preguntaIdx = parseInt(opcion.dataset.pregunta);
+                    const opcionIdx = parseInt(opcion.dataset.opcion);
+                    seleccionarRespuesta(preguntaIdx, opcionIdx);
                 });
             });
         }
-        
-        window.mostrarExplicacion = function(idx) {
-            if (testFinalizado) {
-                const explicacionDiv = document.getElementById(`explicacion_${idx}`);
-                if (explicacionDiv) explicacionDiv.classList.toggle('mostrar');
-            } else {
-                alert('Las explicaciones solo están disponibles después de finalizar el test.');
-            }
-        };
         
         function mostrarToast(mensaje) {
             const toast = document.createElement('div');
@@ -476,6 +504,12 @@
                         opcion.classList.add('incorrecta-respuesta');
                     }
                 });
+                
+                // Mostrar explicación
+                const explicacionDiv = document.getElementById(`explicacion_${idx}`);
+                if (explicacionDiv) {
+                    explicacionDiv.classList.add('mostrar');
+                }
             });
             
             const porcentaje = Math.round((aciertos / total) * 100);
@@ -489,17 +523,19 @@
                 <div class="puntuacion-final">${porcentaje}%</div>
                 <p>Has acertado <strong>${aciertos}</strong> de <strong>${total}</strong> preguntas</p>
                 <p style="color: ${aprobado ? '#10b981' : '#ef4444'}; font-weight: bold;">${aprobado ? '✅ NOTA: APTO' : '❌ NOTA: NO APTO'}</p>
-                <button id="btnVolverMenu" style="background: #f5b042; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; cursor: pointer;">
-                    <i class="fas fa-home"></i> Volver al menú de tests
-                </button>
-                <button id="btnReintentar" style="background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 50px; margin-top: 15px; margin-left: 10px; cursor: pointer;">
-                    <i class="fas fa-redo"></i> Reintentar
-                </button>
+                <div style="margin-top: 20px;">
+                    <button id="btnVolverMenu" style="background: #f5b042; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-right: 10px; cursor: pointer;">
+                        <i class="fas fa-home"></i> Volver al menú
+                    </button>
+                    <button id="btnReintentar" style="background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer;">
+                        <i class="fas fa-redo"></i> Reintentar
+                    </button>
+                </div>
             `;
             resultadoDiv.style.display = 'block';
             document.getElementById('btnEnviar').style.display = 'none';
             
-            // ✅ GUARDAR RESULTADO EN FIRESTORE
+            // GUARDAR RESULTADO EN FIRESTORE
             if (currentUser) {
                 await guardarResultadoTest(
                     currentUser.uid,
@@ -536,8 +572,15 @@
         }
         
         document.getElementById('btnEnviar').addEventListener('click', () => {
-            if (!testFinalizado && confirm('¿Seguro que quieres finalizar el test?')) {
-                finalizarTest();
+            const respondidas = respuestasUsuario.filter(r => r !== null).length;
+            if (respondidas < preguntasActuales.length) {
+                if (confirm(`⚠️ Solo has respondido ${respondidas} de ${preguntasActuales.length} preguntas.\n¿Seguro que quieres finalizar el test?`)) {
+                    finalizarTest();
+                }
+            } else {
+                if (confirm('¿Seguro que quieres finalizar el test?')) {
+                    finalizarTest();
+                }
             }
         });
         
