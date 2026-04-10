@@ -93,7 +93,7 @@ export const tema2 = [
             {
                 id: 12,
                 texto: "¿Qué indica esta señal?",
-                imagen: "../img/STOP.png",
+                imagen: "../img/parar.png",
                 opciones: ["STOP - Detención obligatoria", "Ceda el paso", "Prohibido el paso", "Prioridad"],
                 correcta: 0,
                 explicacion: "La señal de STOP obliga a detenerse completamente antes de continuar."
