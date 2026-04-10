@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema 2 - Señales de tráfico | AprobadoYa</title>
+    <meta name="description" content="Todas las señales de tráfico: verticales, horizontales, semáforos. Aprende a identificarlas para el examen de conducir.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tema-header { background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; padding: 60px 0; text-align: center; margin-bottom: 40px; position: relative; overflow: hidden; }
+        .tema-header::before { content: "🪧"; position: absolute; font-size: 150px; opacity: 0.05; bottom: -30px; right: -30px; transform: rotate(-15deg); }
+        .tema-badge { display: inline-block; background: #fbbf24; color: #1a472a; padding: 5px 15px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin-bottom: 20px; }
+        .tema-header h1 { font-size: 2.5rem; margin-bottom: 15px; }
+        .tema-contenido { background: white; border-radius: 30px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 40px; }
+        .tema-contenido h2 { color: #1e293b; margin-top: 35px; margin-bottom: 20px; padding-left: 15px; border-left: 4px solid #fbbf24; font-size: 1.5rem; }
+        .tema-contenido h3 { color: #334155; margin: 20px 0 10px; font-size: 1.2rem; }
+        .señal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin: 25px 0; }
+        .señal-card { background: #f8fafc; border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: all 0.3s; border: 1px solid #e2e8f0; }
+        .señal-card:hover { transform: translateX(5px); border-color: #fbbf24; background: #fef3c7; }
+        .señal-imagen { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 10px; padding: 8px; }
+        .señal-imagen img { max-width: 60px; max-height: 60px; object-fit: contain; }
+        .señal-info h4 { font-size: 1rem; margin-bottom: 5px; color: #1e293b; }
+        .señal-info p { font-size: 0.8rem; color: #64748b; margin: 0; }
+        .regla-destacada { background: #fef3c7; padding: 20px; border-radius: 15px; margin: 25px 0; border-left: 4px solid #fbbf24; }
+        .tabla-senales { width: 100%; border-collapse: collapse; margin: 20px 0; background: #f8fafc; border-radius: 15px; overflow: hidden; }
+        .tabla-senales th, .tabla-senales td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .tabla-senales th { background: #1e293b; color: white; }
+        .btn-test { display: inline-block; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; padding: 14px 35px; border-radius: 50px; text-decoration: none; font-weight: 600; margin-top: 20px; transition: all 0.3s; }
+        .btn-test:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(251,191,36,0.3); }
+        .navegacion-temas { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 15px; }
+        .btn-volver, .btn-siguiente { background: #f1f5f9; padding: 12px 25px; border-radius: 50px; text-decoration: none; color: #1e293b; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-volver:hover, .btn-siguiente:hover { background: #e2e8f0; transform: translateX(-3px); }
+        @media (max-width: 768px) { .tema-header h1 { font-size: 1.8rem; } .tema-contenido { padding: 25px; } .señal-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav id="navMenu"><ul><li><a href="../index.html">Inicio</a></li><li><a href="index.html" class="active">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="tema-header">
+        <div class="container">
+            <div class="tema-badge">Tema 2</div>
+            <h1>Señales de tráfico</h1>
+            <p>Verticales, horizontales, semáforos y agentes - Guía completa de todas las señales</p>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="tema-contenido">
+                <h2>🚦 2.1 Clasificación de las señales</h2>
+                <ul>
+                    <li><strong>Señales verticales:</strong> Fijas sobre postes o soportes. Se dividen en: peligro, reglamentación (prohibición, obligación, prioridad) e indicación.</li>
+                    <li><strong>Señales horizontales:</strong> Marcas viales pintadas en el pavimento (líneas, flechas, cebreados).</li>
+                    <li><strong>Semáforos:</strong> Regulan la circulación con luces de colores (rojo, amarillo, verde, intermitentes).</li>
+                    <li><strong>Agentes de circulación:</strong> Sus indicaciones prevalecen sobre cualquier otra señal.</li>
+                    <li><strong>Balizamiento y señales circunstanciales:</strong> Obras, desvíos, señales temporales.</li>
+                </ul>
+
+                <h2>🛑 2.2 Señales de reglamentación (con imágenes reales)</h2>
+                <div class="señal-grid">
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Señal S-28 Zona de Estancia y Juego.png" alt="Zona de Estancia y Juego" onerror="this.parentElement.innerHTML='<i class=\'fas fa-child\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Zona de Estancia y Juego</h4><p>Señal S-28. Velocidad máxima 10 km/h. Prioridad para peatones.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Ceda el paso.png" alt="Ceda el paso" onerror="this.parentElement.innerHTML='<i class=\'fas fa-triangle-exclamation\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Ceda el paso</h4><p>Triángulo invertido con borde rojo. Obligación de ceder el paso.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/entrada-prohibida-a vehículos-de motor.png" alt="Prohibido vehículos de motor" onerror="this.parentElement.innerHTML='<i class=\'fas fa-ban\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Prohibido vehículos de motor</h4><p>Prohíbe la entrada a todo vehículo de motor.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/giro-obligatorio-a-la-derecha.png" alt="Giro obligatorio derecha" onerror="this.parentElement.innerHTML='<i class=\'fas fa-arrow-right\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Giro obligatorio a la derecha</h4><p>Indica que hay que girar obligatoriamente a la derecha.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Parking.png" alt="Estacionamiento" onerror="this.parentElement.innerHTML='<i class=\'fas fa-parking\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Estacionamiento</h4><p>Indica zona de estacionamiento permitido.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/paso de peatones.png" alt="Paso de peatones" onerror="this.parentElement.innerHTML='<i class=\'fas fa-person-walking\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Paso de peatones</h4><p>Prioridad para los peatones.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Prohibido-adelantar.png" alt="Prohibido adelantar" onerror="this.parentElement.innerHTML='<i class=\'fas fa-car-side\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Prohibido adelantar</h4><p>Prohíbe adelantar a cualquier vehículo en ese tramo.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Prohibido el paso.png" alt="Prohibido el paso" onerror="this.parentElement.innerHTML='<i class=\'fas fa-circle-stop\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Prohibido el paso</h4><p>Prohíbe la entrada a vehículos en ese sentido.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/stop.png" alt="STOP" onerror="this.parentElement.innerHTML='<i class=\'fas fa-stop-circle\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>STOP</h4><p>Detención obligatoria. Hay que parar completamente antes de continuar.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Prohibido el paso a peatones.png" alt="Prohibido paso a peatones" onerror="this.parentElement.innerHTML='<i class=\'fas fa-person-walking\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Prohibido paso a peatones</h4><p>Prohíbe el paso a peatones.</p></div>
+                    </div>
+                </div>
+
+                <h2>⚠️ 2.3 Señales de peligro</h2>
+                <div class="señal-grid">
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/peligro curvas peligrosas hacia la izquierda.png" alt="Curva izquierda" onerror="this.parentElement.innerHTML='<i class=\'fas fa-curve\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Curva peligrosa izquierda</h4><p>Advierte de una curva peligrosa hacia la izquierda.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/peligro curva peligrosa hacia la derecha.png" alt="Curva derecha" onerror="this.parentElement.innerHTML='<i class=\'fas fa-curve\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Curva peligrosa derecha</h4><p>Advierte de una curva peligrosa hacia la derecha.</p></div>
+                    </div>
+                </div>
+
+                <h2>🚗 2.4 Señales de velocidad máxima</h2>
+                <div class="señal-grid">
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Velocidad máxima 30.png" alt="Velocidad 30" onerror="this.parentElement.innerHTML='<i class=\'fas fa-gauge-high\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Velocidad máxima 30 km/h</h4><p>Límite de velocidad en zonas residenciales o escolares.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Velocidad máxima 50.png" alt="Velocidad 50" onerror="this.parentElement.innerHTML='<i class=\'fas fa-gauge-high\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Velocidad máxima 50 km/h</h4><p>Límite estándar en vías urbanas.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Velocidad máxima 90.png" alt="Velocidad 90" onerror="this.parentElement.innerHTML='<i class=\'fas fa-gauge-high\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Velocidad máxima 90 km/h</h4><p>Límite en carreteras convencionales.</p></div>
+                    </div>
+                    <div class="señal-card">
+                        <div class="señal-imagen"><img src="../img/Velocidad máxima 120.png" alt="Velocidad 120" onerror="this.parentElement.innerHTML='<i class=\'fas fa-gauge-high\' style=\'font-size:2rem; color:#f5b042;\'></i>'"></div>
+                        <div class="señal-info"><h4>Velocidad máxima 120 km/h</h4><p>Límite en autopistas y autovías.</p></div>
+                    </div>
+                </div>
+
+                <h2>📏 2.5 Señales horizontales (marcas viales)</h2>
+                <table class="tabla-senales">
+                    <thead><tr><th>Marca</th><th>Significado</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Línea continua</strong></td><td>Prohibido adelantar o cruzar sobre ella. Prohíbe el cambio de carril.</td></tr>
+                        <tr><td><strong>Línea discontinua</strong></td><td>Permite adelantar o cambiar de carril si es seguro.</td></tr>
+                        <tr><td><strong>Línea continua con discontinua</strong></td><td>La línea continua prohíbe adelantar desde ese lado, la discontinua lo permite.</td></tr>
+                        <tr><td><strong>Cebreado (líneas diagonales)</strong></td><td>Zona de estacionamiento prohibido o área de seguridad.</td></tr>
+                        <tr><td><strong>Paso de peatones</strong></td><td>Franjas blancas paralelas. Prioridad para los peatones.</td></tr>
+                        <tr><td><strong>Flechas de carril</strong></td><td>Indican dirección obligatoria (recto, izquierda, derecha).</td></tr>
+                        <tr><td><strong>Línea amarilla continua (bordillo)</strong></td><td>Prohibido estacionar y parar.</td></tr>
+                        <tr><td><strong>Línea amarilla discontinua (bordillo)</strong></td><td>Prohibido estacionar, pero permite parar.</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>🚥 2.6 Semáforos</h2>
+                <ul>
+                    <li><strong>Rojo fijo:</strong> Detención obligatoria antes de la línea de detención. No se puede circular.</li>
+                    <li><strong>Amarillo fijo:</strong> Precaución, prepararse para detenerse. Indica que va a cambiar a rojo.</li>
+                    <li><strong>Verde fijo:</strong> Paso permitido con precaución.</li>
+                    <li><strong>Amarillo intermitente:</strong> Precaución, prioridad de paso. Se encuentra en pasos a nivel o intersecciones peligrosas.</li>
+                    <li><strong>Semáforo peatonal:</strong> Figura verde (puede pasar) y roja (no cruzar). En intermitente, finalización del paso.</li>
+                    <li><strong>Semáforo con flecha verde:</strong> Permite el paso solo en la dirección de la flecha.</li>
+                </ul>
+
+                <h2>👮 2.7 Agentes de circulación</h2>
+                <p>Las indicaciones de los agentes de tráfico <strong>prevalecen sobre cualquier otra señal</strong>. Sus gestos pueden ser:</p>
+                <ul>
+                    <li><strong>Brazo levantado verticalmente:</strong> Detención obligatoria para todos los vehículos.</li>
+                    <li><strong>Brazo extendido horizontalmente:</strong> Prohibido el paso en la dirección que indica.</li>
+                    <li><strong>Brazo moviéndose en círculo:</strong> Indicación de giro obligatorio.</li>
+                    <li><strong>Brazo hacia abajo con la palma abierta:</strong> Disminuir la velocidad.</li>
+                </ul>
+
+                <div class="regla-destacada">
+                    <i class="fas fa-star"></i>
+                    <strong>Jerarquía de las señales:</strong> Agentes > Semáforos > Señales verticales > Señales horizontales.
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="../test/test-por-temas.html?tema=2" class="btn-test">
+                        <i class="fas fa-clipboard-list"></i> Practicar con test del tema 2
+                    </a>
+                </div>
+
+                <div class="navegacion-temas">
+                    <a href="tema1.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Tema anterior: Normas generales</a>
+                    <a href="tema3.html" class="btn-siguiente">Siguiente tema: Circulación <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div>
+    </footer>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                const userZone = document.getElementById('userZone');
+                if (userZone) userZone.innerHTML = `<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            }
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.getElementById('navWrapper');
+            if (wrapper) wrapper.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

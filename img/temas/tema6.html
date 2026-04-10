@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema 6 - Conducción adversa | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tema-header { background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%); color: white; padding: 60px 0; text-align: center; }
+        .tema-badge { display: inline-block; background: #fbbf24; color: #1a472a; padding: 5px 15px; border-radius: 50px; font-size: 0.8rem; margin-bottom: 20px; }
+        .tema-header h1 { font-size: 2.5rem; }
+        .tema-contenido { background: white; border-radius: 30px; padding: 40px; margin-bottom: 40px; }
+        .tema-contenido h2 { color: #1e293b; margin-top: 35px; margin-bottom: 20px; padding-left: 15px; border-left: 4px solid #fbbf24; }
+        .regla-destacada { background: #fef3c7; padding: 20px; border-radius: 15px; margin: 25px 0; border-left: 4px solid #fbbf24; }
+        .btn-test { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; padding: 14px 35px; border-radius: 50px; display: inline-block; text-decoration: none; margin-top: 20px; }
+        .navegacion-temas { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e2e8f0; }
+        .btn-volver, .btn-siguiente { background: #f1f5f9; padding: 12px 25px; border-radius: 50px; text-decoration: none; color: #1e293b; display: inline-flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+    <header><div class="container"><div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div><div class="nav-container"><div class="nav-wrapper"><nav id="navMenu"><ul><li><a href="../index.html">Inicio</a></li><li><a href="index.html" class="active">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../simulacro/index.html">Simulacro</a></li><li><a href="../videos/index.html">Videos</a></li><li><a href="../ranking/index.html">Ranking</a></li><li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li></ul></nav></div></div><div class="user-zone" id="userZone"></div><button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button></div></header>
+
+    <div class="tema-header"><div class="container"><div class="tema-badge">Tema 6</div><h1>Conducción en condiciones adversas</h1><p>Lluvia, niebla, hielo, nieve, noche y túneles</p></div></div>
+
+    <main><div class="container"><div class="tema-contenido">
+        <h2>🌧️ 6.1 Conducción bajo la lluvia</h2>
+        <ul><li>Reducir la velocidad y aumentar la distancia de seguridad.</li><li>Encender alumbrado de cruce.</li><li>Evitar frenazos bruscos (riesgo de aquaplaning).</li><li>Circular con marchas largas y suavidad en las maniobras.</li></ul>
+
+        <h2>🌫️ 6.2 Niebla y visibilidad reducida</h2>
+        <ul><li>Usar alumbrado de cruce o antiniebla delantero y trasero.</li><li>Velocidad máxima: la mitad del límite genérico de la vía.</li><li>No usar luz larga (empeora la visibilidad por rebote).</li><li>Aumentar distancia de seguridad.</li></ul>
+
+        <div class="regla-destacada"><i class="fas fa-cloud-rain"></i> <strong>Con niebla densa:</strong> Si no ves con claridad, detente en un lugar seguro fuera de la calzada.</div>
+
+        <h2>❄️ 6.3 Hielo y nieve</h2>
+        <ul><li>Circular con marchas largas, evitar frenadas y acelerones bruscos.</li><li>Usar cadenas si es obligatorio (señal de tráfico).</li><li>Mantener distancia de seguridad muy amplia.</li><li>En hielo, evitar cualquier maniobra brusca.</li></ul>
+
+        <h2>🌙 6.4 Conducción nocturna</h2>
+        <ul><li>Encender alumbrado desde el atardecer hasta el amanecer.</li><li>Usar luz de cruce en ciudad, larga en carretera sin deslumbrar.</li><li>Reducir velocidad y aumentar distancia.</li><li>Descansar cada 2 horas para evitar fatiga.</li></ul>
+
+        <h2>🚇 6.5 Túneles</h2>
+        <ul><li>Encender luz de cruce al entrar.</li><li>No adelantar (salvo que esté permitido).</li><li>Reducir velocidad y mantener distancia.</li><li>Quitarse las gafas de sol antes de entrar.</li></ul>
+
+        <div style="text-align:center; margin-top:40px;"><a href="../test/test-por-temas.html?tema=6" class="btn-test"><i class="fas fa-clipboard-list"></i> Practicar con test del tema 6</a></div>
+        <div class="navegacion-temas"><a href="tema5.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Tema anterior: Velocidad</a><a href="tema7.html" class="btn-siguiente">Siguiente tema: Vehículos <i class="fas fa-arrow-right"></i></a></div>
+    </div></div></main>
+
+    <footer><div class="container"><div class="footer-grid"><div class="footer-col"><h4>AprobadoYa</h4><p>Tu plataforma para aprobar el carnet de conducir.</p></div></div><div class="footer-bottom"><p>© 2025 AprobadoYa | Todos los derechos reservados</p></div></div></footer>
+    <script src="../js/auth.js"></script><script src="../js/main.js"></script><script>function renderUserZone(){const u=getCurrentUser();const z=document.getElementById('userZone');if(u)z.innerHTML=`<div style="display:flex; align-items:center; gap:15px;"><span style="color:white;"><i class="fas fa-user-circle"></i> ${u.nombre}</span><a href="../perfil/index.html" class="btn-login" style="background:#fbbf24; color:#1a472a;">Mi perfil</a><button onclick="logoutUser()" class="btn-login" style="background:transparent; border:1px solid #fbbf24; color:#fbbf24;">Cerrar sesión</button></div>`;else z.innerHTML=`<a href="../login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;}renderUserZone();</script>
+</body>
+</html>

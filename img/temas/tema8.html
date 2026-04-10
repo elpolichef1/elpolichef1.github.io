@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema 8 - Conductores | AprobadoYa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f5f3;
+            color: #0f2b2d;
+            line-height: 1.6;
+        }
+        header {
+            background: #0a2f2a;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px;
+            flex-wrap: wrap;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo i { font-size: 2rem; color: #f5b042; }
+        .logo h1 { font-size: 1.7rem; font-weight: 800; color: white; }
+        .logo span { color: #f5b042; }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #eef2f5;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #f5b042; }
+        .user-zone { display: flex; align-items: center; }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255,255,255,0.12);
+            padding: 6px 20px;
+            border-radius: 60px;
+        }
+        .user-avatar { font-size: 1.6rem; }
+        .user-name { color: white; font-weight: 500; }
+        .btn-profile, .btn-logout {
+            background: #f5b042;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #0a2f2a;
+        }
+        .btn-logout { background: #e2e8f0; color: #1e293b; }
+        .btn-login {
+            background: #f5b042;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #0a2f2a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+        }
+        .page-header {
+            background: linear-gradient(125deg, #0f3b2c 0%, #1b5a44 100%);
+            padding: 40px 0;
+            text-align: center;
+            border-bottom-left-radius: 48px;
+            border-bottom-right-radius: 48px;
+            margin-bottom: 40px;
+        }
+        .page-header h1 { font-size: 2rem; font-weight: 800; color: white; }
+        .page-header h1 i { color: #f5b042; margin-right: 12px; }
+        .page-header .tema-badge {
+            display: inline-block;
+            background: rgba(245,176,66,0.2);
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        .tema-content {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .tema-content h2 {
+            color: #1a472a;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-left: 4px solid #f5b042;
+            padding-left: 15px;
+        }
+        .tema-content h3 {
+            color: #1e293b;
+            margin: 25px 0 15px;
+            font-size: 1.2rem;
+        }
+        .tema-content p {
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        .info-box {
+            background: #fef3c7;
+            border-left: 4px solid #f5b042;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+        .info-box i {
+            color: #f5b042;
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        .puntos-clave {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        .puntos-clave h4 {
+            color: #1a472a;
+            margin-bottom: 15px;
+        }
+        .puntos-clave ul {
+            list-style: none;
+        }
+        .puntos-clave li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .puntos-clave li i {
+            color: #10b981;
+        }
+        .btn-test {
+            display: inline-block;
+            background: linear-gradient(135deg, #f5b042, #f59e0b);
+            color: #1a472a;
+            padding: 12px 30px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245,176,66,0.3);
+        }
+        .btn-volver {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #1e293b;
+            padding: 10px 25px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-right: 15px;
+            transition: all 0.3s;
+        }
+        .btn-volver:hover {
+            background: #cbd5e1;
+        }
+        footer {
+            background: #0f2a22;
+            color: #cbdcd6;
+            margin-top: 40px;
+            padding: 40px 0 24px;
+            border-radius: 40px 40px 0 0;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.5rem; }
+            .tema-content { padding: 25px; }
+            .menu-mobile { display: block; }
+            .nav-wrapper { display: none; }
+            .nav-wrapper.active { display: block; width: 100%; margin-top: 16px; }
+            header .container { flex-wrap: wrap; }
+            nav ul { flex-wrap: wrap; justify-content: center; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo" onclick="window.location.href='../index.html'">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper" id="navWrapper">
+                    <nav>
+                        <ul>
+                            <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="index.html" class="active">Temas</a></li>
+                            <li><a href="../test/index.html">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="../mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-user-friends"></i> Tema 8: Conductores</h1>
+            <div class="tema-badge"><i class="fas fa-book-open"></i> Permisos, licencias y documentación</div>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="tema-content">
+                <h2>📋 Permisos de Conducir</h2>
+                <p>Los permisos de conducir son autorizaciones administrativas que habilitan para conducir vehículos de determinadas clases. En España, la DGT es el organismo encargado de su expedición.</p>
+                
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i> <strong>¿Sabías que?</strong> El permiso B tiene una validez de 10 años para conductores menores de 65 años, y de 5 años para mayores de 65.
+                </div>
+
+                <h3>📌 Clases de permisos más comunes</h3>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li><strong>AM:</strong> Ciclomotores (15 años)</li>
+                    <li><strong>A1, A2, A:</strong> Motocicletas (progresivo)</li>
+                    <li><strong>B:</strong> Turismos hasta 3.500 kg (18 años)</li>
+                    <li><strong>C1, C:</strong> Camiones (21 años)</li>
+                    <li><strong>D1, D:</strong> Autobuses (24 años)</li>
+                </ul>
+
+                <h3>📄 Documentación obligatoria del conductor</h3>
+                <p>Todo conductor debe llevar consigo:</p>
+                <ul style="margin-left: 20px; margin-bottom: 20px;">
+                    <li>Permiso de conducir en vigor</li>
+                    <li>Permiso de circulación del vehículo</li>
+                    <li>Informe Técnico de Inspección (ITV) vigente</li>
+                    <li>Comprobante del seguro obligatorio</li>
+                </ul>
+
+                <div class="puntos-clave">
+                    <h4><i class="fas fa-key"></i> Puntos clave del Tema 8</h4>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> El permiso B permite conducir turismos, motos de 125cc (con 3 años de antigüedad) y vehículos especiales agrícolas</li>
+                        <li><i class="fas fa-check-circle"></i> La pérdida total de puntos (8 para noveles, 12 para general) implica la anulación del permiso</li>
+                        <li><i class="fas fa-check-circle"></i> Los conductores noveles tienen un período de 2 años con normas específicas</li>
+                        <li><i class="fas fa-check-circle"></i> El permiso por puntos entró en vigor en 2006</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 30px;">
+                    <a href="index.html" class="btn-volver"><i class="fas fa-arrow-left"></i> Volver a temas</a>
+                    <a href="../test/test-por-temas.html?tema=8" class="btn-test"><i class="fas fa-clipboard-list"></i> Test del tema 8</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) window.location.href = '../login.html';
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            document.querySelector('.nav-wrapper')?.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
