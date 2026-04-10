@@ -105,7 +105,6 @@
         .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
         .page-header h1 i { color: #f5b042; margin-right: 12px; }
         
-        /* Selector de temas */
         .selector-tema {
             background: white;
             border-radius: 25px;
@@ -155,7 +154,6 @@
             color: #94a3b8;
         }
         
-        /* Info del tema seleccionado */
         .tema-info {
             background: white;
             border-radius: 25px;
@@ -178,7 +176,6 @@
             font-weight: 600;
         }
         
-        /* Tests del tema */
         .tests-tema-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -231,7 +228,6 @@
         }
         .btn-volver:hover { background: #cbd5e1; }
         
-        /* Test container */
         .test-container {
             background: white;
             border-radius: 30px;
@@ -295,11 +291,28 @@
             color: #1e293b;
             font-size: 1rem;
         }
+        .senal-imagen {
+            text-align: center;
+            margin: 15px 0;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        .senal-imagen img {
+            max-width: 120px;
+            max-height: 120px;
+            object-fit: contain;
+        }
+        .opciones {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
         .opcion {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 10px;
             padding: 10px 15px;
             border-radius: 12px;
             cursor: pointer;
@@ -352,6 +365,7 @@
             .temas-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
             .tests-tema-grid { grid-template-columns: 1fr; }
             .test-info { flex-wrap: wrap; justify-content: center; }
+            .senal-imagen img { max-width: 80px; }
         }
     </style>
 </head>
@@ -390,13 +404,11 @@
 
     <main>
         <div class="container">
-            <!-- Selector de temas -->
             <div class="selector-tema" id="selectorTema">
                 <h3><i class="fas fa-layer-group"></i> Selecciona un tema:</h3>
                 <div class="temas-grid" id="temasGrid"></div>
             </div>
 
-            <!-- Info del tema seleccionado -->
             <div class="tema-info" id="temaInfo">
                 <div>
                     <h2 id="temaNombre"><i class="fas fa-gavel"></i> Normas Generales</h2>
@@ -407,7 +419,6 @@
                 </div>
             </div>
 
-            <!-- Tests del tema seleccionado -->
             <div id="testsTemaSection" style="display: none;">
                 <div class="tests-tema-grid" id="testsTemaGrid"></div>
                 <button class="btn-volver" id="btnVolverTemas">
@@ -415,7 +426,6 @@
                 </button>
             </div>
 
-            <!-- Contenedor del test -->
             <div class="test-container" id="testContainer">
                 <div class="test-header">
                     <h3 id="testTitle"><i class="fas fa-book-open"></i> Test del tema</h3>
@@ -452,11 +462,9 @@
         let testActivo = false;
         let currentUser = null;
         
-        // Configuración
         const APROBADO_MINIMO = 22;
         const TOTAL_PREGUNTAS_POR_TEST = 25;
         
-        // Los 4 tests por tema
         const testsPorTema = [
             { id: 1, nombre: "Test 1 - Conceptos básicos" },
             { id: 2, nombre: "Test 2 - Desarrollo" },
@@ -464,7 +472,6 @@
             { id: 4, nombre: "Test 4 - Repaso general" }
         ];
         
-        // Descripciones de los temas
         const descripcionesTemas = {
             1: "Documentación, sanciones, tasas de alcohol, permisos, normativa general...",
             2: "Señales de peligro, prohibición, obligación, marcas viales...",
@@ -527,12 +534,10 @@
             
             if (!tema) return;
             
-            // Mostrar info del tema
             document.getElementById('temaNombre').innerHTML = `<i class="fas fa-gavel"></i> ${tema.nombre}`;
             document.getElementById('temaDescripcion').textContent = descripcionesTemas[temaNumero] || "Selecciona un test para comenzar";
             document.getElementById('temaInfo').style.display = 'flex';
             
-            // Mostrar los 4 tests
             const testsGrid = document.getElementById('testsTemaGrid');
             testsGrid.innerHTML = testsPorTema.map(test => `
                 <div class="test-card" data-test-id="${test.id}">
@@ -604,17 +609,29 @@
         
         function renderizarPreguntas() {
             const container = document.getElementById('preguntasContainer');
-            container.innerHTML = preguntasActuales.map((p, idx) => `
-                <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
-                    <div class="pregunta-texto">${idx + 1}. ${p.texto}</div>
-                    ${p.opciones.map((opcion, optIdx) => `
-                        <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
-                            <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
-                            <span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span>
-                        </label>
-                    `).join('')}
-                </div>
-            `).join('');
+            
+            container.innerHTML = preguntasActuales.map((p, idx) => {
+                const tieneImagen = p.imagen && p.imagen !== undefined;
+                
+                return `
+                    <div class="pregunta" data-id="${p.id}" data-correcta="${p.correcta}">
+                        <div class="pregunta-texto">${idx + 1}. ${p.texto}</div>
+                        ${tieneImagen ? `
+                            <div class="senal-imagen">
+                                <img src="${p.imagen}" alt="Señal de tráfico" onerror="this.src='https://placehold.co/120x120/f0f0f0/cccccc?text=Se%C3%B1al'">
+                            </div>
+                        ` : ''}
+                        <div class="opciones">
+                            ${p.opciones.map((opcion, optIdx) => `
+                                <label class="opcion" data-opcion="${optIdx}" data-pregunta="${idx}">
+                                    <input type="radio" name="pregunta_${idx}" value="${optIdx}" ${respuestas[idx] === optIdx ? 'checked' : ''}>
+                                    <span>${String.fromCharCode(65 + optIdx)}. ${opcion}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
             
             document.querySelectorAll('.opcion input').forEach(input => {
                 input.addEventListener('change', (e) => {
@@ -678,7 +695,6 @@
             resultadoDiv.style.display = 'block';
             document.getElementById('btnEnviar').style.display = 'none';
             
-            // Guardar resultado
             if (currentUser && temaSeleccionado) {
                 const temas = obtenerTemas();
                 const tema = temas.find(t => t.numero === temaSeleccionado);
