@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Para Autoescuelas | AprobadoYa - Plataforma de tests DGT</title>
+    <meta name="description" content="Solución integral para autoescuelas. Plataforma de tests online, seguimiento de alumnos, estadísticas y más. Únete a AprobadoYa.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f5f3 0%, #e0ece8 100%);
+            min-height: 100vh;
+            color: #0f2b2d;
+        }
+        
+        /* Header */
+        header {
+            background: #0a2f2a;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px;
+            flex-wrap: wrap;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo i { font-size: 2rem; color: #f5b042; }
+        .logo h1 { font-size: 1.7rem; font-weight: 800; color: white; }
+        .logo span { color: #f5b042; }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #eef2f5;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        nav ul li a:hover { color: #f5b042; }
+        .user-zone { display: flex; align-items: center; }
+        .menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero-autoescuelas {
+            background: linear-gradient(135deg, #0a2f2a 0%, #1b5a44 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-autoescuelas::before {
+            content: "🏫";
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.05;
+            bottom: -50px;
+            right: -50px;
+        }
+        .hero-autoescuelas h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .hero-autoescuelas h1 i {
+            color: #f5b042;
+            margin-right: 15px;
+        }
+        .hero-autoescuelas p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Beneficios */
+        .beneficios-section {
+            padding: 60px 0;
+            background: white;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-title h2 {
+            font-size: 2rem;
+            color: #1a472a;
+            margin-bottom: 15px;
+        }
+        .section-title p {
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .beneficios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .beneficio-card {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+        .beneficio-card:hover {
+            transform: translateY(-8px);
+            border-color: #f5b042;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+        .beneficio-icono {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .beneficio-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #1a472a;
+        }
+        .beneficio-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        /* Características */
+        .caracteristicas-section {
+            padding: 60px 0;
+            background: #f0f5f3;
+        }
+        .caracteristicas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        .caracteristica-item {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+        .caracteristica-item:hover {
+            transform: translateX(5px);
+            border-color: #f5b042;
+        }
+        .caracteristica-icono {
+            font-size: 2rem;
+            min-width: 60px;
+            text-align: center;
+        }
+        .caracteristica-texto h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #1a472a;
+        }
+        .caracteristica-texto p {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        
+        /* Precios */
+        .precios-section {
+            padding: 60px 0;
+            background: white;
+        }
+        .precios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .precio-card {
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+            position: relative;
+        }
+        .precio-card.destacado {
+            border-color: #f5b042;
+            background: linear-gradient(135deg, #fff, #fef3c7);
+            transform: scale(1.02);
+        }
+        .precio-card.destacado .precio-etiqueta {
+            background: #f5b042;
+            color: #1a472a;
+        }
+        .precio-etiqueta {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .precio-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #1a472a;
+        }
+        .precio-precio {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f5b042;
+            margin: 20px 0;
+        }
+        .precio-precio span {
+            font-size: 1rem;
+            font-weight: normal;
+            color: #64748b;
+        }
+        .precio-lista {
+            list-style: none;
+            text-align: left;
+            margin: 25px 0;
+        }
+        .precio-lista li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #475569;
+        }
+        .precio-lista li i {
+            color: #10b981;
+            width: 20px;
+        }
+        .btn-contratar {
+            background: linear-gradient(135deg, #f5b042, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-contratar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245,176,66,0.4);
+        }
+        
+        /* Contacto */
+        .contacto-section {
+            padding: 60px 0;
+            background: linear-gradient(135deg, #0a2f2a, #1b5a44);
+            color: white;
+            text-align: center;
+        }
+        .contacto-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .contacto-section p {
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .contacto-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .btn-contacto {
+            background: white;
+            color: #1a472a;
+            padding: 14px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        .btn-contacto:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .btn-contacto-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        .btn-contacto-whatsapp:hover {
+            background: #20b859;
+        }
+        
+        /* Footer */
+        footer {
+            background: #0f2a22;
+            color: #cbdcd6;
+            padding: 40px 0 24px;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-autoescuelas h1 { font-size: 2rem; }
+            .menu-mobile { display: block; }
+            .nav-wrapper { display: none; }
+            .nav-wrapper.active { display: block; width: 100%; margin-top: 16px; }
+            header .container { flex-wrap: wrap; }
+            nav ul { flex-wrap: wrap; justify-content: center; gap: 16px; }
+            .precios-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <i class="fas fa-check-circle"></i>
+                <h1>Aprobado<span>Ya</span></h1>
+            </div>
+            <div class="nav-container">
+                <div class="nav-wrapper" id="navWrapper">
+                    <nav>
+                        <ul>
+                            <li><a href="index.html">Inicio</a></li>
+                            <li><a href="temas/index.html">Temas</a></li>
+                            <li><a href="test/index.html">Test</a></li>
+                            <li><a href="simulacro/index.html">Simulacro</a></li>
+                            <li><a href="ranking/index.html">Ranking</a></li>
+                            <li><a href="mini-retos/index.html">🏎️ Mini Retos</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="hero-autoescuelas">
+        <div class="container">
+            <h1><i class="fas fa-chalkboard-user"></i> ¿Tienes una autoescuela?</h1>
+            <p>Lleva la preparación de tus alumnos al siguiente nivel con nuestra plataforma digital</p>
+        </div>
+    </div>
+
+    <main>
+        <!-- Beneficios -->
+        <div class="beneficios-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2><i class="fas fa-gem"></i> Ventajas de asociarte con AprobadoYa</h2>
+                    <p>Todo lo que necesitas para que tus alumnos aprueben a la primera</p>
+                </div>
+                <div class="beneficios-grid">
+                    <div class="beneficio-card">
+                        <div class="beneficio-icono">📚</div>
+                        <h3>+3.000 preguntas oficiales</h3>
+                        <p>Banco de preguntas actualizado con el temario oficial de la DGT. Tests por temas, por niveles y examen oficial.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <div class="beneficio-icono">📊</div>
+                        <h3>Seguimiento de alumnos</h3>
+                        <p>Controla el progreso de cada alumno: tests realizados, aciertos, áreas débiles y evolución.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <div class="beneficio-icono">🎮</div>
+                        <h3>Modo multijugador</h3>
+                        <p>Los alumnos pueden competir entre sí, aumentando la motivación y el engagement.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <div class="beneficio-icono">📱</div>
+                        <h3>100% responsive</h3>
+                        <p>Acceso desde cualquier dispositivo: ordenador, tablet o móvil. Estudia donde quieras.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <div class="beneficio-icono">🏆</div>
+                        <h3>Ranking y gamificación</h3>
+                        <p>Sistema de puntuación y rankings para motivar a los alumnos a mejorar día a día.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <div class="beneficio-icono">🆓</div>
+                        <h3>Plan gratuito inicial</h3>
+                        <p>Prueba la plataforma sin compromiso. Escalable según las necesidades de tu autoescuela.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Características -->
+        <div class="caracteristicas-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2><i class="fas fa-cogs"></i> Características de la plataforma</h2>
+                    <p>Una herramienta completa para la preparación del carnet de conducir</p>
+                </div>
+                <div class="caracteristicas-grid">
+                    <div class="caracteristica-item">
+                        <div class="caracteristica-icono">⚡</div>
+                        <div class="caracteristica-texto">
+                            <h4>Test Rápido</h4>
+                            <p>10 preguntas aleatorias para practicar en minutos</p>
+                        </div>
+                    </div>
+                    <div class="caracteristica-item">
+                        <div class="caracteristica-icono">📋</div>
+                        <div class="caracteristica-texto">
+                            <h4>Test Completo</h4>
+                            <p>30 preguntas con 100 tests por nivel (fácil, medio, difícil)</p>
+                        </div>
+                    </div>
+                    <div class="caracteristica-item">
+                        <div class="caracteristica-icono">📚</div>
+                        <div class="caracteristica-texto">
+                            <h4>Test por Temas</h4>
+                            <p>20 temas con 4 tests cada uno de 25 preguntas</p>
+                        </div>
+                    </div>
+                    <div class="caracteristica-item">
+                        <div class="caracteristica-icono">🎯</div>
+                        <div class="caracteristica-texto">
+                            <h4>Examen Oficial</h4>
+                            <p>Simulacro con temporizador de 30 minutos</p>
+                        </div>
+                    </div>
+                    <div class="caracteristica-item">
+                        <div class="caracteristica-icono">👥</div>
+                        <div class="caracteristica-texto">
+                            <h4>Carrera Multijugador</h4>
+                            <p>Compite contra otros alumnos en tiempo real</p>
+                        </div>
+                    </div>
+                    <div class="caracteristica-item">
+                        <div class="caracteristica-icono">📈</div>
+                        <div class="caracteristica-texto">
+                            <h4>Estadísticas detalladas</h4>
+                            <p>Gráficos de progreso, aciertos por tema y evolución</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Precios -->
+        <div class="precios-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2><i class="fas fa-tags"></i> Planes para autoescuelas</h2>
+                    <p>Elige el plan que mejor se adapte a ti</p>
+                </div>
+                <div class="precios-grid">
+                    <div class="precio-card">
+                        <div class="precio-etiqueta">Para empezar</div>
+                        <h3>Básico</h3>
+                        <div class="precio-precio">Gratis <span>siempre</span></div>
+                        <ul class="precio-lista">
+                            <li><i class="fas fa-check"></i> Hasta 10 alumnos activos</li>
+                            <li><i class="fas fa-check"></i> Acceso a todos los tests</li>
+                            <li><i class="fas fa-check"></i> Estadísticas básicas</li>
+                            <li><i class="fas fa-check"></i> Soporte por email</li>
+                            <li><i class="fas fa-times" style="color:#ef4444;"></i> Modo multijugador</li>
+                            <li><i class="fas fa-times" style="color:#ef4444;"></i> Ranking personalizado</li>
+                        </ul>
+                        <button class="btn-contratar" onclick="window.location.href='contacto.html'">Comenzar gratis</button>
+                    </div>
+
+                    <div class="precio-card destacado">
+                        <div class="precio-etiqueta">Más popular</div>
+                        <h3>Profesional</h3>
+                        <div class="precio-precio">19.99€ <span>/Anual</span></div>
+                        <ul class="precio-lista">
+                            <li><i class="fas fa-check"></i> Alumnos ilimitados</li>
+                            <li><i class="fas fa-check"></i> Acceso a todos los tests</li>
+                            <li><i class="fas fa-check"></i> Estadísticas avanzadas</li>
+                            <li><i class="fas fa-check"></i> Modo multijugador</li>
+                            <li><i class="fas fa-check"></i> Ranking personalizado</li>
+                            <li><i class="fas fa-check"></i> Soporte prioritario 24/7</li>
+                            <li><i class="fas fa-check"></i> Informes de progreso</li>
+                        </ul>
+                        <button class="btn-contratar" onclick="window.location.href='contacto.html'">Contratar ahora</button>
+                    </div>
+
+                    <div class="precio-card">
+                        <div class="precio-etiqueta">A medida</div>
+                        <h3>Premium</h3>
+                        <div class="precio-precio">Personalizado</div>
+                        <ul class="precio-lista">
+                            <li><i class="fas fa-check"></i> Todo lo del plan Profesional</li>
+                            <li><i class="fas fa-check"></i> Marca blanca (tu logo)</li>
+                            <li><i class="fas fa-check"></i> API personalizada</li>
+                            <li><i class="fas fa-check"></i> Formación incluida</li>
+                            <li><i class="fas fa-check"></i> Soporte dedicado</li>
+                        </ul>
+                        <button class="btn-contratar" onclick="window.location.href='contacto.html'">Solicitar info</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacto -->
+        <div class="contacto-section">
+            <div class="container">
+                <h2><i class="fas fa-envelope"></i> ¿Hablamos?</h2>
+                <p>Cuéntanos las necesidades de tu autoescuela y te prepararemos una demo personalizada</p>
+                <div class="contacto-buttons">
+                    <a href="../contacto.html" class="btn-contacto"><i class="fas fa-calendar-alt"></i> Solicitar demo</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Tu plataforma para aprobar el carnet de conducir</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './js/firebase-init.js';
+        import { renderUserZone } from './js/global-auth.js';
+        
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                const userZone = document.getElementById('userZone');
+                if (userZone) userZone.innerHTML = `<a href="login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</a>`;
+            }
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.getElementById('navWrapper');
+            if (wrapper) wrapper.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

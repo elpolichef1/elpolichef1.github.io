@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AprobadoYa | Contacto</title>
+    <meta name="description" content="Contacta con nosotros para resolver tus dudas sobre el carnet de conducir.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            color: #1e293b;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: #fbbf24;
+        }
+
+        .logo h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .logo h1 span {
+            color: #fbbf24;
+        }
+
+        .nav-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-wrapper ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-wrapper a {
+            text-decoration: none;
+            color: #334155;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-wrapper a:hover, .nav-wrapper a.active {
+            color: #fbbf24;
+        }
+
+        .user-zone {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 1px solid #fbbf24;
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: #1a472a;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .btn-login:hover {
+            background: #fbbf24;
+        }
+
+        .btn-register {
+            background: #fbbf24;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: #1a472a;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #fbbf24;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            color: #1a472a;
+            font-size: 1.1rem;
+        }
+
+        .menu-mobile {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .nav-wrapper ul {
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-wrapper {
+                display: none;
+                width: 100%;
+                margin-top: 15px;
+            }
+            .nav-wrapper.active {
+                display: block;
+            }
+            .nav-wrapper ul {
+                flex-direction: column;
+                gap: 12px;
+                padding: 10px 0;
+                text-align: center;
+            }
+            .menu-mobile {
+                display: block;
+            }
+        }
+
+        .hero-contact {
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .hero-contact h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .hero-contact h1 i {
+            color: #fbbf24;
+            margin-right: 10px;
+        }
+
+        .hero-contact p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .contact-section {
+            padding: 50px 0;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .contact-card h2 {
+            font-size: 1.8rem;
+            color: #1a472a;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .contact-card h2 i {
+            color: #fbbf24;
+        }
+
+        .subtitulo {
+            color: #64748b;
+            margin-bottom: 30px;
+            border-left: 3px solid #fbbf24;
+            padding-left: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        label i {
+            margin-right: 8px;
+            color: #fbbf24;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            background: #fefefe;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251,191,36,0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn-enviar {
+            background: #1a472a;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-enviar:hover {
+            background: #0f2a1a;
+            transform: translateY(-2px);
+        }
+
+        .mensaje-feedback {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .mensaje-feedback.success {
+            background: #e6f7e6;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .mensaje-feedback.error {
+            background: #ffe6e6;
+            color: #c62828;
+            display: block;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 8px;
+        }
+
+        .footer-col a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .footer-col a:hover {
+            color: #fbbf24;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #334155;
+            font-size: 0.75rem;
+        }
+
+        .modal-bloqueo {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-bloqueo.active { display: flex; }
+        .modal-content {
+            max-width: 400px;
+            background: white;
+            border-radius: 30px;
+            text-align: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 30px 30px 0 0;
+        }
+        .modal-header i { font-size: 2rem; margin-bottom: 10px; }
+        .modal-body { padding: 25px; }
+        .modal-botones { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .modal-btn-registro { background: #fbbf24; padding: 10px 20px; border-radius: 40px; text-decoration: none; color: #1a472a; font-weight: bold; display: inline-block; }
+        .modal-btn-login { background: transparent; border: 2px solid #fbbf24; padding: 8px 18px; border-radius: 40px; text-decoration: none; color: #fbbf24; font-weight: bold; display: inline-block; }
+        .modal-cerrar { position: absolute; right: 20px; top: 20px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #fbbf24;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <i class="fas fa-check-circle"></i>
+            <h1>Aprobado<span>Ya</span></h1>
+        </div>
+        <div class="nav-container">
+            <div class="nav-wrapper" id="navWrapper">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="javascript:void(0)" onclick="verificarAcceso('temas/index.html')">Temas</a></li>
+                    <li><a href="javascript:void(0)" onclick="verificarAcceso('test/index.html')">Test</a></li>
+                    <li><a href="javascript:void(0)" onclick="verificarAcceso('simulacro/index.html')">Simulacro</a></li>
+                    <li><a href="javascript:void(0)" onclick="verificarAcceso('ranking/index.html')">Ranking</a></li>
+                    <li><a href="javascript:void(0)" onclick="verificarAcceso('mini-retos/index.html')">🏎️ Mini Retos</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="user-zone" id="userZone">
+            <div class="loading-spinner"></div>
+        </div>
+        <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+    </div>
+</header>
+
+<section class="hero-contact">
+    <div class="container">
+        <h1><i class="fas fa-envelope"></i> ¿Tienes alguna duda?</h1>
+        <p>Estamos aquí para ayudarte a conseguir tu carnet de conducir al primer intento</p>
+    </div>
+</section>
+
+<section class="contact-section">
+    <div class="container">
+        <div class="contact-card">
+            <h2><i class="fas fa-paper-plane"></i> Escríbenos</h2>
+            <div class="subtitulo">Cuéntanos tu consulta y te responderemos lo antes posible</div>
+
+            <form id="formContactoSimple">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombre completo</label>
+                    <input type="text" id="nombre" placeholder="Ej: Carlos Pérez" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Correo electrónico</label>
+                    <input type="email" id="email" placeholder="carlos@ejemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Asunto</label>
+                    <select id="asunto">
+                        <option value="Duda sobre el temario">📚 Duda sobre el temario</option>
+                        <option value="Problema con tests">❓ Problema con los tests</option>
+                        <option value="Sugerencia">💡 Sugerencia o mejora</option>
+                        <option value="Información de permisos">📄 Información de permisos</option>
+                        <option value="Problema técnico">🔧 Problema técnico</option>
+                        <option value="Otro">📌 Otro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-comment"></i> Mensaje</label>
+                    <textarea id="mensaje" placeholder="Escribe aquí tu consulta..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-enviar"><i class="fas fa-paper-plane"></i> Enviar mensaje</button>
+            </form>
+
+            <div id="feedbackMsg" class="mensaje-feedback"></div>
+            <p style="font-size: 0.7rem; text-align: center; margin-top: 20px; color: #94a3b8;">
+                <i class="fas fa-clock"></i> Te responderemos en menos de 24h laborables.
+            </p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>AprobadoYa</h4>
+                <p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces rápidos</h4>
+                <ul>
+                    <li><a href="temas/index.html">Temas</a></li>
+                    <li><a href="test/index.html">Tests</a></li>
+                    <li><a href="simulacro/index.html">Simulacro</a></li>
+                    <li><a href="mini-retos/index.html">Mini Retos</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Información</h4>
+                <ul>
+                    <li><a href="sobre-nosotros.html">Sobre nosotros</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="preguntas-frecuentes.html">Preguntas frecuentes</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+        </div>
+    </div>
+</footer>
+
+<div id="modalBloqueo" class="modal-bloqueo">
+    <button class="modal-cerrar" onclick="cerrarModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-content">
+        <div class="modal-header">
+            <i class="fas fa-lock"></i>
+            <h2>Contenido protegido</h2>
+            <p>Necesitas una cuenta gratuita para acceder</p>
+        </div>
+        <div class="modal-body">
+            <i class="fas fa-gift" style="font-size: 2rem; color: #fbbf24;"></i>
+            <h3 style="margin: 10px 0;">¡Es completamente gratis!</h3>
+            <div class="modal-botones">
+                <a href="registro.html" class="modal-btn-registro"><i class="fas fa-user-plus"></i> Crear cuenta gratis</a>
+                <a href="login.html" class="modal-btn-login"><i class="fas fa-sign-in-alt"></i> Ya tengo cuenta</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { auth, onAuthStateChanged } from './js/firebase-init.js';
+    
+    const form = document.getElementById('formContactoSimple');
+    const feedback = document.getElementById('feedbackMsg');
+    const modal = document.getElementById('modalBloqueo');
+    let usuarioActual = null;
+
+    function renderUserZone(user) {
+        const userZone = document.getElementById('userZone');
+        if (!userZone) return;
+        
+        if (user) {
+            const email = user.email || '';
+            const inicial = email.charAt(0).toUpperCase() || 'U';
+            userZone.innerHTML = `
+                <div class="user-avatar" onclick="window.location.href='../perfil/index.html'">
+                    ${inicial}
+                </div>
+            `;
+        } else {
+            userZone.innerHTML = `
+                <button class="btn-login" onclick="window.location.href='login.html'"><i class="fas fa-sign-in-alt"></i> Acceder</button>
+                <button class="btn-register" onclick="window.location.href='registro.html'"><i class="fas fa-user-plus"></i> Registro</button>
+            `;
+        }
+    }
+
+    window.verificarAcceso = function(url) {
+        if (usuarioActual) {
+            window.location.href = url;
+        } else {
+            mostrarModal();
+        }
+    };
+
+    window.mostrarModal = function() {
+        if (modal) modal.classList.add('active');
+    };
+
+    window.cerrarModal = function() {
+        if (modal) modal.classList.remove('active');
+    };
+
+    function mostrarFeedback(mensaje, tipo = 'success') {
+        feedback.textContent = mensaje;
+        feedback.className = `mensaje-feedback ${tipo}`;
+        setTimeout(() => {
+            feedback.className = 'mensaje-feedback';
+        }, 5000);
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const nombre = document.getElementById('nombre').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const asunto = document.getElementById('asunto').value;
+        const mensaje = document.getElementById('mensaje').value.trim();
+
+        if (!nombre || !email || !mensaje) {
+            mostrarFeedback('❌ Por favor, completa todos los campos obligatorios.', 'error');
+            return;
+        }
+
+        if (!email.includes('@')) {
+            mostrarFeedback('❌ Introduce un correo electrónico válido.', 'error');
+            return;
+        }
+
+        const datosContacto = {
+            id: Date.now(),
+            nombre,
+            email,
+            asunto,
+            mensaje,
+            fecha: new Date().toLocaleString(),
+            usuarioId: usuarioActual ? usuarioActual.uid : 'anonimo'
+        };
+
+        console.log('📨 Mensaje de contacto enviado:', datosContacto);
+
+        const contactosGuardados = JSON.parse(localStorage.getItem('contactos_aprobadoya') || '[]');
+        contactosGuardados.unshift(datosContacto);
+        localStorage.setItem('contactos_aprobadoya', JSON.stringify(contactosGuardados));
+
+        mostrarFeedback('✅ ¡Mensaje enviado con éxito! Te responderemos pronto.', 'success');
+        form.reset();
+    });
+
+    onAuthStateChanged(auth, (user) => {
+        usuarioActual = user;
+        renderUserZone(user);
+    });
+
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            cerrarModal();
+        }
+    };
+
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+        const navWrapper = document.getElementById('navWrapper');
+        if (navWrapper) navWrapper.classList.toggle('active');
+    });
+</script>
+</body>
+</html>
