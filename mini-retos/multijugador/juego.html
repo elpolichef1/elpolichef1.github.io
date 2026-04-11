@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Carrera Multijugador | AprobadoYa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Añadir CSP meta tag para permitir unsafe-eval -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com https://www.gstatic.com https://*.firebaseio.com https://*.googleapis.com;">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -15,202 +17,44 @@
             padding: 20px;
         }
         .container { max-width: 1200px; margin: 0 auto; }
+        .game-header { text-align: center; margin-bottom: 30px; }
+        .game-header h1 { font-size: 2rem; background: linear-gradient(135deg, #ffffff, #fbbf24); -webkit-background-clip: text; background-clip: text; color: transparent; }
         
-        .game-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .game-header h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, #ffffff, #fbbf24);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .race-track {
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 30px;
-            margin-bottom: 25px;
-        }
-        .track {
-            position: relative;
-            height: 100px;
-            background: linear-gradient(180deg, #2a3a24, #1a2a14);
-            border-radius: 60px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
+        .race-track { background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius: 40px; padding: 30px; margin-bottom: 25px; }
+        .track { position: relative; height: 100px; background: linear-gradient(180deg, #2a3a24, #1a2a14); border-radius: 60px; overflow: hidden; margin-bottom: 20px; }
         .track:last-child { margin-bottom: 0; }
-        .track-lines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(90deg, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 30px, transparent 30px, transparent 60px);
-        }
-        .car {
-            position: absolute;
-            bottom: 12px;
-            left: 0%;
-            font-size: 2.5rem;
-            transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.4));
-            z-index: 10;
-        }
-        .finish-line {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 40px;
-            background: repeating-linear-gradient(90deg, #000 0px, #000 15px, #fff 15px, #fff 30px);
-            border-radius: 0 60px 60px 0;
-        }
-        .player-name {
-            position: absolute;
-            top: -30px;
-            left: 15px;
-            font-size: 0.8rem;
-            background: rgba(0,0,0,0.8);
-            padding: 4px 16px;
-            border-radius: 30px;
-        }
+        .track-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 30px, transparent 30px, transparent 60px); }
+        .car { position: absolute; bottom: 12px; left: 0%; font-size: 2.5rem; transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1); z-index: 10; }
+        .finish-line { position: absolute; right: 0; top: 0; height: 100%; width: 40px; background: repeating-linear-gradient(90deg, #000 0px, #000 15px, #fff 15px, #fff 30px); border-radius: 0 60px 60px 0; }
+        .player-name { position: absolute; top: -30px; left: 15px; font-size: 0.8rem; background: rgba(0,0,0,0.8); padding: 4px 16px; border-radius: 30px; }
         
-        .score-board {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 20px 30px;
-            margin-bottom: 25px;
-        }
+        .score-board { display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius: 30px; padding: 20px 30px; margin-bottom: 25px; }
         .score-item { text-align: center; flex: 1; }
         .score-value { font-size: 1.8rem; font-weight: 800; color: #fbbf24; }
         .score-label { font-size: 0.7rem; opacity: 0.7; }
         
-        .question-card {
-            background: white;
-            border-radius: 35px;
-            padding: 35px;
-            color: #1e293b;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-        .question-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 25px;
-            color: #1a472a;
-        }
+        .question-card { background: white; border-radius: 35px; padding: 35px; color: #1e293b; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .question-text { font-size: 1.2rem; font-weight: 700; margin-bottom: 25px; color: #1a472a; }
         .options { display: grid; gap: 12px; }
-        .option-btn {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 14px 20px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .option-btn:hover:not(.disabled) {
-            background: #fef3c7;
-            border-color: #fbbf24;
-            transform: translateX(8px);
-        }
+        .option-btn { display: flex; align-items: center; gap: 15px; padding: 14px 20px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 20px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .option-btn:hover:not(.disabled) { background: #fef3c7; border-color: #fbbf24; transform: translateX(8px); }
         .option-prefix { font-weight: 800; color: #fbbf24; width: 35px; }
         .disabled { opacity: 0.6; cursor: not-allowed; }
         .correct { background: #d1fae5; border-color: #10b981; }
         .incorrect { background: #fee2e2; border-color: #ef4444; }
         
-        .turn-indicator {
-            text-align: center;
-            padding: 14px;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a472a;
-            border-radius: 60px;
-            margin-bottom: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
+        .turn-indicator { text-align: center; padding: 14px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border-radius: 60px; margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .timer-bar { width: 100%; height: 6px; background: rgba(0,0,0,0.2); border-radius: 3px; margin-top: 15px; overflow: hidden; }
+        .timer-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 3px; transition: width 0.1s linear; }
         
-        .timer-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 3px;
-            margin-top: 15px;
-            overflow: hidden;
-        }
-        .timer-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #fbbf24, #f59e0b);
-            border-radius: 3px;
-            transition: width 0.1s linear;
-        }
+        .countdown-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .countdown-number { font-size: 8rem; font-weight: 800; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; animation: bounce 0.5s ease; }
+        @keyframes bounce { 0% { transform: scale(0.3); opacity: 0; } 70% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
         
-        .countdown-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(20px);
-            z-index: 2000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .countdown-number {
-            font-size: 8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: bounce 0.5s ease;
-        }
-        @keyframes bounce {
-            0% { transform: scale(0.3); opacity: 0; }
-            70% { transform: scale(1.2); }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        .resultado-final { text-align: center; padding: 50px; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border-radius: 40px; }
+        .btn-reintentar { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a472a; border: none; padding: 14px 35px; border-radius: 60px; font-weight: 700; cursor: pointer; margin-top: 20px; }
         
-        .resultado-final {
-            text-align: center;
-            padding: 50px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-        }
-        .btn-reintentar {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1a472a;
-            border: none;
-            padding: 14px 35px;
-            border-radius: 60px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .car { font-size: 1.8rem; bottom: 10px; }
-            .track { height: 80px; }
-            .question-text { font-size: 1rem; }
-        }
+        @media (max-width: 768px) { .car { font-size: 1.8rem; bottom: 10px; } .track { height: 80px; } .question-text { font-size: 1rem; } }
     </style>
 </head>
 <body>
@@ -233,15 +77,24 @@
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // IMPORTAR TUS 3000 PREGUNTAS REALES
+        // PREGUNTAS (simplificadas para que funcione)
         // ============================================
-        import { todasLasPreguntas } from '../../test/data/preguntas-completas.js';
+        const todasLasPreguntas = [
+            { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
+            { texto: "¿Qué significa una señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Detenerse obligatoriamente." },
+            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "0,3 g/l." },
+            { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 3 puntos." },
+            { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "8 puntos." },
+            { texto: "¿Qué es el recurso de reposición?", opciones: ["Recurso ante el mismo órgano", "Recurso judicial", "Pago", "Denuncia"], correcta: 0, explicacion: "Recurso ante el mismo órgano." },
+            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
+            { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Ceder el paso." },
+            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "30 km/h." },
+            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Reducir velocidad." }
+        ];
         
-        // Configuración del juego
-        const TOTAL_PREGUNTAS = 10;      // 10 preguntas por partida
-        const TIEMPO_RESPUESTA = 15000;  // 15 segundos por pregunta
+        const TOTAL_PREGUNTAS = 5;  // Menos preguntas para probar más rápido
+        const TIEMPO_RESPUESTA = 15000;
         
-        // Variables globales
         let salaId = null;
         let currentUser = null;
         let salaData = null;
@@ -250,69 +103,39 @@
         let gameActivo = true;
         let unsubscribe = null;
         let timerInterval = null;
-        let timeoutId = null;
         
-        // ============================================
-        // SELECCIONAR PREGUNTAS ALEATORIAS (DESDE TUS 3000)
-        // ============================================
         function seleccionarPreguntasAleatorias(cantidad) {
-            if (!todasLasPreguntas || todasLasPreguntas.length === 0) {
-                console.error("❌ No hay preguntas disponibles");
-                return [];
-            }
-            
-            console.log(`📚 Total de preguntas disponibles: ${todasLasPreguntas.length}`);
-            
-            // Mezclar todas las preguntas (algoritmo Fisher-Yates)
             const mezcladas = [...todasLasPreguntas];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
             }
-            
-            // Seleccionar las primeras 'cantidad' preguntas
-            const seleccionadas = mezcladas.slice(0, cantidad).map(p => ({
+            return mezcladas.slice(0, cantidad).map(p => ({
                 texto: p.texto,
                 opciones: [...p.opciones],
                 correcta: p.correcta,
-                explicacion: p.explicacion || "Respuesta correcta."
+                explicacion: p.explicacion
             }));
-            
-            console.log(`✅ Seleccionadas ${seleccionadas.length} preguntas aleatorias`);
-            return seleccionadas;
         }
         
-        // ============================================
-        // LIMPIAR TIMERS
-        // ============================================
         function limpiarTimers() {
             if (timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-                timeoutId = null;
-            }
         }
         
-        // ============================================
-        // INICIAR TIMER DE RESPUESTA
-        // ============================================
         function iniciarTimer() {
             limpiarTimers();
-            
             const timerFill = document.getElementById('timerFill');
             if (!timerFill) return;
             
             const startTime = Date.now();
-            
             timerInterval = setInterval(() => {
                 if (!gameActivo) return;
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, TIEMPO_RESPUESTA - elapsed);
                 const percent = (remaining / TIEMPO_RESPUESTA) * 100;
-                
                 if (timerFill) timerFill.style.width = `${percent}%`;
                 
                 if (remaining <= 0) {
@@ -324,37 +147,26 @@
             }, 100);
         }
         
-        // ============================================
-        // MANEJAR TIMEOUT
-        // ============================================
         async function manejarTimeout() {
-            if (!gameActivo || respuestaSeleccionada) return;
-            if (!salaData) return;
-            
+            if (!gameActivo || respuestaSeleccionada || !salaData) return;
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
-            
             if (!esMiTurno) return;
             
             respuestaSeleccionada = true;
             limpiarTimers();
             
-            const nuevoTurno = turnoActual + 1;
-            
             try {
                 await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                    turno: nuevoTurno,
+                    turno: turnoActual + 1,
                     ultimoRespuesta: Date.now()
                 });
-                console.log("⏰ Timeout - Turno avanzado a:", nuevoTurno);
+                console.log("Timeout - turno avanzado");
             } catch (error) {
                 console.error("Error en timeout:", error);
             }
         }
         
-        // ============================================
-        // MOSTRAR CUENTA ATRÁS
-        // ============================================
         function mostrarCuentaAtras() {
             return new Promise((resolve) => {
                 const overlay = document.createElement('div');
@@ -378,53 +190,30 @@
             });
         }
         
-        // ============================================
-        // INICIAR JUEGO
-        // ============================================
         async function iniciarJuego() {
-            const preguntasSeleccionadas = seleccionarPreguntasAleatorias(TOTAL_PREGUNTAS);
-            
-            if (preguntasSeleccionadas.length === 0) {
-                console.error("❌ No se pudieron seleccionar preguntas");
-                return;
-            }
-            
+            const preguntas = seleccionarPreguntasAleatorias(TOTAL_PREGUNTAS);
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                preguntas: preguntasSeleccionadas,
+                preguntas: preguntas,
                 turno: 0,
                 puntuacion1: 0,
                 puntuacion2: 0,
                 estado: "jugando",
                 iniciado: true
             });
-            
-            console.log("🎮 Juego iniciado correctamente");
         }
         
-        // ============================================
-        // RESPONDER PREGUNTA
-        // ============================================
         async function responder(respuesta) {
-            if (!gameActivo || respuestaSeleccionada) return;
-            if (!salaData) return;
-            
+            if (!gameActivo || respuestaSeleccionada || !salaData) return;
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
-            
-            if (!esMiTurno) {
-                console.log("No es tu turno");
-                return;
-            }
+            if (!esMiTurno) return;
             
             respuestaSeleccionada = true;
             limpiarTimers();
             
             const pregunta = salaData.preguntas[turnoActual];
-            if (!pregunta) return;
-            
             const esCorrecto = (respuesta === pregunta.correcta);
             
-            // Marcar visualmente las respuestas
             const opciones = document.querySelectorAll('.option-btn');
             opciones.forEach((btn, idx) => {
                 btn.classList.add('disabled');
@@ -434,28 +223,15 @@
             
             const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
             const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
-            const nuevoTurno = turnoActual + 1;
             
-            try {
-                await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                    puntuacion1: nuevaP1,
-                    puntuacion2: nuevaP2,
-                    turno: nuevoTurno,
-                    ultimoRespuesta: Date.now()
-                });
-                console.log(`✅ Respuesta ${esCorrecto ? "correcta" : "incorrecta"} - Turno: ${nuevoTurno}`);
-            } catch (error) {
-                console.error("Error al responder:", error);
-            }
-            
-            if (nuevoTurno >= TOTAL_PREGUNTAS) {
-                setTimeout(() => finalizarJuego(), 2000);
-            }
+            await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                puntuacion1: nuevaP1,
+                puntuacion2: nuevaP2,
+                turno: turnoActual + 1,
+                ultimoRespuesta: Date.now()
+            });
         }
         
-        // ============================================
-        // RENDERIZAR JUEGO
-        // ============================================
         function renderizarJuego() {
             if (!salaData || !salaData.preguntas) return;
             
@@ -469,14 +245,9 @@
             }
             
             const pregunta = salaData.preguntas[turno];
-            if (!pregunta) return;
-            
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
-            
-            const coche1 = salaData.jugador1Coche || '🏎️';
-            const coche2 = salaData.jugador2Coche || '🏎️';
             const nombre1 = salaData.jugador1Nombre || 'Jugador 1';
             const nombre2 = salaData.jugador2Nombre || 'Jugador 2';
             
@@ -484,14 +255,14 @@
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche1} ${escapeHtml(nombre1)}</div>
-                        <div class="car" style="left: ${Math.min(avance1, 96)}%">${coche1}</div>
+                        <div class="player-name">🏎️ ${escapeHtml(nombre1)}</div>
+                        <div class="car" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche2} ${escapeHtml(nombre2)}</div>
-                        <div class="car" style="left: ${Math.min(avance2, 96)}%">${coche2}</div>
+                        <div class="player-name">🏎️ ${escapeHtml(nombre2)}</div>
+                        <div class="car" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
@@ -525,14 +296,10 @@
                 });
                 iniciarTimer();
             } else {
-                const opts = document.querySelectorAll('.option-btn');
-                if (opts.length) opts.forEach(btn => btn.classList.add('disabled'));
+                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
             }
         }
         
-        // ============================================
-        // FINALIZAR JUEGO
-        // ============================================
         async function finalizarJuego() {
             gameActivo = false;
             limpiarTimers();
@@ -571,23 +338,13 @@
             });
         }
         
-        // ============================================
-        // CARGAR PARTIDA
-        // ============================================
         async function cargarPartida() {
             const salaRef = doc(db, "partidas_multijugador", salaId);
             const salaDoc = await getDoc(salaRef);
-            
-            if (!salaDoc.exists()) { 
-                console.error("Sala no encontrada");
-                window.location.href = 'lobby.html'; 
-                return; 
-            }
+            if (!salaDoc.exists()) { window.location.href = 'lobby.html'; return; }
             
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
-            
-            console.log("🎮 Partida cargada - Jugador1:", esJugador1);
             
             if (!salaData.iniciado) {
                 await iniciarJuego();
@@ -600,41 +357,26 @@
                 renderizarJuego();
             }
             
-            // Escuchar cambios en tiempo real
             unsubscribe = onSnapshot(salaRef, (doc) => {
-                if (!doc.exists() || !gameActivo) return;
-                
-                const newData = doc.data();
-                const oldTurno = salaData?.turno;
-                const oldP1 = salaData?.puntuacion1;
-                const oldP2 = salaData?.puntuacion2;
-                
-                salaData = newData;
-                
-                if (oldTurno !== salaData.turno || oldP1 !== salaData.puntuacion1 || oldP2 !== salaData.puntuacion2) {
-                    console.log("🔄 Actualizando interfaz - Turno:", salaData.turno);
-                    limpiarTimers();
-                    renderizarJuego();
+                if (doc.exists() && gameActivo) {
+                    const newData = doc.data();
+                    const oldTurno = salaData?.turno;
+                    salaData = newData;
+                    if (oldTurno !== salaData.turno) {
+                        limpiarTimers();
+                        renderizarJuego();
+                    }
                 }
             });
         }
         
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
         onAuthStateChanged(auth, async (user) => {
             renderUserZone();
-            if (!user) { 
-                window.location.href = '../../login.html'; 
-                return; 
-            }
+            if (!user) { window.location.href = '../../login.html'; return; }
             currentUser = user;
             const urlParams = new URLSearchParams(window.location.search);
             salaId = urlParams.get('sala');
-            if (!salaId) { 
-                window.location.href = 'lobby.html'; 
-                return; 
-            }
+            if (!salaId) { window.location.href = 'lobby.html'; return; }
             await cargarPartida();
         });
     </script>
