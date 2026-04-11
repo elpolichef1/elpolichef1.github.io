@@ -16,10 +16,7 @@
         }
         .container { max-width: 1200px; margin: 0 auto; }
         
-        .game-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .game-header { text-align: center; margin-bottom: 30px; }
         .game-header h1 {
             font-size: 2rem;
             background: linear-gradient(135deg, #ffffff, #fbbf24);
@@ -78,6 +75,7 @@
             background: rgba(0,0,0,0.8);
             padding: 4px 16px;
             border-radius: 30px;
+            white-space: nowrap;
         }
         
         .score-board {
@@ -167,14 +165,8 @@
             font-weight: bold;
             animation: fadeIn 0.3s ease;
         }
-        .feedback-correct {
-            background: #10b981;
-            color: white;
-        }
-        .feedback-incorrect {
-            background: #ef4444;
-            color: white;
-        }
+        .feedback-correct { background: #10b981; color: white; }
+        .feedback-incorrect { background: #ef4444; color: white; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -231,6 +223,7 @@
             .car { font-size: 1.8rem; bottom: 10px; }
             .track { height: 80px; }
             .question-text { font-size: 1rem; }
+            .player-name { font-size: 0.6rem; top: -25px; white-space: nowrap; }
         }
     </style>
 </head>
@@ -250,13 +243,13 @@
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot, arrayUnion } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // PREGUNTAS (40 preguntas reales DGT)
+        // BASE DE PREGUNTAS (40 preguntas)
         // ============================================
-        const TODAS_PREGUNTAS = [
+        const BANCO_PREGUNTAS = [
             { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
             { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Solo permiso de circulación", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV", "Solo el seguro"], correcta: 2 },
             { texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
@@ -276,7 +269,7 @@
             { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 },
             { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
             { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
-            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde la continua", "No adelantar desde la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 }
+            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde el lado de la continua", "No adelantar desde el lado de la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 }
         ];
 
         const TOTAL_PREGUNTAS = 10;
@@ -289,10 +282,11 @@
         let gameActivo = true;
         let unsubscribe = null;
         let timerInterval = null;
+        let yaRespondi = false;
         
-        // Mezclar y seleccionar preguntas
+        // Mezclar y seleccionar preguntas aleatorias
         function seleccionarPreguntas() {
-            const mezcladas = [...TODAS_PREGUNTAS];
+            const mezcladas = [...BANCO_PREGUNTAS];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
@@ -304,6 +298,7 @@
             if (timerInterval) clearInterval(timerInterval);
             const timerFill = document.getElementById('timerFill');
             if (!timerFill) return;
+            
             const startTime = Date.now();
             timerInterval = setInterval(() => {
                 if (!gameActivo) return;
@@ -311,7 +306,8 @@
                 const remaining = Math.max(0, TIEMPO_RESPUESTA - elapsed);
                 const percent = (remaining / TIEMPO_RESPUESTA) * 100;
                 if (timerFill) timerFill.style.width = `${percent}%`;
-                if (remaining <= 0) {
+                
+                if (remaining <= 0 && !yaRespondi && gameActivo) {
                     clearInterval(timerInterval);
                     manejarTimeout();
                 }
@@ -319,7 +315,7 @@
         }
         
         async function manejarTimeout() {
-            if (!gameActivo) return;
+            if (!gameActivo || yaRespondi) return;
             if (!salaData) return;
             
             const turnoActual = salaData.turno;
@@ -327,9 +323,9 @@
             
             if (!esMiTurno) return;
             
-            const nuevoTurno = turnoActual + 1;
+            yaRespondi = true;
             
-            // Mostrar mensaje
+            // Mostrar mensaje de timeout
             const feedback = document.createElement('div');
             feedback.className = 'feedback-message feedback-incorrect';
             feedback.innerHTML = '<i class="fas fa-clock"></i> ⏰ ¡TIEMPO AGOTADO!';
@@ -339,13 +335,15 @@
             // Deshabilitar opciones
             document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
             
+            const nuevoTurno = turnoActual + 1;
+            
             try {
                 await updateDoc(doc(db, "partidas_multijugador", salaId), {
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
             } catch (error) {
-                console.error("Error timeout:", error);
+                console.error("Error en timeout:", error);
             }
             
             if (nuevoTurno >= TOTAL_PREGUNTAS) {
@@ -386,13 +384,18 @@
         }
         
         async function responder(respuesta) {
-            if (!gameActivo) return;
+            if (!gameActivo || yaRespondi) return;
             if (!salaData) return;
             
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
-            if (!esMiTurno) return;
             
+            if (!esMiTurno) {
+                console.log("No es mi turno");
+                return;
+            }
+            
+            yaRespondi = true;
             if (timerInterval) clearInterval(timerInterval);
             
             const pregunta = salaData.preguntas[turnoActual];
@@ -413,12 +416,12 @@
                 feedback.innerHTML = '<i class="fas fa-check-circle"></i> ✓ ¡CORRECTO! +1 punto';
             } else {
                 feedback.className = 'feedback-message feedback-incorrect';
-                feedback.innerHTML = `<i class="fas fa-times-circle"></i> ✗ INCORRECTO. Era: ${pregunta.opciones[pregunta.correcta]}`;
+                feedback.innerHTML = `<i class="fas fa-times-circle"></i> ✗ INCORRECTO. Respuesta correcta: ${pregunta.opciones[pregunta.correcta]}`;
             }
             const card = document.querySelector('.question-card');
             if (card) card.appendChild(feedback);
             
-            // Actualizar puntuación
+            // Calcular nuevas puntuaciones
             const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
             const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
             const nuevoTurno = turnoActual + 1;
@@ -430,6 +433,7 @@
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
+                console.log("Respuesta guardada, nuevo turno:", nuevoTurno);
             } catch (error) {
                 console.error("Error al responder:", error);
             }
@@ -456,29 +460,32 @@
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
             
+            const nombre1 = salaData.jugador1Nombre || 'Jugador 1';
+            const nombre2 = salaData.jugador2Nombre || 'Jugador 2';
+            
             document.getElementById('gameContent').innerHTML = `
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">🏎️ ${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div>
+                        <div class="player-name">🏎️ ${escapeHtml(nombre1)}</div>
                         <div class="car" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">🏎️ ${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div>
+                        <div class="player-name">🏎️ ${escapeHtml(nombre2)}</div>
                         <div class="car" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
                 <div class="score-board">
-                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div></div>
+                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(nombre1)}</div></div>
                     <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
-                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div></div>
+                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(nombre2)}</div></div>
                 </div>
                 ${!esMiTurno ? 
                     '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> ⏳ Esperando respuesta del rival...</div>' : 
-                    '<div class="turn-indicator"><i class="fas fa-clock"></i> 🎯 ¡Tu turno! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'
+                    '<div class="turn-indicator"><i class="fas fa-clock"></i> 🎯 ¡TU TURNO! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'
                 }
                 <div class="question-card">
                     <div class="question-text">${escapeHtml(pregunta.texto)}</div>
@@ -492,6 +499,8 @@
                     </div>
                 </div>
             `;
+            
+            yaRespondi = false;
             
             if (esMiTurno && gameActivo) {
                 document.querySelectorAll('.option-btn').forEach(btn => {
@@ -544,7 +553,9 @@
         async function cargarPartida() {
             const salaRef = doc(db, "partidas_multijugador", salaId);
             const salaDoc = await getDoc(salaRef);
+            
             if (!salaDoc.exists()) { 
+                console.error("La sala no existe");
                 window.location.href = 'lobby.html'; 
                 return; 
             }
@@ -552,23 +563,32 @@
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
             
+            console.log("Sala cargada:", salaData);
+            console.log("Soy jugador1?", esJugador1);
+            
             if (!salaData.iniciado) {
+                console.log("Iniciando juego...");
                 await iniciarJuego();
                 await mostrarCuentaAtras();
                 const updatedDoc = await getDoc(salaRef);
                 salaData = updatedDoc.data();
                 renderizarJuego();
             } else {
+                console.log("Juego ya iniciado");
                 await mostrarCuentaAtras();
                 renderizarJuego();
             }
             
+            // Escuchar cambios en tiempo real
             unsubscribe = onSnapshot(salaRef, (doc) => {
                 if (doc.exists() && gameActivo) {
                     const newData = doc.data();
                     const oldTurno = salaData?.turno;
                     salaData = newData;
+                    
+                    // Si cambió el turno, recargar la pantalla
                     if (oldTurno !== salaData.turno) {
+                        console.log("Turno cambiado de", oldTurno, "a", salaData.turno);
                         if (timerInterval) clearInterval(timerInterval);
                         renderizarJuego();
                     }
@@ -576,6 +596,7 @@
             });
         }
         
+        // Inicializar
         onAuthStateChanged(auth, async (user) => {
             renderUserZone();
             if (!user) { 
@@ -585,10 +606,14 @@
             currentUser = user;
             const urlParams = new URLSearchParams(window.location.search);
             salaId = urlParams.get('sala');
+            
             if (!salaId) { 
+                console.error("No hay sala ID");
                 window.location.href = 'lobby.html'; 
                 return; 
             }
+            
+            console.log("Sala ID:", salaId);
             await cargarPartida();
         });
     </script>
