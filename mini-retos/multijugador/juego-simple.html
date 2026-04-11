@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrera Multijugador - Simple</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a2f2a 0%, #061a14 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 { text-align: center; margin-bottom: 20px; color: #fbbf24; }
+        
+        .info-panel {
+            background: rgba(0,0,0,0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .scores {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .score-card {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+        }
+        .score-card h3 { margin-bottom: 10px; }
+        .score-card .points { font-size: 3rem; font-weight: bold; color: #fbbf24; }
+        
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            color: #1e293b;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1a472a;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-btn {
+            padding: 12px 20px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #fef3c7;
+            border-color: #fbbf24;
+            transform: translateX(5px);
+        }
+        .disabled { opacity: 0.5; cursor: not-allowed; }
+        .correct { background: #d1fae5; border-color: #10b981; }
+        .incorrect { background: #fee2e2; border-color: #ef4444; }
+        
+        .turn-indicator {
+            text-align: center;
+            padding: 12px;
+            background: #fbbf24;
+            color: #1a472a;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .timer-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .timer-fill {
+            width: 100%;
+            height: 100%;
+            background: #f59e0b;
+            transition: width 0.1s linear;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .feedback-correct { background: #10b981; color: white; }
+        .feedback-incorrect { background: #ef4444; color: white; }
+        
+        .countdown {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 8rem;
+            font-weight: bold;
+            color: #fbbf24;
+            z-index: 1000;
+        }
+        
+        button {
+            background: #fbbf24;
+            color: #1a472a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .resultado {
+            text-align: center;
+            padding: 40px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 30px;
+        }
+        
+        .debug {
+            background: rgba(0,0,0,0.7);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #0f0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏁 Carrera Multijugador</h1>
+        
+        <div id="gameArea">
+            <div class="info-panel">
+                <p>Cargando partida...</p>
+            </div>
+        </div>
+        
+        <div id="debug" class="debug"></div>
+    </div>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { renderUserZone } from '../../js/global-auth.js';
+        
+        // ============================================
+        // PREGUNTAS
+        // ============================================
+        const PREGUNTAS = [
+            { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
+            { texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
+            { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1 },
+            { texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
+            { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1 },
+            { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
+            { texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2 },
+            { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida de adherencia por agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0 },
+            { texto: "¿Qué velocidad máxima puede alcanzar un turismo con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0 },
+            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1 }
+        ];
+        
+        const TOTAL = 5; // 5 preguntas para probar rápido
+        let salaId = null;
+        let currentUser = null;
+        let salaData = null;
+        let esJugador1 = false;
+        let unsubscribe = null;
+        let timer = null;
+        let puedeResponder = true;
+        
+        function log(msg) {
+            const debugDiv = document.getElementById('debug');
+            if (debugDiv) {
+                debugDiv.innerHTML += `<p>[${new Date().toLocaleTimeString()}] ${msg}</p>`;
+                debugDiv.scrollTop = debugDiv.scrollHeight;
+            }
+            console.log(msg);
+        }
+        
+        function seleccionarPreguntas() {
+            const mezcladas = [...PREGUNTAS];
+            for (let i = mezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
+            }
+            return mezcladas.slice(0, TOTAL);
+        }
+        
+        function mostrarCuentaAtras() {
+            return new Promise((resolve) => {
+                const div = document.createElement('div');
+                div.className = 'countdown';
+                div.innerHTML = '3';
+                document.body.appendChild(div);
+                let count = 3;
+                const interval = setInterval(() => {
+                    count--;
+                    if (count >= 1) {
+                        div.innerHTML = count;
+                    } else {
+                        clearInterval(interval);
+                        div.remove();
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+        
+        function iniciarTimer() {
+            if (timer) clearInterval(timer);
+            const fill = document.getElementById('timerFill');
+            if (!fill) return;
+            
+            const start = Date.now();
+            timer = setInterval(() => {
+                const elapsed = Date.now() - start;
+                const remaining = Math.max(0, 15000 - elapsed);
+                const percent = (remaining / 15000) * 100;
+                if (fill) fill.style.width = `${percent}%`;
+                
+                if (remaining <= 0 && puedeResponder) {
+                    clearInterval(timer);
+                    manejarTimeout();
+                }
+            }, 100);
+        }
+        
+        async function manejarTimeout() {
+            if (!puedeResponder) return;
+            puedeResponder = false;
+            log("⏰ TIEMPO AGOTADO!");
+            
+            const turno = salaData.turno;
+            const nuevoTurno = turno + 1;
+            
+            await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                turno: nuevoTurno
+            });
+            
+            if (nuevoTurno >= TOTAL) {
+                setTimeout(() => finalizarJuego(), 2000);
+            }
+        }
+        
+        async function responder(opcionIndex) {
+            if (!puedeResponder) {
+                log("⚠️ Ya respondiste o no es tu turno");
+                return;
+            }
+            
+            const turno = salaData.turno;
+            const esMiTurno = (turno === (esJugador1 ? 0 : 1));
+            
+            if (!esMiTurno) {
+                log("❌ No es tu turno!");
+                return;
+            }
+            
+            puedeResponder = false;
+            if (timer) clearInterval(timer);
+            
+            const pregunta = salaData.preguntas[turno];
+            const esCorrecto = (opcionIndex === pregunta.correcta);
+            
+            log(`📝 Respuesta: ${opcionIndex}, Correcta: ${pregunta.correcta}, Acertó: ${esCorrecto}`);
+            
+            // Marcar visualmente
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach((btn, idx) => {
+                btn.classList.add('disabled');
+                if (idx === pregunta.correcta) btn.classList.add('correct');
+                if (idx === opcionIndex && !esCorrecto) btn.classList.add('incorrect');
+            });
+            
+            // Mostrar feedback
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${esCorrecto ? 'feedback-correct' : 'feedback-incorrect'}`;
+            if (esCorrecto) {
+                feedback.innerHTML = '✓ ¡CORRECTO! +1 punto';
+            } else {
+                feedback.innerHTML = `✗ INCORRECTO. Era: ${pregunta.opciones[pregunta.correcta]}`;
+            }
+            document.querySelector('.question-card').appendChild(feedback);
+            
+            // Actualizar puntuaciones
+            const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
+            const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
+            const nuevoTurno = turno + 1;
+            
+            await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                puntuacion1: nuevaP1,
+                puntuacion2: nuevaP2,
+                turno: nuevoTurno
+            });
+            
+            log(`✅ Puntuaciones: P1=${nuevaP1}, P2=${nuevaP2}, Turno=${nuevoTurno}`);
+            
+            if (nuevoTurno >= TOTAL) {
+                setTimeout(() => finalizarJuego(), 2000);
+            }
+        }
+        
+        function renderizar() {
+            if (!salaData || !salaData.preguntas) return;
+            
+            const p1 = salaData.puntuacion1 || 0;
+            const p2 = salaData.puntuacion2 || 0;
+            const turno = salaData.turno;
+            
+            if (turno >= TOTAL) {
+                finalizarJuego();
+                return;
+            }
+            
+            const pregunta = salaData.preguntas[turno];
+            const esMiTurno = (turno === (esJugador1 ? 0 : 1));
+            const nombre1 = salaData.jugador1Nombre || 'Jugador 1';
+            const nombre2 = salaData.jugador2Nombre || 'Jugador 2';
+            
+            log(`🖥️ Render - Turno: ${turno}, MiTurno: ${esMiTurno}`);
+            
+            document.getElementById('gameArea').innerHTML = `
+                <div class="scores">
+                    <div class="score-card">
+                        <h3>🏎️ ${escapeHtml(nombre1)}</h3>
+                        <div class="points">${p1}</div>
+                    </div>
+                    <div class="score-card">
+                        <h3>📊 ${turno+1}/${TOTAL}</h3>
+                        <div class="points">🏁</div>
+                    </div>
+                    <div class="score-card">
+                        <h3>🏎️ ${escapeHtml(nombre2)}</h3>
+                        <div class="points">${p2}</div>
+                    </div>
+                </div>
+                
+                <div class="turn-indicator">
+                    ${esMiTurno ? '🎯 ¡TU TURNO! Responde antes de 15 segundos' : '⏳ Esperando respuesta del rival...'}
+                    ${esMiTurno ? '<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>' : ''}
+                </div>
+                
+                <div class="question-card">
+                    <div class="question-text">${escapeHtml(pregunta.texto)}</div>
+                    <div class="options" id="options">
+                        ${pregunta.opciones.map((opt, idx) => `
+                            <button class="option-btn" data-opcion="${idx}">
+                                <strong>${String.fromCharCode(65+idx)}.</strong> ${escapeHtml(opt)}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            puedeResponder = true;
+            
+            if (esMiTurno) {
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
+                });
+                iniciarTimer();
+            } else {
+                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
+            }
+        }
+        
+        async function finalizarJuego() {
+            if (timer) clearInterval(timer);
+            if (unsubscribe) unsubscribe();
+            
+            const p1 = salaData?.puntuacion1 || 0;
+            const p2 = salaData?.puntuacion2 || 0;
+            const nombre1 = salaData?.jugador1Nombre || 'Jugador 1';
+            const nombre2 = salaData?.jugador2Nombre || 'Jugador 2';
+            const ganador = p1 > p2 ? nombre1 : (p2 > p1 ? nombre2 : "Empate");
+            const esGanador = (p1 > p2 && esJugador1) || (p2 > p1 && !esJugador1);
+            
+            document.getElementById('gameArea').innerHTML = `
+                <div class="resultado">
+                    <h2>🏁 ¡PARTIDA FINALIZADA! 🏁</h2>
+                    <div style="margin: 20px 0;">
+                        <p><strong>${escapeHtml(nombre1)}</strong>: ${p1} puntos</p>
+                        <p><strong>${escapeHtml(nombre2)}</strong>: ${p2} puntos</p>
+                        <h3 style="color: #fbbf24; margin-top: 15px;">
+                            ${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${escapeHtml(ganador)} 🏆`)}
+                        </h3>
+                    </div>
+                    <button onclick="window.location.href='lobby.html'">🎮 Jugar de nuevo</button>
+                    <button onclick="window.location.href='../index.html'" style="margin-left: 10px;">🏠 Volver al menú</button>
+                </div>
+            `;
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        async function cargarPartida() {
+            const salaRef = doc(db, "partidas_multijugador", salaId);
+            const salaDoc = await getDoc(salaRef);
+            
+            if (!salaDoc.exists()) {
+                log("❌ Sala no existe");
+                window.location.href = 'lobby.html';
+                return;
+            }
+            
+            salaData = salaDoc.data();
+            esJugador1 = salaData.jugador1 === currentUser.uid;
+            
+            log(`📡 Sala: ${salaId}`);
+            log(`👤 Soy Jugador1: ${esJugador1}`);
+            log(`🔄 Turno actual: ${salaData.turno}`);
+            
+            if (!salaData.iniciado) {
+                log("🎮 Iniciando juego...");
+                const preguntas = seleccionarPreguntas();
+                await updateDoc(salaRef, {
+                    preguntas: preguntas,
+                    turno: 0,
+                    puntuacion1: 0,
+                    puntuacion2: 0,
+                    iniciado: true
+                });
+                await mostrarCuentaAtras();
+                const updated = await getDoc(salaRef);
+                salaData = updated.data();
+                renderizar();
+            } else {
+                log("🎮 Juego ya iniciado");
+                await mostrarCuentaAtras();
+                renderizar();
+            }
+            
+            unsubscribe = onSnapshot(salaRef, (doc) => {
+                if (doc.exists()) {
+                    const newData = doc.data();
+                    const oldTurno = salaData?.turno;
+                    salaData = newData;
+                    if (oldTurno !== salaData.turno) {
+                        log(`🔄 Turno cambió: ${oldTurno} → ${salaData.turno}`);
+                        if (timer) clearInterval(timer);
+                        renderizar();
+                    }
+                }
+            });
+        }
+        
+        onAuthStateChanged(auth, async (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../../login.html';
+                return;
+            }
+            currentUser = user;
+            const urlParams = new URLSearchParams(window.location.search);
+            salaId = urlParams.get('sala');
+            
+            if (!salaId) {
+                window.location.href = 'lobby.html';
+                return;
+            }
+            
+            log(`🔑 Usuario: ${user.email}`);
+            log(`🎮 Sala: ${salaId}`);
+            await cargarPartida();
+        });
+    </script>
+</body>
+</html>
