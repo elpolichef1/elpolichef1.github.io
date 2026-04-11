@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Carrera Multijugador DGT | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        .game-header {
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        .game-header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .game-header h1 i { color: #fbbf24; }
+        
+        .game-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        /* Pista de carreras */
+        .race-track {
+            background: linear-gradient(135deg, #2d3e2c, #1f2e1a);
+            border-radius: 30px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .track {
+            position: relative;
+            height: 100px;
+            background: #4a5b3e;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .track:last-child { margin-bottom: 0; }
+        .track-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 30px, transparent 30px, transparent 60px);
+        }
+        .car {
+            position: absolute;
+            bottom: 10px;
+            left: 0%;
+            font-size: 2.5rem;
+            transition: left 0.4s ease-out;
+            filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+            z-index: 10;
+        }
+        .finish-line {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 35px;
+            background: repeating-linear-gradient(90deg, #000 0px, #000 12px, #fff 12px, #fff 24px);
+        }
+        .player-name {
+            position: absolute;
+            top: -28px;
+            left: 15px;
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.7);
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        
+        /* Marcador */
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            border-radius: 25px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .score-item {
+            text-align: center;
+            flex: 1;
+        }
+        .score-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fbbf24;
+        }
+        .score-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
+        /* Pregunta */
+        .question-card {
+            background: white;
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 20px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #fef3c7;
+            border-color: #fbbf24;
+            transform: translateX(8px);
+        }
+        .option-prefix {
+            font-weight: 800;
+            color: #fbbf24;
+            width: 35px;
+        }
+        .disabled { opacity: 0.6; cursor: not-allowed; }
+        .correct { background: #d1fae5; border-color: #10b981; }
+        .incorrect { background: #fee2e2; border-color: #ef4444; }
+        
+        .turn-indicator {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .timer-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        
+        .feedback-message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
+        }
+        .feedback-correct { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
+        .feedback-incorrect { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .countdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 2000;
+        }
+        .countdown-number {
+            font-size: 8rem;
+            font-weight: 800;
+            color: #fbbf24;
+            animation: bounce 0.5s ease;
+        }
+        @keyframes bounce {
+            0% { transform: scale(0.3); opacity: 0; }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .resultado-final {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 25px;
+        }
+        .btn-reintentar {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container { padding: 15px; }
+            .score-board { flex-direction: column; gap: 10px; text-align: center; }
+            .question-text { font-size: 1rem; }
+            .option-btn { font-size: 0.9rem; padding: 12px 15px; }
+            .car { font-size: 2rem; bottom: 8px; }
+            .track { height: 80px; }
+            .player-name { font-size: 0.65rem; top: -22px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
+            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../mini-retos/index.html" class="active">Mini Retos</a></li></ul></nav></div></div>
+            <div class="user-zone" id="userZone"></div>
+            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <div class="game-header">
+        <div class="container">
+            <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador DGT</h1>
+            <p>Responde preguntas del examen oficial y adelanta a tu rival</p>
+        </div>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <div style="text-align:center; padding:80px;">
+            <div style="width:60px; height:60px; border:4px solid rgba(0,0,0,0.1); border-top-color:#fbbf24; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 25px;"></div>
+            <p>Cargando partida...</p>
+        </div>
+    </div>
+
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { renderUserZone } from '../../js/global-auth.js';
+        
+        // ============================================
+        // BASE DE PREGUNTAS DGT (50 preguntas reales)
+        // ============================================
+        const BANCO_PREGUNTAS = [
+            { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
+            { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Solo permiso de circulación", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV", "Solo el seguro"], correcta: 2 },
+            { texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
+            { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1 },
+            { texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
+            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar", "Prohibido estacionar", "Zona de carga"], correcta: 0 },
+            { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2 },
+            { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Detenerse", "Prioridad", "Prohibido", "Ceder el paso"], correcta: 3 },
+            { texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2 },
+            { texto: "¿Qué es el recurso de reposición?", opciones: ["Recurso ante el mismo órgano", "Recurso judicial", "Pago", "Denuncia"], correcta: 0 },
+            { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida de adherencia por agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0 },
+            { texto: "¿Qué velocidad máxima puede alcanzar un turismo con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0 },
+            { texto: "¿Cuántos puntos se pierden por usar el móvil al volante?", opciones: ["2 puntos", "3 puntos", "4 puntos", "6 puntos"], correcta: 1 },
+            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1 },
+            { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1 },
+            { texto: "¿Está permitido adelantar en una curva sin visibilidad?", opciones: ["Sí, con precaución", "Sí, si no viene nadie", "No, está prohibido", "Solo de noche"], correcta: 2 },
+            { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 },
+            { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
+            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
+            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde el lado de la continua", "No adelantar desde el lado de la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 },
+            { texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1 },
+            { texto: "¿Qué significa la señal de 'Calle residencial'?", opciones: ["Velocidad máxima 20 km/h", "Prioridad peatones", "Zona de juegos", "Todas son correctas"], correcta: 3 },
+            { texto: "¿Cuándo debe encender las luces de cruce?", opciones: ["Al anochecer", "En túneles", "Con lluvia intensa", "Todas son correctas"], correcta: 3 },
+            { texto: "¿Qué indica una señal circular con fondo rojo y una franja blanca?", opciones: ["Prohibido el paso", "Prohibido girar", "Prohibido adelantar", "Prohibido estacionar"], correcta: 0 },
+            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1 },
+            { texto: "¿Qué es la fatiga al volante?", opciones: ["Cansancio que afecta a la conducción", "Aburrimiento", "Estrés", "Nervios"], correcta: 0 },
+            { texto: "¿Qué debe hacer si tiene sueño al volante?", opciones: ["Parar a descansar", "Aumentar velocidad", "Poner música alta", "Abrir ventana"], correcta: 0 },
+            { texto: "¿Qué significa la señal P-19?", opciones: ["Resalto o lomo de asno", "Curva peligrosa", "Paso de peatones", "Obras"], correcta: 0 },
+            { texto: "¿Qué es el carril VAO?", opciones: ["Carril para vehículos de alta ocupación", "Carril bus", "Carril bici", "Carril de emergencia"], correcta: 0 },
+            { texto: "¿Qué sanción tiene superar la velocidad máxima en 30 km/h en autovía?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 2 }
+        ];
+
+        const TOTAL_PREGUNTAS = 10;
+        const TIEMPO_RESPUESTA = 15000;
+        
+        let salaId = null;
+        let currentUser = null;
+        let salaData = null;
+        let esJugador1 = false;
+        let gameActivo = true;
+        let unsubscribe = null;
+        let timerInterval = null;
+        let yaRespondi = false;
+        
+        function log(msg) { console.log(`[${new Date().toLocaleTimeString()}] ${msg}`); }
+        
+        function seleccionarPreguntas() {
+            const mezcladas = [...BANCO_PREGUNTAS];
+            for (let i = mezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
+            }
+            return mezcladas.slice(0, TOTAL_PREGUNTAS);
+        }
+        
+        function iniciarTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            const timerFill = document.getElementById('timerFill');
+            if (!timerFill) return;
+            const startTime = Date.now();
+            timerInterval = setInterval(() => {
+                if (!gameActivo) return;
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, TIEMPO_RESPUESTA - elapsed);
+                const percent = (remaining / TIEMPO_RESPUESTA) * 100;
+                if (timerFill) timerFill.style.width = `${percent}%`;
+                if (remaining <= 0 && !yaRespondi && gameActivo) {
+                    clearInterval(timerInterval);
+                    manejarTimeout();
+                }
+            }, 100);
+        }
+        
+        async function manejarTimeout() {
+            if (!gameActivo || yaRespondi) return;
+            if (!salaData) return;
+            const turnoActual = salaData.turno;
+            const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
+            if (!esMiTurno) return;
+            yaRespondi = true;
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback-message feedback-incorrect';
+            feedback.innerHTML = '<i class="fas fa-clock"></i> ⏰ ¡TIEMPO AGOTADO! No respondiste a tiempo';
+            document.querySelector('.question-card')?.appendChild(feedback);
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
+            const nuevoTurno = turnoActual + 1;
+            try {
+                await updateDoc(doc(db, "partidas_multijugador", salaId), { turno: nuevoTurno });
+            } catch (error) { log("Error timeout: " + error.message); }
+            if (nuevoTurno >= TOTAL_PREGUNTAS) setTimeout(() => finalizarJuego(), 2000);
+        }
+        
+        function mostrarCuentaAtras() {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'countdown-overlay';
+                overlay.innerHTML = `<div class="countdown-number" id="countdownNum">3</div><div class="countdown-text">Preparados...</div>`;
+                document.body.appendChild(overlay);
+                let count = 3;
+                const interval = setInterval(() => {
+                    count--;
+                    if (count >= 1) {
+                        const num = document.getElementById('countdownNum');
+                        if (num) num.textContent = count;
+                    } else {
+                        clearInterval(interval);
+                        overlay.remove();
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+        
+        async function iniciarJuego() {
+            const preguntas = seleccionarPreguntas();
+            await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                preguntas: preguntas,
+                turno: 0,
+                puntuacion1: 0,
+                puntuacion2: 0,
+                iniciado: true
+            });
+        }
+        
+        async function responder(respuesta) {
+            if (!gameActivo || yaRespondi) return;
+            if (!salaData) return;
+            const turnoActual = salaData.turno;
+            const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
+            if (!esMiTurno) return;
+            yaRespondi = true;
+            if (timerInterval) clearInterval(timerInterval);
+            const pregunta = salaData.preguntas[turnoActual];
+            const esCorrecto = (respuesta === pregunta.correcta);
+            const opciones = document.querySelectorAll('.option-btn');
+            opciones.forEach((btn, idx) => {
+                btn.classList.add('disabled');
+                if (idx === pregunta.correcta) btn.classList.add('correct');
+                if (idx === respuesta && respuesta !== pregunta.correcta) btn.classList.add('incorrect');
+            });
+            const feedback = document.createElement('div');
+            if (esCorrecto) {
+                feedback.className = 'feedback-message feedback-correct';
+                feedback.innerHTML = '<i class="fas fa-check-circle"></i> ✓ ¡CORRECTO! +1 punto';
+            } else {
+                feedback.className = 'feedback-message feedback-incorrect';
+                feedback.innerHTML = `<i class="fas fa-times-circle"></i> ✗ INCORRECTO. La respuesta correcta era: ${pregunta.opciones[pregunta.correcta]}`;
+            }
+            document.querySelector('.question-card')?.appendChild(feedback);
+            const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
+            const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
+            const nuevoTurno = turnoActual + 1;
+            try {
+                await updateDoc(doc(db, "partidas_multijugador", salaId), {
+                    puntuacion1: nuevaP1,
+                    puntuacion2: nuevaP2,
+                    turno: nuevoTurno
+                });
+            } catch (error) { log("Error responder: " + error.message); }
+            if (nuevoTurno >= TOTAL_PREGUNTAS) setTimeout(() => finalizarJuego(), 2000);
+        }
+        
+        function renderizarJuego() {
+            if (!salaData || !salaData.preguntas) return;
+            const p1 = salaData.puntuacion1 || 0;
+            const p2 = salaData.puntuacion2 || 0;
+            const turno = salaData.turno;
+            if (turno >= TOTAL_PREGUNTAS) { finalizarJuego(); return; }
+            const pregunta = salaData.preguntas[turno];
+            const esMiTurno = (turno === (esJugador1 ? 0 : 1));
+            const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
+            const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
+            const nombre1 = salaData.jugador1Nombre || 'Jugador 1';
+            const nombre2 = salaData.jugador2Nombre || 'Jugador 2';
+            document.getElementById('gameContainer').innerHTML = `
+                <div class="race-track">
+                    <div class="track">
+                        <div class="track-lines"></div>
+                        <div class="player-name">🏎️ ${escapeHtml(nombre1)}</div>
+                        <div class="car" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
+                        <div class="finish-line"></div>
+                    </div>
+                    <div class="track">
+                        <div class="track-lines"></div>
+                        <div class="player-name">🏎️ ${escapeHtml(nombre2)}</div>
+                        <div class="car" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
+                        <div class="finish-line"></div>
+                    </div>
+                </div>
+                <div class="score-board">
+                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(nombre1)}</div></div>
+                    <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
+                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(nombre2)}</div></div>
+                </div>
+                ${!esMiTurno ? 
+                    '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> ⏳ Esperando respuesta del rival...</div>' : 
+                    '<div class="turn-indicator"><i class="fas fa-clock"></i> 🎯 ¡TU TURNO! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'
+                }
+                <div class="question-card">
+                    <div class="question-text">${escapeHtml(pregunta.texto)}</div>
+                    <div class="options" id="options">
+                        ${pregunta.opciones.map((opt, idx) => `
+                            <div class="option-btn" data-opcion="${idx}">
+                                <span class="option-prefix">${String.fromCharCode(65+idx)}.</span>
+                                <span>${escapeHtml(opt)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            yaRespondi = false;
+            if (esMiTurno && gameActivo) {
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
+                });
+                iniciarTimer();
+            } else {
+                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
+            }
+        }
+        
+        async function finalizarJuego() {
+            gameActivo = false;
+            if (timerInterval) clearInterval(timerInterval);
+            if (unsubscribe) unsubscribe();
+            const p1 = salaData?.puntuacion1 || 0;
+            const p2 = salaData?.puntuacion2 || 0;
+            const nombre1 = salaData?.jugador1Nombre || 'Jugador 1';
+            const nombre2 = salaData?.jugador2Nombre || 'Jugador 2';
+            const ganador = p1 > p2 ? nombre1 : (p2 > p1 ? nombre2 : "Empate");
+            const esGanador = (p1 > p2 && esJugador1) || (p2 > p1 && !esJugador1);
+            document.getElementById('gameContainer').innerHTML = `
+                <div class="resultado-final">
+                    <i class="fas ${esGanador ? 'fa-trophy' : 'fa-flag-checkered'}" style="font-size: 4rem; color: #fbbf24;"></i>
+                    <h2 style="margin: 20px 0;">🏁 ¡PARTIDA FINALIZADA! 🏁</h2>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;">
+                        <p><strong>${escapeHtml(nombre1)}</strong>: ${p1} puntos</p>
+                        <p><strong>${escapeHtml(nombre2)}</strong>: ${p2} puntos</p>
+                        <div style="height: 1px; background: #e2e8f0; margin: 15px 0;"></div>
+                        <h3 style="color: #fbbf24;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${escapeHtml(ganador)} 🏆`)}</h3>
+                    </div>
+                    <button class="btn-reintentar" onclick="window.location.href='lobby.html'"><i class="fas fa-redo"></i> Jugar de nuevo</button>
+                    <a href="index.html" style="display: inline-block; margin-left: 15px; background: #f1f5f9; color: #1e293b; padding: 12px 30px; border-radius: 50px; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a>
+                </div>
+            `;
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        async function cargarPartida() {
+            const salaRef = doc(db, "partidas_multijugador", salaId);
+            const salaDoc = await getDoc(salaRef);
+            if (!salaDoc.exists()) { window.location.href = 'lobby.html'; return; }
+            salaData = salaDoc.data();
+            esJugador1 = salaData.jugador1 === currentUser.uid;
+            if (!salaData.iniciado) {
+                await iniciarJuego();
+                await mostrarCuentaAtras();
+                const updatedDoc = await getDoc(salaRef);
+                salaData = updatedDoc.data();
+                renderizarJuego();
+            } else {
+                await mostrarCuentaAtras();
+                renderizarJuego();
+            }
+            unsubscribe = onSnapshot(salaRef, (doc) => {
+                if (doc.exists() && gameActivo) {
+                    const newData = doc.data();
+                    const oldTurno = salaData?.turno;
+                    salaData = newData;
+                    if (oldTurno !== salaData.turno) {
+                        if (timerInterval) clearInterval(timerInterval);
+                        renderizarJuego();
+                    }
+                }
+            });
+        }
+        
+        onAuthStateChanged(auth, async (user) => {
+            renderUserZone();
+            if (!user) { window.location.href = '../../login.html'; return; }
+            currentUser = user;
+            const urlParams = new URLSearchParams(window.location.search);
+            salaId = urlParams.get('sala');
+            if (!salaId) { window.location.href = 'lobby.html'; return; }
+            await cargarPartida();
+        });
+        
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            document.querySelector('.nav-wrapper')?.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
