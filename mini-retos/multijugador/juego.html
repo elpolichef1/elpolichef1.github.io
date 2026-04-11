@@ -25,6 +25,19 @@
             color: transparent;
         }
         
+        .debug-panel {
+            background: rgba(0,0,0,0.7);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #0f0;
+            max-height: 120px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        
         .race-track {
             background: rgba(0,0,0,0.4);
             backdrop-filter: blur(10px);
@@ -75,7 +88,6 @@
             background: rgba(0,0,0,0.8);
             padding: 4px 16px;
             border-radius: 30px;
-            white-space: nowrap;
         }
         
         .score-board {
@@ -223,7 +235,6 @@
             .car { font-size: 1.8rem; bottom: 10px; }
             .track { height: 80px; }
             .question-text { font-size: 1rem; }
-            .player-name { font-size: 0.6rem; top: -25px; white-space: nowrap; }
         }
     </style>
 </head>
@@ -231,6 +242,9 @@
     <div class="container">
         <div class="game-header">
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
+        </div>
+        <div id="debugPanel" class="debug-panel" style="display: none;">
+            <p>📡 Logs de depuración...</p>
         </div>
         <div id="gameContent">
             <div style="text-align:center; padding:80px;">
@@ -243,11 +257,11 @@
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot, arrayUnion } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // BASE DE PREGUNTAS (40 preguntas)
+        // BASE DE PREGUNTAS
         // ============================================
         const BANCO_PREGUNTAS = [
             { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
@@ -268,8 +282,7 @@
             { texto: "¿Está permitido adelantar en una curva sin visibilidad?", opciones: ["Sí, con precaución", "Sí, si no viene nadie", "No, está prohibido", "Solo de noche"], correcta: 2 },
             { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 },
             { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
-            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
-            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde el lado de la continua", "No adelantar desde el lado de la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 }
+            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 }
         ];
 
         const TOTAL_PREGUNTAS = 10;
@@ -284,7 +297,17 @@
         let timerInterval = null;
         let yaRespondi = false;
         
-        // Mezclar y seleccionar preguntas aleatorias
+        function log(mensaje) {
+            console.log(`[${new Date().toLocaleTimeString()}] ${mensaje}`);
+            const panel = document.getElementById('debugPanel');
+            if (panel) {
+                const p = document.createElement('p');
+                p.textContent = mensaje;
+                panel.appendChild(p);
+                panel.scrollTop = panel.scrollHeight;
+            }
+        }
+        
         function seleccionarPreguntas() {
             const mezcladas = [...BANCO_PREGUNTAS];
             for (let i = mezcladas.length - 1; i > 0; i--) {
@@ -321,29 +344,31 @@
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
             
+            log(`⏰ TIMEOUT - Turno actual: ${turnoActual}, esJugador1: ${esJugador1}, esMiTurno: ${esMiTurno}`);
+            
             if (!esMiTurno) return;
             
             yaRespondi = true;
             
-            // Mostrar mensaje de timeout
             const feedback = document.createElement('div');
             feedback.className = 'feedback-message feedback-incorrect';
             feedback.innerHTML = '<i class="fas fa-clock"></i> ⏰ ¡TIEMPO AGOTADO!';
             const card = document.querySelector('.question-card');
             if (card) card.appendChild(feedback);
             
-            // Deshabilitar opciones
             document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
             
             const nuevoTurno = turnoActual + 1;
+            log(`➡️ Avanzando al turno ${nuevoTurno}`);
             
             try {
                 await updateDoc(doc(db, "partidas_multijugador", salaId), {
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
+                log(`✅ Turno actualizado a ${nuevoTurno}`);
             } catch (error) {
-                console.error("Error en timeout:", error);
+                log(`❌ Error en timeout: ${error.message}`);
             }
             
             if (nuevoTurno >= TOTAL_PREGUNTAS) {
@@ -374,6 +399,7 @@
         
         async function iniciarJuego() {
             const preguntas = seleccionarPreguntas();
+            log(`🎮 Iniciando juego con ${preguntas.length} preguntas`);
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
                 preguntas: preguntas,
                 turno: 0,
@@ -381,17 +407,23 @@
                 puntuacion2: 0,
                 iniciado: true
             });
+            log(`✅ Juego iniciado, turno inicial: 0 (empieza Jugador 1)`);
         }
         
         async function responder(respuesta) {
-            if (!gameActivo || yaRespondi) return;
+            if (!gameActivo || yaRespondi) {
+                log(`⚠️ No se puede responder: gameActivo=${gameActivo}, yaRespondi=${yaRespondi}`);
+                return;
+            }
             if (!salaData) return;
             
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
             
+            log(`🎯 RESPONDER - Turno actual: ${turnoActual}, esJugador1: ${esJugador1}, esMiTurno: ${esMiTurno}`);
+            
             if (!esMiTurno) {
-                console.log("No es mi turno");
+                log(`❌ No es mi turno, ignorando respuesta`);
                 return;
             }
             
@@ -400,8 +432,8 @@
             
             const pregunta = salaData.preguntas[turnoActual];
             const esCorrecto = (respuesta === pregunta.correcta);
+            log(`📝 Respuesta: ${respuesta}, Correcta: ${pregunta.correcta}, EsCorrecto: ${esCorrecto}`);
             
-            // Marcar visualmente
             const opciones = document.querySelectorAll('.option-btn');
             opciones.forEach((btn, idx) => {
                 btn.classList.add('disabled');
@@ -409,7 +441,6 @@
                 if (idx === respuesta && respuesta !== pregunta.correcta) btn.classList.add('incorrect');
             });
             
-            // Mostrar feedback
             const feedback = document.createElement('div');
             if (esCorrecto) {
                 feedback.className = 'feedback-message feedback-correct';
@@ -421,10 +452,11 @@
             const card = document.querySelector('.question-card');
             if (card) card.appendChild(feedback);
             
-            // Calcular nuevas puntuaciones
             const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
             const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
             const nuevoTurno = turnoActual + 1;
+            
+            log(`📊 Nuevas puntuaciones: P1=${nuevaP1}, P2=${nuevaP2}, Nuevo turno=${nuevoTurno}`);
             
             try {
                 await updateDoc(doc(db, "partidas_multijugador", salaId), {
@@ -433,22 +465,28 @@
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
-                console.log("Respuesta guardada, nuevo turno:", nuevoTurno);
+                log(`✅ Datos guardados en Firebase`);
             } catch (error) {
-                console.error("Error al responder:", error);
+                log(`❌ Error al responder: ${error.message}`);
             }
             
             if (nuevoTurno >= TOTAL_PREGUNTAS) {
+                log(`🏁 Última pregunta respondida, finalizando juego...`);
                 setTimeout(() => finalizarJuego(), 2000);
             }
         }
         
         function renderizarJuego() {
-            if (!salaData || !salaData.preguntas) return;
+            if (!salaData || !salaData.preguntas) {
+                log(`⚠️ No hay datos para renderizar`);
+                return;
+            }
             
             const p1 = salaData.puntuacion1 || 0;
             const p2 = salaData.puntuacion2 || 0;
             const turno = salaData.turno;
+            
+            log(`🖥️ RENDERIZANDO - Turno: ${turno}, P1: ${p1}, P2: ${p2}`);
             
             if (turno >= TOTAL_PREGUNTAS) {
                 finalizarJuego();
@@ -462,6 +500,8 @@
             
             const nombre1 = salaData.jugador1Nombre || 'Jugador 1';
             const nombre2 = salaData.jugador2Nombre || 'Jugador 2';
+            
+            log(`🎮 Render - esJugador1=${esJugador1}, turno=${turno}, esMiTurno=${esMiTurno}`);
             
             document.getElementById('gameContent').innerHTML = `
                 <div class="race-track">
@@ -503,11 +543,13 @@
             yaRespondi = false;
             
             if (esMiTurno && gameActivo) {
+                log(`🎯 Es mi turno! Activando opciones y timer`);
                 document.querySelectorAll('.option-btn').forEach(btn => {
                     btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
                 });
                 iniciarTimer();
             } else {
+                log(`⏳ No es mi turno, deshabilitando opciones`);
                 document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
             }
         }
@@ -523,6 +565,8 @@
             const nombre2 = salaData?.jugador2Nombre || 'Jugador 2';
             const ganador = p1 > p2 ? nombre1 : (p2 > p1 ? nombre2 : "Empate");
             const esGanador = (p1 > p2 && esJugador1) || (p2 > p1 && !esJugador1);
+            
+            log(`🏁 FIN DEL JUEGO - ${nombre1}: ${p1} vs ${nombre2}: ${p2}`);
             
             document.getElementById('gameContent').innerHTML = `
                 <div class="resultado-final">
@@ -555,7 +599,7 @@
             const salaDoc = await getDoc(salaRef);
             
             if (!salaDoc.exists()) { 
-                console.error("La sala no existe");
+                log(`❌ La sala ${salaId} no existe`);
                 window.location.href = 'lobby.html'; 
                 return; 
             }
@@ -563,32 +607,34 @@
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
             
-            console.log("Sala cargada:", salaData);
-            console.log("Soy jugador1?", esJugador1);
+            log(`📡 Sala cargada: ID=${salaId}`);
+            log(`👤 Mi UID: ${currentUser.uid}`);
+            log(`👥 Jugador1 UID: ${salaData.jugador1}`);
+            log(`👥 Jugador2 UID: ${salaData.jugador2}`);
+            log(`🎯 ¿Soy Jugador1? ${esJugador1}`);
+            log(`🔄 Turno actual: ${salaData.turno}`);
             
             if (!salaData.iniciado) {
-                console.log("Iniciando juego...");
+                log(`🎮 Iniciando juego por primera vez...`);
                 await iniciarJuego();
                 await mostrarCuentaAtras();
                 const updatedDoc = await getDoc(salaRef);
                 salaData = updatedDoc.data();
                 renderizarJuego();
             } else {
-                console.log("Juego ya iniciado");
+                log(`🎮 Juego ya estaba iniciado`);
                 await mostrarCuentaAtras();
                 renderizarJuego();
             }
             
-            // Escuchar cambios en tiempo real
             unsubscribe = onSnapshot(salaRef, (doc) => {
                 if (doc.exists() && gameActivo) {
                     const newData = doc.data();
                     const oldTurno = salaData?.turno;
                     salaData = newData;
                     
-                    // Si cambió el turno, recargar la pantalla
                     if (oldTurno !== salaData.turno) {
-                        console.log("Turno cambiado de", oldTurno, "a", salaData.turno);
+                        log(`🔄 Cambio detectado: turno ${oldTurno} → ${salaData.turno}`);
                         if (timerInterval) clearInterval(timerInterval);
                         renderizarJuego();
                     }
@@ -596,7 +642,6 @@
             });
         }
         
-        // Inicializar
         onAuthStateChanged(auth, async (user) => {
             renderUserZone();
             if (!user) { 
@@ -608,12 +653,13 @@
             salaId = urlParams.get('sala');
             
             if (!salaId) { 
-                console.error("No hay sala ID");
+                log(`❌ No hay sala ID en la URL`);
                 window.location.href = 'lobby.html'; 
                 return; 
             }
             
-            console.log("Sala ID:", salaId);
+            log(`🔑 Usuario autenticado: ${user.email}`);
+            log(`🎮 Sala ID: ${salaId}`);
             await cargarPartida();
         });
     </script>
