@@ -229,69 +229,19 @@
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot, runTransaction } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // BASE DE DATOS DE PREGUNTAS REALES DGT (100 preguntas)
+        // IMPORTAR PREGUNTAS REALES DE LA DGT
         // ============================================
-        const preguntasReales = [
-            { id: 1, tema: 1, dificultad: "facil", texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1, explicacion: "En las intersecciones sin señalizar, la prioridad la tiene el vehículo que circula por la derecha." },
-            { id: 2, tema: 1, dificultad: "facil", texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación y seguro", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV en vigor", "Permiso de conducir y seguro"], correcta: 2, explicacion: "Es obligatorio llevar el permiso de conducir, el permiso de circulación y la ITV en vigor." },
-            { id: 3, tema: 1, dificultad: "media", texto: "¿Cuál es la tasa máxima de alcoholemia permitida para conductores noveles?", opciones: ["0,5 gramos por litro de sangre", "0,3 gramos por litro de sangre", "0,25 gramos por litro de sangre", "0,0 gramos por litro de sangre"], correcta: 1, explicacion: "Para conductores noveles (primeros 2 años) y profesionales, el límite es de 0,3 g/l en sangre." },
-            { id: 4, tema: 1, dificultad: "media", texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "Usar el móvil al volante es una infracción grave: 200€ de multa y 3 puntos del carnet." },
-            { id: 5, tema: 1, dificultad: "facil", texto: "¿Durante cuánto tiempo es considerado conductor novel?", opciones: ["1 año", "2 años", "3 años", "5 años"], correcta: 1, explicacion: "Se considera conductor novel durante los primeros 2 años desde la obtención del permiso." },
-            { id: 6, tema: 1, dificultad: "facil", texto: "¿Qué significa la señal de STOP?", opciones: ["Prohibido el paso", "Ceda el paso", "Detención obligatoria", "Prohibido estacionar"], correcta: 2, explicacion: "La señal de STOP indica detención obligatoria antes de continuar." },
-            { id: 7, tema: 1, dificultad: "facil", texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "La velocidad máxima para turismos en autovía y autopista es de 120 km/h." },
-            { id: 8, tema: 1, dificultad: "facil", texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar para pasar rápido", "Tocar el claxon", "Reducir la velocidad y ceder el paso", "Estacionar antes del paso"], correcta: 2, explicacion: "Debe reducir la velocidad y ceder el paso a los peatones que crucen o vayan a cruzar." },
-            { id: 9, tema: 1, dificultad: "media", texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "La línea continua prohíbe adelantar y cruzar sobre ella." },
-            { id: 10, tema: 1, dificultad: "facil", texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre que se quiera", "Para saludar a conocidos", "Para evitar un accidente", "En zonas urbanas siempre"], correcta: 2, explicacion: "El claxon solo debe usarse para evitar un accidente o en casos de emergencia." },
-            { id: 11, tema: 1, dificultad: "media", texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar la velocidad", "Detenerse siempre", "Reducir la velocidad y extremar la precaución", "Tocar el claxon"], correcta: 2, explicacion: "Deben reducir la velocidad y extremar la precaución al aproximarse a un paso a nivel." },
-            { id: 12, tema: 1, dificultad: "media", texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Obligación de detenerse", "Preferencia de paso", "Prohibido el paso", "Obligación de ceder el paso a otros vehículos"], correcta: 3, explicacion: "Indica la obligación de ceder el paso a los vehículos que circulan por la vía a la que se aproxima." },
-            { id: 13, tema: 1, dificultad: "dificil", texto: "¿Qué se entiende por 'conducción negligente'?", opciones: ["Conducir a velocidad moderada", "Conducir sin la atención y diligencia debidas", "Conducir sin documentos", "Conducir con exceso de equipaje"], correcta: 1, explicacion: "Es conducir sin la atención y diligencia necesarias, poniendo en riesgo la seguridad vial." },
-            { id: 14, tema: 1, dificultad: "media", texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12 puntos", "10 puntos", "8 puntos", "6 puntos"], correcta: 2, explicacion: "Los conductores noveles disponen inicialmente de 8 puntos." },
-            { id: 15, tema: 1, dificultad: "dificil", texto: "¿Qué documentación NO es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Tarjeta de la ITV", "Justificante del último pago del impuesto de circulación", "Permiso de conducir"], correcta: 2, explicacion: "El justificante del impuesto de circulación no es obligatorio llevarlo en el vehículo." },
-            { id: 16, tema: 1, dificultad: "media", texto: "¿Qué significa una señal circular con fondo rojo y una franja blanca horizontal?", opciones: ["Prohibido girar a la izquierda", "Prohibido el paso", "Prohibido adelantar", "Prohibido estacionar"], correcta: 1, explicacion: "Es la señal de prohibido el paso." },
-            { id: 17, tema: 1, dificultad: "facil", texto: "¿Dónde se debe circular normalmente en una vía de doble sentido?", opciones: ["Por el carril izquierdo", "Por el carril derecho", "Por el centro", "Por el arcén"], correcta: 1, explicacion: "Se debe circular por el carril derecho, dejando el izquierdo para adelantamientos." },
-            { id: 18, tema: 1, dificultad: "media", texto: "¿Qué significa la luz amarilla intermitente de un semáforo?", opciones: ["Paso prohibido", "Paso obligatorio", "Precaución, prioridad de paso", "Fin de prohibición"], correcta: 2, explicacion: "Indica precaución y que se debe ceder el paso." },
-            { id: 19, tema: 1, dificultad: "dificil", texto: "¿Qué se considera conducción temeraria?", opciones: ["Conducir a más de 80 km/h", "Conducir sin cinturón", "Conducir con manifiesto desprecio por la vida de los demás", "Conducir sin luces"], correcta: 2, explicacion: "Es un delito contra la seguridad vial que conlleva penas de prisión." },
-            { id: 20, tema: 1, dificultad: "media", texto: "¿Cuándo debe un conductor encender las luces de cruce?", opciones: ["Solo de noche", "Solo en túneles", "Desde el atardecer hasta el amanecer y en túneles", "Solo cuando llueve"], correcta: 2, explicacion: "Debe encender las luces de cruce desde el atardecer hasta el amanecer y en túneles o condiciones adversas." },
-            { id: 21, tema: 2, dificultad: "facil", texto: "¿Qué color tienen las señales de servicio (hospital, gasolinera)?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 0, explicacion: "Las señales de servicio son de color azul." },
-            { id: 22, tema: 2, dificultad: "facil", texto: "¿Qué indica una señal triangular con borde rojo y fondo blanco?", opciones: ["Prohibición", "Obligación", "Peligro", "Información"], correcta: 2, explicacion: "Las señales triangulares con borde rojo indican peligro." },
-            { id: 23, tema: 2, dificultad: "facil", texto: "¿Qué indica una señal circular de fondo azul con una flecha blanca hacia arriba?", opciones: ["Prohibido girar", "Dirección obligatoria", "Carril exclusivo", "Zona peatonal"], correcta: 1, explicacion: "Indica dirección obligatoria hacia donde apunta la flecha." },
-            { id: 24, tema: 2, dificultad: "media", texto: "¿Qué significa una línea continua amarilla en el bordillo?", opciones: ["Prohibido estacionar", "Prohibido parar", "Zona de carga", "Parada de autobús"], correcta: 1, explicacion: "La línea continua amarilla en el bordillo indica prohibido parar y estacionar." },
-            { id: 25, tema: 2, dificultad: "media", texto: "¿Qué indica un semáforo con una flecha verde?", opciones: ["Prohibido el paso", "Paso permitido solo en esa dirección", "Precaución", "Fin de prohibición"], correcta: 1, explicacion: "Permite el paso solo en la dirección que indica la flecha." },
-            { id: 26, tema: 2, dificultad: "facil", texto: "¿Qué señal indica 'Ceda el paso'?", opciones: ["Triángulo invertido con borde rojo", "Círculo rojo", "Octógono rojo", "Cuadrado azul"], correcta: 0, explicacion: "La señal de ceda el paso es un triángulo invertido con borde rojo y fondo blanco." },
-            { id: 27, tema: 2, dificultad: "media", texto: "¿Qué indica una señal redonda con fondo rojo y un número?", opciones: ["Velocidad máxima", "Velocidad mínima", "Prohibición de circular a más de esa velocidad", "Fin de prohibición"], correcta: 2, explicacion: "Indica la velocidad máxima permitida, no se puede circular a más de esa velocidad." },
-            { id: 28, tema: 2, dificultad: "facil", texto: "¿Qué color tienen las señales de autopista?", opciones: ["Azul", "Verde", "Amarillo", "Rojo"], correcta: 1, explicacion: "Las señales de autopista y autovía son de fondo verde." },
-            { id: 29, tema: 2, dificultad: "facil", texto: "¿Qué indica una señal cuadrada o rectangular de color azul?", opciones: ["Prohibición", "Peligro", "Información o servicio", "Obligación"], correcta: 2, explicacion: "Las señales cuadradas o rectangulares de color azul indican información o servicios." },
-            { id: 30, tema: 2, dificultad: "facil", texto: "¿Qué significa una línea discontinua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar si es seguro", "Prohibido cambiar de carril", "Zona de estacionamiento"], correcta: 1, explicacion: "La línea discontinua permite adelantar o cambiar de carril si es seguro." },
-            { id: 31, tema: 3, dificultad: "facil", texto: "¿Dónde debe circular un turismo en una autovía?", opciones: ["Por el carril izquierdo", "Por el carril derecho", "Por el carril central", "Por el arcén"], correcta: 1, explicacion: "Debe circular por el carril derecho, dejando el izquierdo para adelantar." },
-            { id: 32, tema: 3, dificultad: "facil", texto: "¿Cuándo está permitido utilizar el carril izquierdo en autovía?", opciones: ["Siempre", "Para circular a máxima velocidad", "Para adelantar", "Para circular en sentido contrario"], correcta: 2, explicacion: "El carril izquierdo se utiliza exclusivamente para adelantar." },
-            { id: 33, tema: 3, dificultad: "facil", texto: "¿Qué velocidad máxima puede alcanzar un turismo en autopista?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "La velocidad máxima para turismos en autopista es de 120 km/h." },
-            { id: 34, tema: 3, dificultad: "facil", texto: "¿Cuál es la velocidad máxima en carretera convencional para un turismo?", opciones: ["80 km/h", "90 km/h", "100 km/h", "110 km/h"], correcta: 1, explicacion: "En carretera convencional, la velocidad máxima para turismos es de 90 km/h." },
-            { id: 35, tema: 3, dificultad: "facil", texto: "¿Cuál es la velocidad máxima en vía urbana de dos carriles por sentido?", opciones: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], correcta: 2, explicacion: "En vías urbanas de dos o más carriles por sentido, la velocidad máxima es 50 km/h." },
-            { id: 36, tema: 3, dificultad: "facil", texto: "¿Qué debe hacer un conductor al aproximarse a una rotonda?", opciones: ["Ceder el paso a los vehículos que circulan en ella", "Tener prioridad siempre", "Acelerar para entrar", "Detenerse siempre"], correcta: 0, explicacion: "Debe ceder el paso a los vehículos que ya circulan por la rotonda." },
-            { id: 37, tema: 3, dificultad: "facil", texto: "¿Cómo se debe señalizar la salida de una rotonda?", opciones: ["Con el intermitente derecho", "Con el intermitente izquierdo", "Con las luces de emergencia", "No es necesario señalizar"], correcta: 0, explicacion: "Se debe señalizar con el intermitente derecho al abandonar la rotonda." },
-            { id: 38, tema: 3, dificultad: "facil", texto: "¿Está permitido adelantar en un paso de peatones?", opciones: ["Sí, si no hay peatones", "Sí, con precaución", "No, está prohibido", "Solo en vías urbanas"], correcta: 2, explicacion: "Está prohibido adelantar en los pasos de peatones." },
-            { id: 39, tema: 3, dificultad: "facil", texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "La distancia de seguridad recomendada es de 2 segundos con el vehículo delantero." },
-            { id: 40, tema: 3, dificultad: "media", texto: "¿Qué debe hacer un conductor en un túnel?", opciones: ["Encender las luces de cruce", "Reducir la velocidad", "No adelantar si está prohibido", "Todas son correctas"], correcta: 3, explicacion: "En túneles debe encender luces, reducir velocidad y no adelantar si está prohibido." },
-            { id: 41, tema: 4, dificultad: "facil", texto: "¿Cómo debe señalizarse un cambio de carril?", opciones: ["Con el intermitente correspondiente", "Con las luces de emergencia", "Con el claxon", "No es necesario señalizar"], correcta: 0, explicacion: "Debe señalizarse con el intermitente con antelación." },
-            { id: 42, tema: 4, dificultad: "facil", texto: "¿Está permitido realizar un cambio de sentido en autovía?", opciones: ["Sí, si no hay tráfico", "Sí, solo en áreas permitidas", "No, está prohibido", "Solo en caso de emergencia"], correcta: 2, explicacion: "Está totalmente prohibido cambiar de sentido en autovías y autopistas." },
-            { id: 43, tema: 4, dificultad: "facil", texto: "¿Está permitido estacionar en un paso de peatones?", opciones: ["Sí, si no hay peatones", "Sí, por poco tiempo", "No, está prohibido", "Solo de noche"], correcta: 2, explicacion: "Está totalmente prohibido estacionar en pasos de peatones." },
-            { id: 44, tema: 4, dificultad: "facil", texto: "¿Cómo se debe estacionar en una pendiente?", opciones: ["Con el freno de mano", "Girando las ruedas hacia la acera", "En punto muerto", "Las dos primeras son correctas"], correcta: 3, explicacion: "Debe usar el freno de mano y girar las ruedas hacia la acera." },
-            { id: 45, tema: 4, dificultad: "facil", texto: "¿Qué maniobra está prohibida en autopista?", opciones: ["Incorporación", "Adelantamiento", "Marcha atrás", "Circular"], correcta: 2, explicacion: "Está prohibido circular marcha atrás en autopista." },
-            { id: 46, tema: 5, dificultad: "facil", texto: "¿Cuál es la velocidad máxima para un turismo en autovía con lluvia?", opciones: ["100 km/h", "110 km/h", "120 km/h", "80 km/h"], correcta: 0, explicacion: "Con lluvia, la velocidad máxima se reduce a 100 km/h." },
-            { id: 47, tema: 5, dificultad: "media", texto: "¿Qué distancia de seguridad debe dejarse con lluvia?", opciones: ["2 segundos", "3 segundos", "4 segundos", "5 segundos"], correcta: 1, explicacion: "Con lluvia, se debe duplicar la distancia de seguridad a 3-4 segundos." },
-            { id: 48, tema: 5, dificultad: "facil", texto: "¿Qué velocidad máxima pueden alcanzar los camiones en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 1, explicacion: "Los camiones tienen limitada su velocidad a 90 km/h en autovía." },
-            { id: 49, tema: 5, dificultad: "facil", texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida de adherencia por agua", "Frenado brusco", "Aceleración repentina", "Derrape controlado"], correcta: 0, explicacion: "Es la pérdida de adherencia de los neumáticos por acumulación de agua." },
-            { id: 50, tema: 5, dificultad: "facil", texto: "¿Cómo se debe actuar en caso de aquaplaning?", opciones: ["Frenar bruscamente", "Acelerar", "Mantener dirección y no frenar", "Girar el volante"], correcta: 2, explicacion: "Se debe mantener la dirección y no frenar hasta recuperar adherencia." }
-        ];
-
+        import { preguntasReales } from '../../test/data/preguntas-reales.js';
+        
         // Configuración del juego
         const TOTAL_PREGUNTAS = 10;
         const TIEMPO_RESPUESTA = 15000;
         
+        // Variables globales
         let salaId = null;
         let currentUser = null;
         let salaData = null;
@@ -300,9 +250,11 @@
         let gameActivo = true;
         let unsubscribe = null;
         let timerInterval = null;
-        let procesandoRespuesta = false;
+        let timeoutId = null;  // Para el timeout de respuesta
         
-        // Función para seleccionar preguntas aleatorias
+        // ============================================
+        // SELECCIONAR PREGUNTAS ALEATORIAS
+        // ============================================
         function seleccionarPreguntasAleatorias(cantidad) {
             if (!preguntasReales || preguntasReales.length === 0) {
                 console.error("No hay preguntas disponibles");
@@ -315,61 +267,87 @@
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
             }
             
-            const seleccionadas = mezcladas.slice(0, cantidad).map(p => ({
+            return mezcladas.slice(0, cantidad).map(p => ({
                 texto: p.texto,
                 opciones: [...p.opciones],
                 correcta: p.correcta,
                 explicacion: p.explicacion || "Respuesta correcta."
             }));
-            
-            console.log(`✅ Seleccionadas ${seleccionadas.length} preguntas de ${preguntasReales.length} totales`);
-            return seleccionadas;
         }
         
+        // ============================================
+        // LIMPIAR TIMERS (CRUCIAL PARA EVITAR BUGS)
+        // ============================================
+        function limpiarTimers() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+        }
+        
+        // ============================================
+        // INICIAR TIMER DE RESPUESTA
+        // ============================================
         function iniciarTimer() {
-            if (timerInterval) clearInterval(timerInterval);
+            limpiarTimers();
+            
             const timerFill = document.getElementById('timerFill');
             if (!timerFill) return;
+            
             const startTime = Date.now();
+            
             timerInterval = setInterval(() => {
                 if (!gameActivo) return;
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, TIEMPO_RESPUESTA - elapsed);
                 const percent = (remaining / TIEMPO_RESPUESTA) * 100;
+                
                 if (timerFill) timerFill.style.width = `${percent}%`;
+                
                 if (remaining <= 0) {
-                    clearInterval(timerInterval);
-                    if (!respuestaSeleccionada && gameActivo && !procesandoRespuesta) {
+                    limpiarTimers();
+                    if (!respuestaSeleccionada && gameActivo) {
                         manejarTimeout();
                     }
                 }
             }, 100);
         }
         
+        // ============================================
+        // MANEJAR TIMEOUT (NO RESPONDIÓ A TIEMPO)
+        // ============================================
         async function manejarTimeout() {
-            if (!gameActivo || respuestaSeleccionada || procesandoRespuesta) return;
+            if (!gameActivo || respuestaSeleccionada) return;
             if (!salaData) return;
-            procesandoRespuesta = true;
+            
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
-            if (!esMiTurno) {
-                procesandoRespuesta = false;
-                return;
-            }
+            
+            if (!esMiTurno) return;
+            
             respuestaSeleccionada = true;
+            limpiarTimers();
+            
             const nuevoTurno = turnoActual + 1;
+            
             try {
                 await updateDoc(doc(db, "partidas_multijugador", salaId), {
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
+                console.log("⏰ Timeout: turno avanzado a", nuevoTurno);
             } catch (error) {
                 console.error("Error en timeout:", error);
             }
-            procesandoRespuesta = false;
-            if (timerInterval) clearInterval(timerInterval);
         }
         
+        // ============================================
+        // MOSTRAR CUENTA ATRÁS
+        // ============================================
         function mostrarCuentaAtras() {
             return new Promise((resolve) => {
                 const overlay = document.createElement('div');
@@ -393,12 +371,17 @@
             });
         }
         
+        // ============================================
+        // INICIAR JUEGO (CREAR PREGUNTAS)
+        // ============================================
         async function iniciarJuego() {
             const preguntasSeleccionadas = seleccionarPreguntasAleatorias(TOTAL_PREGUNTAS);
+            
             if (preguntasSeleccionadas.length === 0) {
                 console.error("No se pudieron seleccionar preguntas");
                 return;
             }
+            
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
                 preguntas: preguntasSeleccionadas,
                 turno: 0,
@@ -407,24 +390,34 @@
                 estado: "jugando",
                 iniciado: true
             });
+            
+            console.log("🎮 Juego iniciado con", preguntasSeleccionadas.length, "preguntas");
         }
         
+        // ============================================
+        // RESPONDER PREGUNTA
+        // ============================================
         async function responder(respuesta) {
-            if (!gameActivo || respuestaSeleccionada || procesandoRespuesta) return;
+            if (!gameActivo || respuestaSeleccionada) return;
             if (!salaData) return;
-            if (salaData.turno !== (esJugador1 ? 0 : 1)) return;
             
-            procesandoRespuesta = true;
-            respuestaSeleccionada = true;
-            if (timerInterval) clearInterval(timerInterval);
+            const turnoActual = salaData.turno;
+            const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
             
-            const pregunta = salaData.preguntas[salaData.turno];
-            if (!pregunta) {
-                procesandoRespuesta = false;
+            if (!esMiTurno) {
+                console.log("No es tu turno");
                 return;
             }
             
+            respuestaSeleccionada = true;
+            limpiarTimers();
+            
+            const pregunta = salaData.preguntas[turnoActual];
+            if (!pregunta) return;
+            
             const esCorrecto = (respuesta === pregunta.correcta);
+            
+            // Marcar visualmente las respuestas
             const opciones = document.querySelectorAll('.option-btn');
             opciones.forEach((btn, idx) => {
                 btn.classList.add('disabled');
@@ -434,7 +427,7 @@
             
             const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
             const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
-            const nuevoTurno = salaData.turno + 1;
+            const nuevoTurno = turnoActual + 1;
             
             try {
                 await updateDoc(doc(db, "partidas_multijugador", salaId), {
@@ -443,16 +436,19 @@
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
+                console.log(`✅ Respuesta: ${esCorrecto ? "Correcta" : "Incorrecta"}. Nuevo turno: ${nuevoTurno}`);
             } catch (error) {
                 console.error("Error al responder:", error);
             }
             
-            procesandoRespuesta = false;
             if (nuevoTurno >= TOTAL_PREGUNTAS) {
                 setTimeout(() => finalizarJuego(), 2000);
             }
         }
         
+        // ============================================
+        // RENDERIZAR INTERFAZ DEL JUEGO
+        // ============================================
         function renderizarJuego() {
             if (!salaData || !salaData.preguntas) return;
             
@@ -471,31 +467,36 @@
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
+            
             const coche1 = salaData.jugador1Coche || '🏎️';
             const coche2 = salaData.jugador2Coche || '🏎️';
+            const nombre1 = salaData.jugador1Nombre || 'Jugador 1';
+            const nombre2 = salaData.jugador2Nombre || 'Jugador 2';
             
             document.getElementById('gameContent').innerHTML = `
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche1} ${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div>
+                        <div class="player-name">${coche1} ${escapeHtml(nombre1)}</div>
                         <div class="car" style="left: ${Math.min(avance1, 96)}%">${coche1}</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche2} ${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div>
+                        <div class="player-name">${coche2} ${escapeHtml(nombre2)}</div>
                         <div class="car" style="left: ${Math.min(avance2, 96)}%">${coche2}</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
                 <div class="score-board">
-                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div></div>
+                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(nombre1)}</div></div>
                     <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
-                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div></div>
+                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(nombre2)}</div></div>
                 </div>
-                ${!esMiTurno ? '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> Esperando respuesta del rival...</div>' : 
-                    '<div class="turn-indicator"><i class="fas fa-clock"></i> ¡Tu turno! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'}
+                ${!esMiTurno ? 
+                    '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> Esperando respuesta del rival...</div>' : 
+                    '<div class="turn-indicator"><i class="fas fa-clock"></i> ¡Tu turno! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'
+                }
                 <div class="question-card">
                     <div class="question-text">${escapeHtml(pregunta.texto)}</div>
                     <div class="options" id="options">
@@ -518,13 +519,16 @@
                 iniciarTimer();
             } else {
                 const opts = document.querySelectorAll('.option-btn');
-                if (opts) opts.forEach(btn => btn.classList.add('disabled'));
+                if (opts.length) opts.forEach(btn => btn.classList.add('disabled'));
             }
         }
         
+        // ============================================
+        // FINALIZAR JUEGO
+        // ============================================
         async function finalizarJuego() {
             gameActivo = false;
-            if (timerInterval) clearInterval(timerInterval);
+            limpiarTimers();
             if (unsubscribe) unsubscribe();
             
             const p1 = salaData?.puntuacion1 || 0;
@@ -560,9 +564,13 @@
             });
         }
         
+        // ============================================
+        // CARGAR PARTIDA Y ESCUCHAR CAMBIOS
+        // ============================================
         async function cargarPartida() {
             const salaRef = doc(db, "partidas_multijugador", salaId);
             const salaDoc = await getDoc(salaRef);
+            
             if (!salaDoc.exists()) { 
                 window.location.href = 'lobby.html'; 
                 return; 
@@ -582,19 +590,29 @@
                 renderizarJuego();
             }
             
+            // Escuchar cambios en tiempo real
             unsubscribe = onSnapshot(salaRef, (doc) => {
-                if (doc.exists() && gameActivo) {
-                    const newData = doc.data();
-                    const oldTurno = salaData?.turno;
-                    salaData = newData;
-                    if (oldTurno !== salaData.turno && gameActivo) {
-                        if (timerInterval) clearInterval(timerInterval);
-                        renderizarJuego();
-                    }
+                if (!doc.exists() || !gameActivo) return;
+                
+                const newData = doc.data();
+                const oldTurno = salaData?.turno;
+                const oldP1 = salaData?.puntuacion1;
+                const oldP2 = salaData?.puntuacion2;
+                
+                salaData = newData;
+                
+                // Si cambió el turno o las puntuaciones, actualizar interfaz
+                if (oldTurno !== salaData.turno || oldP1 !== salaData.puntuacion1 || oldP2 !== salaData.puntuacion2) {
+                    console.log("🔄 Actualizando interfaz - Turno:", salaData.turno);
+                    limpiarTimers();
+                    renderizarJuego();
                 }
             });
         }
         
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
         onAuthStateChanged(auth, async (user) => {
             renderUserZone();
             if (!user) { 
