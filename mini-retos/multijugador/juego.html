@@ -229,17 +229,17 @@
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot, runTransaction } from '../../js/firebase-init.js';
+        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // IMPORTAR PREGUNTAS REALES DE LA DGT
+        // IMPORTAR TUS 3000 PREGUNTAS REALES
         // ============================================
-        import { preguntasReales } from '../../test/data/preguntas-completas.js';
+        import { todasLasPreguntas } from '../../test/data/preguntas-completas.js';
         
         // Configuración del juego
-        const TOTAL_PREGUNTAS = 10;
-        const TIEMPO_RESPUESTA = 15000;
+        const TOTAL_PREGUNTAS = 10;      // 10 preguntas por partida
+        const TIEMPO_RESPUESTA = 15000;  // 15 segundos por pregunta
         
         // Variables globales
         let salaId = null;
@@ -250,33 +250,40 @@
         let gameActivo = true;
         let unsubscribe = null;
         let timerInterval = null;
-        let timeoutId = null;  // Para el timeout de respuesta
+        let timeoutId = null;
         
         // ============================================
-        // SELECCIONAR PREGUNTAS ALEATORIAS
+        // SELECCIONAR PREGUNTAS ALEATORIAS (DESDE TUS 3000)
         // ============================================
         function seleccionarPreguntasAleatorias(cantidad) {
-            if (!preguntasReales || preguntasReales.length === 0) {
-                console.error("No hay preguntas disponibles");
+            if (!todasLasPreguntas || todasLasPreguntas.length === 0) {
+                console.error("❌ No hay preguntas disponibles");
                 return [];
             }
             
-            const mezcladas = [...preguntasReales];
+            console.log(`📚 Total de preguntas disponibles: ${todasLasPreguntas.length}`);
+            
+            // Mezclar todas las preguntas (algoritmo Fisher-Yates)
+            const mezcladas = [...todasLasPreguntas];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
             }
             
-            return mezcladas.slice(0, cantidad).map(p => ({
+            // Seleccionar las primeras 'cantidad' preguntas
+            const seleccionadas = mezcladas.slice(0, cantidad).map(p => ({
                 texto: p.texto,
                 opciones: [...p.opciones],
                 correcta: p.correcta,
                 explicacion: p.explicacion || "Respuesta correcta."
             }));
+            
+            console.log(`✅ Seleccionadas ${seleccionadas.length} preguntas aleatorias`);
+            return seleccionadas;
         }
         
         // ============================================
-        // LIMPIAR TIMERS (CRUCIAL PARA EVITAR BUGS)
+        // LIMPIAR TIMERS
         // ============================================
         function limpiarTimers() {
             if (timerInterval) {
@@ -318,7 +325,7 @@
         }
         
         // ============================================
-        // MANEJAR TIMEOUT (NO RESPONDIÓ A TIEMPO)
+        // MANEJAR TIMEOUT
         // ============================================
         async function manejarTimeout() {
             if (!gameActivo || respuestaSeleccionada) return;
@@ -339,7 +346,7 @@
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
-                console.log("⏰ Timeout: turno avanzado a", nuevoTurno);
+                console.log("⏰ Timeout - Turno avanzado a:", nuevoTurno);
             } catch (error) {
                 console.error("Error en timeout:", error);
             }
@@ -372,13 +379,13 @@
         }
         
         // ============================================
-        // INICIAR JUEGO (CREAR PREGUNTAS)
+        // INICIAR JUEGO
         // ============================================
         async function iniciarJuego() {
             const preguntasSeleccionadas = seleccionarPreguntasAleatorias(TOTAL_PREGUNTAS);
             
             if (preguntasSeleccionadas.length === 0) {
-                console.error("No se pudieron seleccionar preguntas");
+                console.error("❌ No se pudieron seleccionar preguntas");
                 return;
             }
             
@@ -391,7 +398,7 @@
                 iniciado: true
             });
             
-            console.log("🎮 Juego iniciado con", preguntasSeleccionadas.length, "preguntas");
+            console.log("🎮 Juego iniciado correctamente");
         }
         
         // ============================================
@@ -436,7 +443,7 @@
                     turno: nuevoTurno,
                     ultimoRespuesta: Date.now()
                 });
-                console.log(`✅ Respuesta: ${esCorrecto ? "Correcta" : "Incorrecta"}. Nuevo turno: ${nuevoTurno}`);
+                console.log(`✅ Respuesta ${esCorrecto ? "correcta" : "incorrecta"} - Turno: ${nuevoTurno}`);
             } catch (error) {
                 console.error("Error al responder:", error);
             }
@@ -447,7 +454,7 @@
         }
         
         // ============================================
-        // RENDERIZAR INTERFAZ DEL JUEGO
+        // RENDERIZAR JUEGO
         // ============================================
         function renderizarJuego() {
             if (!salaData || !salaData.preguntas) return;
@@ -565,19 +572,22 @@
         }
         
         // ============================================
-        // CARGAR PARTIDA Y ESCUCHAR CAMBIOS
+        // CARGAR PARTIDA
         // ============================================
         async function cargarPartida() {
             const salaRef = doc(db, "partidas_multijugador", salaId);
             const salaDoc = await getDoc(salaRef);
             
             if (!salaDoc.exists()) { 
+                console.error("Sala no encontrada");
                 window.location.href = 'lobby.html'; 
                 return; 
             }
             
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
+            
+            console.log("🎮 Partida cargada - Jugador1:", esJugador1);
             
             if (!salaData.iniciado) {
                 await iniciarJuego();
@@ -601,7 +611,6 @@
                 
                 salaData = newData;
                 
-                // Si cambió el turno o las puntuaciones, actualizar interfaz
                 if (oldTurno !== salaData.turno || oldP1 !== salaData.puntuacion1 || oldP2 !== salaData.puntuacion2) {
                     console.log("🔄 Actualizando interfaz - Turno:", salaData.turno);
                     limpiarTimers();
