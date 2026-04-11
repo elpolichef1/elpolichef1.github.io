@@ -233,21 +233,16 @@
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // PREGUNTAS PARA MULTIJUGADOR (10 preguntas)
+        // IMPORTAR PREGUNTAS REALES DE LA DGT
         // ============================================
-        const preguntasMulti = [
-            { texto: "¿Cuál es la velocidad máxima en autovía para un turismo?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2, explicacion: "120 km/h." },
-            { texto: "¿Qué significa una señal de STOP?", opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Detenerse obligatoriamente." },
-            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1, explicacion: "0,3 g/l." },
-            { texto: "¿Qué sanción tiene usar el teléfono móvil al volante?", opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1, explicacion: "200€ y 3 puntos." },
-            { texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?", opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"], correcta: 1, explicacion: "8 puntos." },
-            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"], correcta: 0, explicacion: "Prohíbe adelantar." },
-            { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1, explicacion: "Ceder el paso." },
-            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1, explicacion: "30 km/h." },
-            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2, explicacion: "Reducir velocidad." },
-            { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1, explicacion: "2 segundos." }
-        ];
-
+        // Usamos preguntas-reales.js con más de 500 preguntas realistas
+        import { preguntasReales } from '../../test/data/preguntas-reales.js';
+        
+        // Configuración del juego
+        const TOTAL_PREGUNTAS = 10;      // Número de preguntas por partida
+        const TIEMPO_RESPUESTA = 15000;  // 15 segundos por pregunta
+        
+        // Variables globales
         let salaId = null;
         let currentUser = null;
         let salaData = null;
@@ -256,15 +251,45 @@
         let gameActivo = true;
         let unsubscribe = null;
         let timerInterval = null;
-        let procesandoRespuesta = false; // 🔧 NUEVO: Evita respuestas duplicadas
+        let procesandoRespuesta = false;
         
-        const TOTAL_PREGUNTAS = 10;
-        const TIEMPO_RESPUESTA = 15000; // 15 segundos
+        // ============================================
+        // FUNCIÓN PARA SELECCIONAR PREGUNTAS ALEATORIAS
+        // ============================================
+        function seleccionarPreguntasAleatorias(cantidad) {
+            if (!preguntasReales || preguntasReales.length === 0) {
+                console.error("No hay preguntas disponibles");
+                return [];
+            }
+            
+            // Mezclar todas las preguntas
+            const mezcladas = [...preguntasReales];
+            for (let i = mezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
+            }
+            
+            // Seleccionar las primeras 'cantidad' preguntas
+            const seleccionadas = mezcladas.slice(0, cantidad).map(p => ({
+                texto: p.texto,
+                opciones: [...p.opciones],
+                correcta: p.correcta,
+                explicacion: p.explicacion || "Respuesta correcta."
+            }));
+            
+            console.log(`✅ Seleccionadas ${seleccionadas.length} preguntas aleatorias de ${preguntasReales.length} totales`);
+            return seleccionadas;
+        }
         
+        // ============================================
+        // FUNCIONES DEL JUEGO
+        // ============================================
         function iniciarTimer() {
             if (timerInterval) clearInterval(timerInterval);
             
             const timerFill = document.getElementById('timerFill');
+            if (!timerFill) return;
+            
             const startTime = Date.now();
             
             timerInterval = setInterval(() => {
@@ -327,8 +352,8 @@
                     if (count >= 1) {
                         const num = document.getElementById('countdownNum');
                         const text = overlay.querySelector('.countdown-text');
-                        num.textContent = count;
-                        text.textContent = count === 2 ? "Listos..." : "¡YA!";
+                        if (num) num.textContent = count;
+                        if (text) text.textContent = count === 2 ? "Listos..." : "¡YA!";
                     } else {
                         clearInterval(interval);
                         overlay.remove();
@@ -339,15 +364,16 @@
         }
         
         async function iniciarJuego() {
-            // Mezclar preguntas
-            const preguntasSeleccionadas = [...preguntasMulti];
-            for (let i = preguntasSeleccionadas.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [preguntasSeleccionadas[i], preguntasSeleccionadas[j]] = [preguntasSeleccionadas[j], preguntasSeleccionadas[i]];
+            // Seleccionar preguntas aleatorias de tu base de datos real
+            const preguntasSeleccionadas = seleccionarPreguntasAleatorias(TOTAL_PREGUNTAS);
+            
+            if (preguntasSeleccionadas.length === 0) {
+                console.error("No se pudieron seleccionar preguntas");
+                return;
             }
             
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                preguntas: preguntasSeleccionadas.slice(0, TOTAL_PREGUNTAS),
+                preguntas: preguntasSeleccionadas,
                 turno: 0,
                 puntuacion1: 0,
                 puntuacion2: 0,
@@ -367,6 +393,11 @@
             if (timerInterval) clearInterval(timerInterval);
             
             const pregunta = salaData.preguntas[salaData.turno];
+            if (!pregunta) {
+                procesandoRespuesta = false;
+                return;
+            }
+            
             const esCorrecto = (respuesta === pregunta.correcta);
             
             // Marcar visualmente
@@ -412,11 +443,12 @@
             }
             
             const pregunta = salaData.preguntas[turno];
+            if (!pregunta) return;
+            
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
             
-            // Obtener coches de los jugadores (si existen)
             const coche1 = salaData.jugador1Coche || '🏎️';
             const coche2 = salaData.jugador2Coche || '🏎️';
             
@@ -424,21 +456,21 @@
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche1} ${salaData.jugador1Nombre}</div>
+                        <div class="player-name">${coche1} ${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div>
                         <div class="car" style="left: ${Math.min(avance1, 96)}%">${coche1}</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche2} ${salaData.jugador2Nombre}</div>
+                        <div class="player-name">${coche2} ${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div>
                         <div class="car" style="left: ${Math.min(avance2, 96)}%">${coche2}</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
                 <div class="score-board">
-                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${salaData.jugador1Nombre}</div></div>
+                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div></div>
                     <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
-                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${salaData.jugador2Nombre}</div></div>
+                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div></div>
                 </div>
                 ${!esMiTurno ? '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> Esperando respuesta del rival...</div>' : 
                     '<div class="turn-indicator"><i class="fas fa-clock"></i> ¡Tu turno! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'}
@@ -455,7 +487,6 @@
                 </div>
             `;
             
-            // Resetear estado de respuesta para la nueva pregunta
             respuestaSeleccionada = false;
             
             if (esMiTurno && gameActivo) {
@@ -464,7 +495,8 @@
                 });
                 iniciarTimer();
             } else {
-                document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
+                const opts = document.querySelectorAll('.option-btn');
+                if (opts) opts.forEach(btn => btn.classList.add('disabled'));
             }
         }
         
@@ -473,9 +505,11 @@
             if (timerInterval) clearInterval(timerInterval);
             if (unsubscribe) unsubscribe();
             
-            const p1 = salaData.puntuacion1 || 0;
-            const p2 = salaData.puntuacion2 || 0;
-            const ganador = p1 > p2 ? salaData.jugador1Nombre : (p2 > p1 ? salaData.jugador2Nombre : "Empate");
+            const p1 = salaData?.puntuacion1 || 0;
+            const p2 = salaData?.puntuacion2 || 0;
+            const nombre1 = salaData?.jugador1Nombre || 'Jugador 1';
+            const nombre2 = salaData?.jugador2Nombre || 'Jugador 2';
+            const ganador = p1 > p2 ? nombre1 : (p2 > p1 ? nombre2 : "Empate");
             const esGanador = (p1 > p2 && esJugador1) || (p2 > p1 && !esJugador1);
             
             document.getElementById('gameContent').innerHTML = `
@@ -483,10 +517,10 @@
                     <i class="fas ${esGanador ? 'fa-trophy' : 'fa-flag-checkered'}" style="font-size: 4rem; color: #fbbf24;"></i>
                     <h2 style="margin: 20px 0;">🏁 ¡PARTIDA FINALIZADA! 🏁</h2>
                     <div style="background: rgba(0,0,0,0.3); border-radius: 25px; padding: 20px; margin: 20px 0;">
-                        <p><strong>${salaData.jugador1Nombre}</strong>: ${p1} puntos</p>
-                        <p><strong>${salaData.jugador2Nombre}</strong>: ${p2} puntos</p>
+                        <p><strong>${escapeHtml(nombre1)}</strong>: ${p1} puntos</p>
+                        <p><strong>${escapeHtml(nombre2)}</strong>: ${p2} puntos</p>
                         <div style="height: 2px; background: rgba(255,255,255,0.2); margin: 15px 0;"></div>
-                        <h3 style="color: #fbbf24;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${ganador} 🏆`)}</h3>
+                        <h3 style="color: #fbbf24;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${escapeHtml(ganador)} 🏆`)}</h3>
                     </div>
                     <button class="btn-reintentar" onclick="window.location.href='lobby.html'"><i class="fas fa-redo"></i> Jugar de nuevo</button>
                     <a href="../index.html" style="display: inline-block; margin-left: 15px; background: rgba(255,255,255,0.15); color: white; padding: 14px 35px; border-radius: 60px; text-decoration: none;">Volver al menú</a>
@@ -507,7 +541,10 @@
         async function cargarPartida() {
             const salaRef = doc(db, "partidas_multijugador", salaId);
             const salaDoc = await getDoc(salaRef);
-            if (!salaDoc.exists()) { window.location.href = 'lobby.html'; return; }
+            if (!salaDoc.exists()) { 
+                window.location.href = 'lobby.html'; 
+                return; 
+            }
             
             salaData = salaDoc.data();
             esJugador1 = salaData.jugador1 === currentUser.uid;
@@ -529,7 +566,6 @@
                     const oldTurno = salaData?.turno;
                     salaData = newData;
                     
-                    // Si cambió el turno, actualizar la interfaz
                     if (oldTurno !== salaData.turno && gameActivo) {
                         if (timerInterval) clearInterval(timerInterval);
                         renderizarJuego();
@@ -538,13 +574,22 @@
             });
         }
         
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
         onAuthStateChanged(auth, async (user) => {
             renderUserZone();
-            if (!user) { window.location.href = '../../login.html'; return; }
+            if (!user) { 
+                window.location.href = '../../login.html'; 
+                return; 
+            }
             currentUser = user;
             const urlParams = new URLSearchParams(window.location.search);
             salaId = urlParams.get('sala');
-            if (!salaId) { window.location.href = 'lobby.html'; return; }
+            if (!salaId) { 
+                window.location.href = 'lobby.html'; 
+                return; 
+            }
             await cargarPartida();
         });
     </script>
