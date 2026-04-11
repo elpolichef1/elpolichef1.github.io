@@ -254,29 +254,29 @@
         import { renderUserZone } from '../../js/global-auth.js';
         
         // ============================================
-        // PREGUNTAS (más de 50 preguntas reales DGT)
+        // PREGUNTAS (40 preguntas reales DGT)
         // ============================================
-        const todasLasPreguntas = [
+        const TODAS_PREGUNTAS = [
             { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
-            { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Permiso de circulación", "Permiso de conducir", "Ambos y la ITV", "Solo el seguro"], correcta: 2 },
+            { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Solo permiso de circulación", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV", "Solo el seguro"], correcta: 2 },
             { texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
             { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1 },
             { texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
             { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar", "Prohibido estacionar", "Zona de carga"], correcta: 0 },
-            { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas siempre"], correcta: 2 },
+            { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2 },
             { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Detenerse", "Prioridad", "Prohibido", "Ceder el paso"], correcta: 3 },
             { texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2 },
             { texto: "¿Qué es el recurso de reposición?", opciones: ["Recurso ante el mismo órgano", "Recurso judicial", "Pago", "Denuncia"], correcta: 0 },
             { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida de adherencia por agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0 },
             { texto: "¿Qué velocidad máxima puede alcanzar un turismo con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0 },
-            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["Adelantar desde la continua no", "Adelantar desde la discontinua no", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 },
             { texto: "¿Cuántos puntos se pierden por usar el móvil al volante?", opciones: ["2 puntos", "3 puntos", "4 puntos", "6 puntos"], correcta: 1 },
-            { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
             { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1 },
-            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
             { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1 },
             { texto: "¿Está permitido adelantar en una curva sin visibilidad?", opciones: ["Sí, con precaución", "Sí, si no viene nadie", "No, está prohibido", "Solo de noche"], correcta: 2 },
-            { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 }
+            { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 },
+            { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
+            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
+            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde la continua", "No adelantar desde la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 }
         ];
 
         const TOTAL_PREGUNTAS = 10;
@@ -286,19 +286,18 @@
         let currentUser = null;
         let salaData = null;
         let esJugador1 = false;
-        let respuestaSeleccionada = false;
         let gameActivo = true;
         let unsubscribe = null;
         let timerInterval = null;
         
-        // Función para seleccionar preguntas aleatorias
-        function seleccionarPreguntasAleatorias(cantidad) {
-            const mezcladas = [...todasLasPreguntas];
+        // Mezclar y seleccionar preguntas
+        function seleccionarPreguntas() {
+            const mezcladas = [...TODAS_PREGUNTAS];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
             }
-            return mezcladas.slice(0, cantidad);
+            return mezcladas.slice(0, TOTAL_PREGUNTAS);
         }
         
         function iniciarTimer() {
@@ -312,7 +311,7 @@
                 const remaining = Math.max(0, TIEMPO_RESPUESTA - elapsed);
                 const percent = (remaining / TIEMPO_RESPUESTA) * 100;
                 if (timerFill) timerFill.style.width = `${percent}%`;
-                if (remaining <= 0 && !respuestaSeleccionada && gameActivo) {
+                if (remaining <= 0) {
                     clearInterval(timerInterval);
                     manejarTimeout();
                 }
@@ -320,7 +319,7 @@
         }
         
         async function manejarTimeout() {
-            if (!gameActivo || respuestaSeleccionada) return;
+            if (!gameActivo) return;
             if (!salaData) return;
             
             const turnoActual = salaData.turno;
@@ -328,15 +327,14 @@
             
             if (!esMiTurno) return;
             
-            respuestaSeleccionada = true;
             const nuevoTurno = turnoActual + 1;
             
-            // Mostrar mensaje de timeout
-            const feedbackDiv = document.createElement('div');
-            feedbackDiv.className = 'feedback-message feedback-incorrect';
-            feedbackDiv.innerHTML = '<i class="fas fa-clock"></i> ¡TIEMPO AGOTADO! No has respondido a tiempo';
-            const questionCard = document.querySelector('.question-card');
-            if (questionCard) questionCard.appendChild(feedbackDiv);
+            // Mostrar mensaje
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback-message feedback-incorrect';
+            feedback.innerHTML = '<i class="fas fa-clock"></i> ⏰ ¡TIEMPO AGOTADO!';
+            const card = document.querySelector('.question-card');
+            if (card) card.appendChild(feedback);
             
             // Deshabilitar opciones
             document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
@@ -347,10 +345,8 @@
                     ultimoRespuesta: Date.now()
                 });
             } catch (error) {
-                console.error("Error en timeout:", error);
+                console.error("Error timeout:", error);
             }
-            
-            if (timerInterval) clearInterval(timerInterval);
             
             if (nuevoTurno >= TOTAL_PREGUNTAS) {
                 setTimeout(() => finalizarJuego(), 2000);
@@ -368,9 +364,7 @@
                     count--;
                     if (count >= 1) {
                         const num = document.getElementById('countdownNum');
-                        const text = overlay.querySelector('.countdown-text');
                         if (num) num.textContent = count;
-                        if (text) text.textContent = count === 2 ? "Listos..." : "¡YA!";
                     } else {
                         clearInterval(interval);
                         overlay.remove();
@@ -381,26 +375,24 @@
         }
         
         async function iniciarJuego() {
-            const preguntasSeleccionadas = seleccionarPreguntasAleatorias(TOTAL_PREGUNTAS);
+            const preguntas = seleccionarPreguntas();
             await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                preguntas: preguntasSeleccionadas,
+                preguntas: preguntas,
                 turno: 0,
                 puntuacion1: 0,
                 puntuacion2: 0,
-                estado: "jugando",
                 iniciado: true
             });
         }
         
         async function responder(respuesta) {
-            if (!gameActivo || respuestaSeleccionada) return;
+            if (!gameActivo) return;
             if (!salaData) return;
             
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
             if (!esMiTurno) return;
             
-            respuestaSeleccionada = true;
             if (timerInterval) clearInterval(timerInterval);
             
             const pregunta = salaData.preguntas[turnoActual];
@@ -415,15 +407,16 @@
             });
             
             // Mostrar feedback
-            const feedbackDiv = document.createElement('div');
-            feedbackDiv.className = `feedback-message ${esCorrecto ? 'feedback-correct' : 'feedback-incorrect'}`;
+            const feedback = document.createElement('div');
             if (esCorrecto) {
-                feedbackDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✓ ¡CORRECTO! +1 punto';
+                feedback.className = 'feedback-message feedback-correct';
+                feedback.innerHTML = '<i class="fas fa-check-circle"></i> ✓ ¡CORRECTO! +1 punto';
             } else {
-                feedbackDiv.innerHTML = `<i class="fas fa-times-circle"></i> ✗ INCORRECTO. La respuesta correcta era: ${pregunta.opciones[pregunta.correcta]}`;
+                feedback.className = 'feedback-message feedback-incorrect';
+                feedback.innerHTML = `<i class="fas fa-times-circle"></i> ✗ INCORRECTO. Era: ${pregunta.opciones[pregunta.correcta]}`;
             }
-            const questionCard = document.querySelector('.question-card');
-            if (questionCard) questionCard.appendChild(feedbackDiv);
+            const card = document.querySelector('.question-card');
+            if (card) card.appendChild(feedback);
             
             // Actualizar puntuación
             const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
@@ -462,21 +455,19 @@
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
-            const coche1 = salaData.jugador1Coche || '🏎️';
-            const coche2 = salaData.jugador2Coche || '🏎️';
             
             document.getElementById('gameContent').innerHTML = `
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche1} ${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div>
-                        <div class="car" style="left: ${Math.min(avance1, 96)}%">${coche1}</div>
+                        <div class="player-name">🏎️ ${escapeHtml(salaData.jugador1Nombre || 'Jugador 1')}</div>
+                        <div class="car" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche2} ${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div>
-                        <div class="car" style="left: ${Math.min(avance2, 96)}%">${coche2}</div>
+                        <div class="player-name">🏎️ ${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div>
+                        <div class="car" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
@@ -485,8 +476,10 @@
                     <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
                     <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(salaData.jugador2Nombre || 'Jugador 2')}</div></div>
                 </div>
-                ${!esMiTurno ? '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> Esperando respuesta del rival...</div>' : 
-                    '<div class="turn-indicator"><i class="fas fa-clock"></i> ¡Tu turno! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'}
+                ${!esMiTurno ? 
+                    '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> ⏳ Esperando respuesta del rival...</div>' : 
+                    '<div class="turn-indicator"><i class="fas fa-clock"></i> 🎯 ¡Tu turno! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'
+                }
                 <div class="question-card">
                     <div class="question-text">${escapeHtml(pregunta.texto)}</div>
                     <div class="options" id="options">
@@ -499,8 +492,6 @@
                     </div>
                 </div>
             `;
-            
-            respuestaSeleccionada = false;
             
             if (esMiTurno && gameActivo) {
                 document.querySelectorAll('.option-btn').forEach(btn => {
@@ -577,7 +568,7 @@
                     const newData = doc.data();
                     const oldTurno = salaData?.turno;
                     salaData = newData;
-                    if (oldTurno !== salaData.turno && gameActivo) {
+                    if (oldTurno !== salaData.turno) {
                         if (timerInterval) clearInterval(timerInterval);
                         renderizarJuego();
                     }
