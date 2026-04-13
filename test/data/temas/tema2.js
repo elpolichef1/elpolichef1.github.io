@@ -3,7 +3,7 @@
 
 export const tema2 = [
 {
-                id: 1,
+                id: 201,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Señal S-28 Zona de Estancia y Juego.png",
                 opciones: ["Señal S-28 Zona de Estancia y Juego (velocidad 10 km/h)", "Zona peatonal", "Calle de prioridad invertida", "Zona de bajas emisiones"],
@@ -11,7 +11,7 @@ export const tema2 = [
                 explicacion: "La señal Señal S-28 Zona de Estancia y Juego, con velocidad máxima de 10 km/h y prioridad para peatones."
             },
             {
-                id: 2,
+                id: 202,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Ceda el paso.png",
                 opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"],
@@ -19,7 +19,7 @@ export const tema2 = [
                 explicacion: "La señal de CEDA EL PASO obliga a ceder el paso a los vehículos de la vía preferente."
             },
             {
-                id: 3,
+                id: 203,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/entrada-prohibida-a vehículos-de motor.png",
                 opciones: ["Prohibido el paso a vehículos de motor", "Prohibido el paso a camiones", "Prohibido el paso a motos", "Prohibido el paso a ciclomotores"],
@@ -27,7 +27,7 @@ export const tema2 = [
                 explicacion: "Prohíbe la entrada a todo vehículo de motor."
             },
             {
-                id: 4,
+                id: 204,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/giro-obligatorio-a-la-derecha.png",
                 opciones: ["Giro obligatorio a la derecha", "Prohibido girar a la derecha", "Dirección recomendada", "Carril obligatorio"],
@@ -35,7 +35,7 @@ export const tema2 = [
                 explicacion: "Indica que hay que girar obligatoriamente a la derecha."
             },
             {
-                id: 5,
+                id: 205,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Parking.png",
                 opciones: ["Estacionamiento", "Prohibido estacionar", "Parada de autobús", "Zona de carga"],
@@ -43,7 +43,7 @@ export const tema2 = [
                 explicacion: "Indica zona de estacionamiento permitido."
             },
             {
-                id: 6,
+                id: 206,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/paso de peatones.png",
                 opciones: ["Paso de peatones", "Zona peatonal", "Prohibido el paso a peatones", "Carril bici"],
@@ -51,7 +51,7 @@ export const tema2 = [
                 explicacion: "Indica la proximidad de un paso de peatones. Los peatones tienen prioridad."
             },
             {
-                id: 7,
+                id: 207,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/peligro curvas peligrosas hacia la izquierda.png",
                 opciones: ["Curva peligrosa hacia la izquierda", "Curva peligrosa hacia la derecha", "Curva cerrada", "Curva con visibilidad reducida"],
@@ -59,7 +59,7 @@ export const tema2 = [
                 explicacion: "La señal P-1 indica una curva peligrosa hacia la izquierda."
             },
             {
-                id: 8,
+                id: 208,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/peligro curva peligrosa hacia la derecha.png",
                 opciones: ["Curva peligrosa hacia la derecha", "Curva peligrosa hacia la izquierda", "Curva cerrada", "Curva con visibilidad reducida"],
@@ -67,7 +67,7 @@ export const tema2 = [
                 explicacion: "La señal P-1 indica una curva peligrosa hacia la derecha."
             },
             {
-                id: 9,
+                id: 209,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Prohibido el paso a peatones.png",
                 opciones: ["Prohibido el paso a peatones", "Paso de peatones", "Zona peatonal", "Prohibido el paso a bicicletas"],
@@ -75,7 +75,7 @@ export const tema2 = [
                 explicacion: "Prohíbe el paso a peatones."
             },
             {
-                id: 10,
+                id: 210,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Prohibido-adelantar.png",
                 opciones: ["Prohibido adelantar", "Prohibido circular", "Fin de prohibición de adelantar", "Prohibido cambiar de carril"],
@@ -83,7 +83,7 @@ export const tema2 = [
                 explicacion: "Prohíbe adelantar a cualquier vehículo en ese tramo."
             },
             {
-                id: 11,
+                id: 211,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Prohibido el paso.png",
                 opciones: ["Prohibido el paso", "Prohibido adelantar", "Prohibido estacionar", "Prohibido girar"],
@@ -91,7 +91,7 @@ export const tema2 = [
                 explicacion: "Prohíbe la entrada a vehículos en ese sentido."
             },
             {
-                id: 12,
+                id: 212,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/parar.png",
                 opciones: ["STOP - Detención obligatoria", "Ceda el paso", "Prohibido el paso", "Prioridad"],
@@ -99,7 +99,7 @@ export const tema2 = [
                 explicacion: "La señal de STOP obliga a detenerse completamente antes de continuar."
             },
             {
-                id: 13,
+                id: 213,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Velocidad máxima 30.png",
                 opciones: ["Velocidad máxima 30 km/h", "Velocidad mínima 30 km/h", "Fin de velocidad máxima 30", "Velocidad recomendada 30"],
@@ -107,7 +107,7 @@ export const tema2 = [
                 explicacion: "Indica la velocidad máxima permitida de 30 km/h."
             },
             {
-                id: 14,
+                id: 214,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Velocidad máxima 50.png",
                 opciones: ["Velocidad máxima 50 km/h", "Velocidad mínima 50 km/h", "Fin de velocidad máxima 50", "Velocidad recomendada 50"],
@@ -115,7 +115,7 @@ export const tema2 = [
                 explicacion: "Indica la velocidad máxima permitida de 50 km/h."
             },
             {
-                id: 15,
+                id: 215,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Velocidad máxima 90.png",
                 opciones: ["Velocidad máxima 90 km/h", "Velocidad mínima 90 km/h", "Fin de velocidad máxima 90", "Velocidad recomendada 90"],
@@ -123,7 +123,7 @@ export const tema2 = [
                 explicacion: "Indica la velocidad máxima permitida de 90 km/h."
             },
             {
-                id: 16,
+                id: 216,
                 texto: "¿Qué indica esta señal?",
                 imagen: "../img/Velocidad máxima 120.png",
                 opciones: ["Velocidad máxima 120 km/h", "Velocidad mínima 120 km/h", "Fin de velocidad máxima 120", "Velocidad recomendada 120"],
@@ -133,6 +133,7 @@ export const tema2 = [
     {
         id: 217,
         texto: "¿Qué indica la señal P-17?",
+        imagen: "../img/la señal P-17.png",
         opciones: ["Rotonda", "Glorieta", "Intersección circular", "Todas son correctas"],
         correcta: 3,
         explicacion: "La señal P-17 advierte de la proximidad de una rotonda o glorieta.",
@@ -142,6 +143,7 @@ export const tema2 = [
     {
         id: 218,
         texto: "¿Qué indica la señal P-18?",
+        imagen: "../img/la señal P-18.png",
         opciones: ["Tranvía", "Autobús", "Carril bus", "Vehículo especial"],
         correcta: 0,
         explicacion: "La señal P-18 advierte de la proximidad de un tranvía.",
@@ -151,6 +153,7 @@ export const tema2 = [
     {
         id: 219,
         texto: "¿Qué indica la señal P-19?",
+        imagen: "../img/la señal P-19.png",
         opciones: ["Resalto", "Lomo de asno", "Glacis", "Todas son correctas"],
         correcta: 3,
         explicacion: "La señal P-19 advierte de un resalto en la calzada.",
@@ -160,59 +163,46 @@ export const tema2 = [
     {
         id: 220,
         texto: "¿Qué indica la señal P-20?",
-        opciones: ["Aeroplanos", "Aeronaves", "Peligro por aviones", "Todas son correctas"],
+        imagen: "../img/paso de peatones.png",
+        opciones: ["Aeroplanos", "Peligro por la proximidad de un lugar frecuentado por peatones", "Peligro por aviones", "Todas son correctas"],
         correcta: 3,
-        explicacion: "La señal P-20 advierte de peligro por aeronaves cerca de aeropuertos.",
+        explicacion: "La señal P-20 advierte de peligro por la proximidad de un lugar frecuentado por peatones.",
         tema: 2,
         dificultad: "media"
     },
-    {
-        id: 221,
-        texto: "¿Qué indica la señal P-21?",
-        opciones: ["Incendio", "Peligro de fuego", "Zona de riesgo", "Todas son correctas"],
+        {
+        id: 220,
+        texto: "¿Qué indica la señal P-20a?",
+        imagen: "../img/paso de peatones.png",
+        opciones: ["Aeroplanos", "Peligro por la proximidad de un lugar frecuentado por peatones", "Peligro por aviones", "Todas son correctas"],
         correcta: 3,
-        explicacion: "La señal P-21 advierte de peligro de incendio.",
+        explicacion: "La señal P-20 advierte de peligro por la proximidad de un lugar frecuentado por peatones.",
         tema: 2,
         dificultad: "media"
     },
-    {
-        id: 222,
-        texto: "¿Qué indica la señal P-22?",
-        opciones: ["Desprendimiento", "Caída de piedras", "Derrumbe", "Todas son correctas"],
+    
+        {
+        id: 220,
+        texto: "¿Qué indica la señal P-20c?",
+        imagen: "../img/P-20c. Pasos para peatones y ciclistas.png",
+        opciones: ["ciclomotores", "Pasos para peatones y ciclistas.png", "Peligro por aviones", "Todas son correctas"],
         correcta: 3,
-        explicacion: "La señal P-22 advierte de peligro por desprendimiento.",
+        explicacion: "Peligro por la proximidad de un paso para peatones adosado o compartido con un paso para ciclistas.",
         tema: 2,
         dificultad: "media"
-    },
-    {
-        id: 223,
-        texto: "¿Qué indica la señal P-23?",
-        opciones: ["Inundación", "Zona anegable", "Peligro de agua", "Todas son correctas"],
-        correcta: 3,
-        explicacion: "La señal P-23 advierte de peligro por inundación.",
-        tema: 2,
-        dificultad: "media"
-    },
-    {
-        id: 224,
-        texto: "¿Qué indica la señal P-24?",
-        opciones: ["Salida de emergencia", "Evacuación", "Zona de escape", "Todas son correctas"],
-        correcta: 3,
-        explicacion: "La señal P-24 indica una salida de emergencia.",
-        tema: 2,
-        dificultad: "media"
-    },
-    {
-        id: 225,
-        texto: "¿Qué indica la señal P-25?",
-        opciones: ["Peligro por barco", "Zona de embarcadero", "Proximidad de embarcación", "Todas son correctas"],
-        correcta: 3,
-        explicacion: "La señal P-25 advierte de peligro por embarcaciones (paso de transbordadores).",
-        tema: 2,
-        dificultad: "dificil"
     },
 
-    // ==================== SEÑALES DE PROHIBICIÓN (R-series) ====================
+    {
+        id: 220,
+        texto: "¿Qué indica la señal P-21a?",
+        imagen: "../img/niños.png",
+        opciones: ["adultos", "Niños", "pequeños", "Todas son correctas"],
+        correcta: 3,
+        explicacion: "Peligro por la proximidad de un lugar frecuentado por niños, tales como escuelas, zona de juegos, etc.",
+        tema: 2,
+        dificultad: "media"
+    },
+
     {
         id: 226,
         texto: "¿Qué indica la señal R-1?",
@@ -484,7 +474,6 @@ export const tema2 = [
         dificultad: "dificil"
     },
 
-    // ==================== SEÑALES DE OBLIGACIÓN (R-series circulares azules) ====================
     {
         id: 256,
         texto: "¿Qué indica una señal circular azul con una flecha blanca hacia arriba?",
@@ -803,7 +792,6 @@ export const tema2 = [
         dificultad: "facil"
     },
 
-    // ==================== SEÑALES DE CARRIL (Adicionales) ====================
     {
         id: 291,
         texto: "¿Qué indica una señal cuadrada azul con la palabra 'BUS'?",
@@ -850,7 +838,6 @@ export const tema2 = [
         dificultad: "facil"
     },
 
-    // ==================== MARCAS VIALES ====================
     {
         id: 296,
         texto: "¿Qué indica una línea continua en la calzada?",
@@ -942,7 +929,6 @@ export const tema2 = [
         dificultad: "facil"
     },
 
-    // ==================== SEÑALES DE AUTOPISTA Y AUTOVÍA ====================
     {
         id: 306,
         texto: "¿Qué color tienen las señales de autopista?",
@@ -962,7 +948,8 @@ export const tema2 = [
         dificultad: "facil"
     },
     {
-        id: 308,
+        id: 308,    
+
         texto: "¿Qué color tienen las señales de carreteras convencionales?",
         opciones: ["Azul", "Verde", "Amarillo", "Rojo"],
         correcta: 0,
@@ -989,7 +976,6 @@ export const tema2 = [
         dificultad: "facil"
     },
 
-    // ==================== SEÑALES DE BALIZAMIENTO ====================
     {
         id: 311,
         texto: "¿Qué indica un hito de borde de calzada?",
@@ -1036,7 +1022,6 @@ export const tema2 = [
         dificultad: "media"
     },
 
-    // ==================== SEÑALES DE PANELES COMPLEMENTARIOS ====================
     {
         id: 316,
         texto: "¿Qué indica un panel complementario rectangular blanco debajo de una señal?",
