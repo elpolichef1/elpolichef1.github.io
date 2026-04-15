@@ -285,6 +285,42 @@ export const tema2 = [
         tema: 2,
         dificultad: "dificil"
     },
+    {
+        id: 237,
+        texto: "¿Qué indica la señal R-106?",
+        imagen: "../img/R-106.png",
+        opciones: ["Entrada prohibida a vehículos destinados al transporte de mercancías con mayor masa autorizada que la indicada", "Entrada prohibida a vehículos destinados al transporte de mercancías", "Entrada prohibida a ciclomotores (y vehículos para personas de movilidad reducida)"],
+        correcta: 1,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 238,
+        texto: "¿Qué indica la señal R-107?",
+        imagen: "../img/R-107.png",
+        opciones: ["Entrada prohibida a vehículos destinados al transporte de mercancías con mayor masa autorizada que la indicada", "Entrada prohibida a vehículos destinados al transporte de mercancías", "Entrada prohibida a ciclomotores (y vehículos para personas de movilidad reducida)"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 239,
+        texto: "¿Qué indica la señal R-108?",
+        imagen: "../img/R-108.png",
+        opciones: ["Entrada prohibida a vehículos que transporten productos contaminantes del agua ( más de 1.000 litros )", "Entrada prohibida a vehículos que transporten mercancías explosivas o inflamables", "Entrada prohibida a vehículos que transporten mercancías peligrosas"],
+        correcta: 2,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 239,
+        texto: "¿Qué indica la señal R-109?",
+        imagen: "../img/R-109.png",
+        opciones: ["Entrada prohibida a vehículos que transporten productos contaminantes del agua ( más de 1.000 litros )", "Entrada prohibida a vehículos que transporten mercancías explosivas o inflamables", "Entrada prohibida a vehículos que transporten mercancías peligrosas"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "dificil"
+    },
 ];
 
 
