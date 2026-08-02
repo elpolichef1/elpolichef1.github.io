@@ -398,7 +398,7 @@
     <div class="page-header">
         <div class="container">
             <h1><i class="fas fa-book"></i> Test por Temas</h1>
-            <p>Elige un tema y completa sus 4 tests de 25 preguntas</p>
+            <p>Elige un tema y completa sus 4 tests de 30 preguntas</p>
         </div>
     </div>
 
@@ -415,7 +415,7 @@
                     <p id="temaDescripcion">Documentación, sanciones, tasas de alcohol, permisos...</p>
                 </div>
                 <div class="nota-corte">
-                    <i class="fas fa-info-circle"></i> Aprobado: mínimo 22 aciertos (máx 3 fallos)
+                    <i class="fas fa-info-circle"></i> Aprobado: mínimo 27 aciertos (máx 3 fallos)
                 </div>
             </div>
 
@@ -462,8 +462,8 @@
         let testActivo = false;
         let currentUser = null;
         
-        const APROBADO_MINIMO = 22;
-        const TOTAL_PREGUNTAS_POR_TEST = 25;
+        const APROBADO_MINIMO = 27; // 30 preguntas - 3 fallos permitidos
+        const TOTAL_PREGUNTAS_POR_TEST = 30;
         
         const testsPorTema = [
             { id: 1, nombre: "Test 1 - Conceptos básicos" },
@@ -571,7 +571,7 @@
         }
         
         async function iniciarTest(temaNumero, testId) {
-            const todasPreguntas = obtenerPreguntasPorTema(temaNumero, 200);
+            const todasPreguntas = obtenerPreguntasPorTema(temaNumero, 300);
             
             if (todasPreguntas.length < TOTAL_PREGUNTAS_POR_TEST) {
                 alert(`No hay suficientes preguntas para este tema. Disponibles: ${todasPreguntas.length}`);
@@ -681,7 +681,7 @@
                     <div class="resultado-stat"><div class="resultado-stat-number">${aprobado ? 'APTO' : 'NO APTO'}</div><div>Resultado</div></div>
                 </div>
                 <p style="margin-top: 10px; font-size: 0.9rem;">
-                    ${aprobado ? '✅ ¡Has superado el test!' : '❌ Necesitas al menos 22 aciertos para aprobar'}
+                    ${aprobado ? '✅ ¡Has superado el test!' : '❌ Necesitas al menos 27 aciertos para aprobar'}
                 </p>
                 <div style="margin-top: 20px;">
                     <button id="btnReintentar" style="background: #fbbf24; color: #1a472a; border: none; padding: 10px 20px; border-radius: 50px; margin-right: 10px; cursor: pointer;">
