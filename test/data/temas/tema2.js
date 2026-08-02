@@ -321,6 +321,107 @@ export const tema2 = [
         tema: 2,
         dificultad: "dificil"
     },
+    {
+        id: 240,
+        texto: "¿Qué indica la señal R-110?",
+        imagen: "../img/R-110.png",
+        opciones: ["Entrada prohibida a vehículos que transporten mercancías explosivas o inflamables", "Entrada prohibida a vehículos que transporten productos contaminantes del agua (más de 1.000 litros)", "Entrada prohibida a vehículos que transporten mercancías peligrosas"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 241,
+        texto: "¿Qué prohibición establece la señal R-111?",
+        imagen: "../img/R-111.png",
+        opciones: ["Prohibición de circular a vehículos que transporten mercancías explosivas", "Prohibición de circular a vehículos que transporten mercancías inflamables", "Prohibición de circular a vehículos que transporten productos que puedan contaminar el agua"],
+        correcta: 2,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 242,
+        texto: "La señal R-112, ¿qué indica?",
+        imagen: "../img/R-112.png",
+        opciones: ["Entrada prohibida a vehículos que transporten mercancías peligrosas", "Entrada prohibida a vehículos que transporten explosivos", "Entrada prohibida a vehículos que transporten materias que puedan inflamarse"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 243,
+        texto: "¿Qué significa la señal R-113?",
+        imagen: "../img/R-113.png",
+        opciones: ["Prohibido circular a vehículos cuya carga pueda producir proyecciones", "Prohibido circular a vehículos que transporten mercancías peligrosas", "Prohibido circular a vehículos que transporten objetos punzantes"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "media"
+    },
+    {
+        id: 244,
+        texto: "¿Cuál es el significado de la señal R-114?",
+        imagen: "../img/R-114.png",
+        opciones: ["Prohibición de circular a vehículos que transporten mercancías que desprendan polvo", "Prohibición de circular a vehículos que transporten mercancías malolientes", "Prohibición de circular a vehículos que puedan ensuciar la calzada"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "media"
+    },
+    {
+        id: 245,
+        texto: "La señal R-115 prohíbe:",
+        imagen: "../img/R-115.png",
+        opciones: ["El paso a vehículos que transporten mercancías que puedan producir ruido o contaminación acústica", "El paso a vehículos que transporten mercancías peligrosas", "El paso a vehículos que transporten animales"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "media"
+    },
+    {
+        id: 246,
+        texto: "¿Qué indica la señal R-116?",
+        imagen: "../img/R-116.png",
+        opciones: ["Prohibición de circular a vehículos cuya carga pueda rozar con la bóveda del túnel", "Prohibición de circular a vehículos de más de 2 metros de altura", "Prohibición de circular a vehículos que transporten mercancías voluminosas"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 247,
+        texto: "¿Qué prohíbe la señal R-117?",
+        imagen: "../img/R-117.png",
+        opciones: ["Prohibición de circular a vehículos que transporten mercancías que requieran temperatura controlada", "Prohibición de circular a vehículos que transporten mercancías perecederas", "Prohibición de circular a vehículos que transporten mercancías que desprendan gases"],
+        correcta: 2,
+        tema: 2,
+        dificultad: "media"
+    },
+    {
+        id: 248,
+        texto: "La señal R-118 indica:",
+        imagen: "../img/R-118.png",
+        opciones: ["Prohibición de circular a vehículos que transporten mercancías radiactivas", "Prohibición de circular a vehículos que transporten mercancías infecciosas", "Prohibición de circular a vehículos que transporten materiales corrosivos"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "dificil"
+    },
+    {
+        id: 249,
+        texto: "¿Qué significa la señal R-119?",
+        imagen: "../img/R-119.png",
+        opciones: ["Prohibición de circular a vehículos que transporten animales", "Prohibición de circular a vehículos que transporten mercancías vivas", "Prohibición de circular a vehículos que transporten productos de origen animal"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "facil"
+    },
+    {
+        id: 250,
+        texto: "¿Cuál es el mensaje de la señal R-120?",
+        imagen: "../img/R-120.png",
+        opciones: ["Prohibición de circular a vehículos que transporten mercancías que desprendan olores desagradables", "Prohibición de circular a vehículos que transporten mercancías peligrosas para el medio ambiente", "Prohibición de circular a vehículos que transporten mercancías putrescibles"],
+        correcta: 0,
+        tema: 2,
+        dificultad: "media"
+    }
+
+    
 ];
 
 
