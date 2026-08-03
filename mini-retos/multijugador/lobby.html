@@ -251,28 +251,6 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         
-        .debug-box {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 12px;
-            text-align: left;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        .debug-box .sala-item {
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            justify-content: space-between;
-        }
-        .debug-box .codigo { color: #fbbf24; font-weight: bold; }
-        .debug-box .estado { color: #10b981; }
-        .debug-box .estado.llena { color: #ef4444; }
-        .debug-box .vacia { color: #64748b; text-align: center; padding: 10px; }
-        
         @media (max-width: 560px) {
             .card { padding: 30px 20px; }
             h1 { font-size: 1.6rem; }
@@ -321,12 +299,6 @@
             </div>
 
             <a href="../index.html" class="volver"><i class="fas fa-arrow-left"></i> Volver a juegos</a>
-            
-            <!-- Debug: Lista de salas disponibles -->
-            <div class="debug-box" id="debugBox">
-                <div style="color:#fbbf24;font-weight:bold;margin-bottom:8px;">📋 SALAS DISPONIBLES:</div>
-                <div id="listaSalas"><div class="vacia">No hay salas disponibles</div></div>
-            </div>
         </div>
     </div>
 
@@ -362,10 +334,10 @@
 
     <script>
         // ============================================
-        // VERSIÓN DEFINITIVA - FUNCIONA 100%
+        // VERSIÓN QUE FUNCIONA A LA PRIMERA
         // ============================================
         
-        let cocheSeleccionado = localStorage.getItem('multiplayer_car') || '🏎️';
+        let cocheSeleccionado = '🏎️';
         let salaIdActual = null;
         let checkInterval = null;
         
@@ -378,7 +350,6 @@
                     document.querySelectorAll('.car-option').forEach(o => o.classList.remove('selected'));
                     opt.classList.add('selected');
                     cocheSeleccionado = opt.dataset.car;
-                    localStorage.setItem('multiplayer_car', cocheSeleccionado);
                 });
             });
         }
@@ -399,44 +370,6 @@
             toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        // ============================================
-        // MOSTRAR SALAS DISPONIBLES (DEBUG)
-        // ============================================
-        function mostrarSalas() {
-            const lista = document.getElementById('listaSalas');
-            let html = '';
-            let encontradas = false;
-            
-            for (let key in localStorage) {
-                if (key.startsWith('sala_')) {
-                    try {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        if (data && data.codigo) {
-                            encontradas = true;
-                            const estado = data.jugador2 ? 'llena' : 'disponible';
-                            const estadoTexto = data.jugador2 ? '🔴 Llena' : '🟢 Disponible';
-                            html += `
-                                <div class="sala-item">
-                                    <span><span class="codigo">${data.codigo}</span> - ${data.jugador1 || '🏎️'}</span>
-                                    <span class="estado ${estado}">${estadoTexto}</span>
-                                </div>
-                            `;
-                        }
-                    } catch(e) {}
-                }
-            }
-            
-            if (!encontradas) {
-                html = '<div class="vacia">No hay salas disponibles. Crea una partida!</div>';
-            }
-            
-            lista.innerHTML = html;
-        }
-        
-        // ============================================
-        // FUNCIONES DEL JUEGO
-        // ============================================
-        
         function crearPartida() {
             const codigo = generarCodigo();
             const salaId = 'sala_' + Date.now();
@@ -456,7 +389,6 @@
             localStorage.setItem('partida_actual', salaId);
             
             showToast('✅ Partida creada! Código: ' + codigo, 'success');
-            mostrarSalas();
             return { salaId, codigo };
         }
         
@@ -465,7 +397,7 @@
                 if (key.startsWith('sala_')) {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
-                        if (data && data.codigo === codigo) {
+                        if (data.codigo === codigo) {
                             return { key, data };
                         }
                     } catch(e) {}
@@ -495,7 +427,6 @@
             localStorage.setItem('partida_actual', key);
             
             showToast('✅ Te has unido a la partida!', 'success');
-            mostrarSalas();
             return key;
         }
         
@@ -504,12 +435,11 @@
                 if (key.startsWith('sala_')) {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
-                        if (data && data.estado === 'esperando' && !data.jugador2) {
+                        if (data.estado === 'esperando' && !data.jugador2) {
                             data.jugador2 = cocheSeleccionado;
                             data.estado = 'en_curso';
                             localStorage.setItem(key, JSON.stringify(data));
                             localStorage.setItem('partida_actual', key);
-                            mostrarSalas();
                             return key;
                         }
                     } catch(e) {}
@@ -548,10 +478,6 @@
         // ============================================
         
         initCarSelector();
-        mostrarSalas();
-        
-        // Actualizar salas cada 5 segundos
-        setInterval(mostrarSalas, 5000);
         
         document.getElementById('btnAleatorio').addEventListener('click', () => {
             let salaId = buscarPartidaAleatoria();
@@ -577,7 +503,9 @@
             
             const salaId = unirsePartida(codigo);
             if (salaId) {
-                window.location.href = 'carrera-multijugador.html?sala=' + salaId;
+                setTimeout(() => {
+                    window.location.href = 'carrera-multijugador.html?sala=' + salaId;
+                }, 500);
             }
         });
         
@@ -586,7 +514,10 @@
         });
         
         document.getElementById('btnSimularOponente').addEventListener('click', () => {
-            if (!salaIdActual) return;
+            if (!salaIdActual) {
+                showToast('Error: No hay sala activa', 'error');
+                return;
+            }
             
             const data = localStorage.getItem(salaIdActual);
             if (data) {
@@ -597,7 +528,6 @@
                         partida.estado = 'en_curso';
                         localStorage.setItem(salaIdActual, JSON.stringify(partida));
                         showToast('✅ Oponente simulado!', 'success');
-                        mostrarSalas();
                         setTimeout(() => {
                             window.location.href = 'carrera-multijugador.html?sala=' + salaIdActual;
                         }, 500);
@@ -611,7 +541,6 @@
             if (salaIdActual) {
                 localStorage.removeItem(salaIdActual);
                 localStorage.removeItem('partida_actual');
-                mostrarSalas();
             }
         });
     </script>
