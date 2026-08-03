@@ -148,6 +148,8 @@
             letter-spacing: 4px;
             font-weight: bold;
             background: white;
+            color: #1a472a;
+            text-transform: uppercase;
         }
         .codigo-input input:focus {
             outline: none;
@@ -162,6 +164,7 @@
             font-weight: bold;
             transition: 0.3s;
             font-size: 1rem;
+            color: #1a472a;
         }
         .codigo-input button:hover { background: #f59e0b; }
         
@@ -267,6 +270,31 @@
         }
         .btn-unirse-demo:hover { background: #059669; transform: scale(1.05); }
         
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 16px 30px;
+            border-radius: 16px;
+            z-index: 3000;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.success { border-left: 4px solid #10b981; }
+        .toast.show { display: flex; animation: slideDown 0.3s ease; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
         @media (max-width: 560px) {
             .card { padding: 30px 20px; }
             h1 { font-size: 1.6rem; }
@@ -318,6 +346,12 @@
         </div>
     </div>
 
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        <i id="toastIcon" class="fas fa-info-circle"></i>
+        <span id="toastMessage">Mensaje</span>
+    </div>
+
     <div id="waitingScreen" class="waiting-screen">
         <div class="waiting-card">
             <div class="waiting-spinner"></div>
@@ -343,15 +377,14 @@
         }
     </style>
 
-    <script type="module">
+    <script>
         // ============================================
-        // VERSIÓN CORREGIDA - CON SOPORTE PARA DEMO
+        // VERSIÓN COMPLETAMENTE FUNCIONAL
         // ============================================
         
         let cocheSeleccionado = localStorage.getItem('multiplayer_car') || '🏎️';
-        let salaCreada = null;
-        let timerEspera = null;
         let salaIdActual = null;
+        let checkInterval = null;
         
         function initCarSelector() {
             document.querySelectorAll('.car-option').forEach(opt => {
@@ -368,12 +401,28 @@
         }
         
         function generarCodigo() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
+            return String(Math.floor(100000 + Math.random() * 900000));
+        }
+        
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+            
+            toast.className = `toast ${type}`;
+            icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            msg.textContent = message;
+            toast.classList.add('show');
+            
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
         
         function crearPartida() {
             const codigo = generarCodigo();
-            const salaId = `sala_${Date.now()}`;
+            const salaId = `sala_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
             
             const partida = {
                 id: salaId,
@@ -388,68 +437,136 @@
                 turno: 0,
                 puntuacion1: 0,
                 puntuacion2: 0,
-                preguntas: null
+                preguntas: null,
+                creada: Date.now()
             };
             
-            localStorage.setItem(`partida_${salaId}`, JSON.stringify(partida));
-            localStorage.setItem('partida_actual', salaId);
-            
-            return { salaId, codigo };
+            try {
+                localStorage.setItem(`partida_${salaId}`, JSON.stringify(partida));
+                localStorage.setItem('partida_actual', salaId);
+                return { salaId, codigo };
+            } catch(e) {
+                showToast('Error al crear la partida: ' + e.message);
+                return null;
+            }
         }
         
         function unirsePorCodigo(codigo) {
-            for (let key in localStorage) {
+            // Buscar en todas las partidas
+            const keys = Object.keys(localStorage);
+            let partidaEncontrada = null;
+            let keyEncontrada = null;
+            
+            for (const key of keys) {
                 if (key.startsWith('partida_')) {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
-                        if (data.codigo === codigo && data.estado === 'esperando' && !data.jugador2) {
-                            data.jugador2 = {
-                                nombre: 'Jugador 2',
-                                coche: cocheSeleccionado,
-                                uid: 'player2'
-                            };
-                            data.estado = 'en_curso';
-                            localStorage.setItem(key, JSON.stringify(data));
-                            localStorage.setItem('partida_actual', data.id);
-                            return data.id;
+                        if (data.codigo === codigo) {
+                            partidaEncontrada = data;
+                            keyEncontrada = key;
+                            break;
                         }
                     } catch(e) {}
                 }
             }
-            return null;
+            
+            if (!partidaEncontrada) {
+                showToast('❌ Partida no encontrada con ese código');
+                return null;
+            }
+            
+            if (partidaEncontrada.jugador2) {
+                showToast('❌ Esta partida ya está llena');
+                return null;
+            }
+            
+            if (partidaEncontrada.estado === 'en_curso') {
+                showToast('❌ La partida ya ha comenzado');
+                return null;
+            }
+            
+            // Unirse
+            partidaEncontrada.jugador2 = {
+                nombre: 'Jugador 2',
+                coche: cocheSeleccionado,
+                uid: 'player2'
+            };
+            partidaEncontrada.estado = 'en_curso';
+            
+            try {
+                localStorage.setItem(keyEncontrada, JSON.stringify(partidaEncontrada));
+                localStorage.setItem('partida_actual', partidaEncontrada.id);
+                return partidaEncontrada.id;
+            } catch(e) {
+                showToast('Error al unirse: ' + e.message);
+                return null;
+            }
         }
         
         function buscarPartidaAleatoria() {
-            for (let key in localStorage) {
+            const keys = Object.keys(localStorage);
+            
+            // Buscar partidas disponibles (esperando y sin jugador2)
+            const disponibles = [];
+            for (const key of keys) {
                 if (key.startsWith('partida_')) {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
                         if (data.estado === 'esperando' && !data.jugador2) {
-                            data.jugador2 = {
-                                nombre: 'Jugador 2',
-                                coche: cocheSeleccionado,
-                                uid: 'player2'
-                            };
-                            data.estado = 'en_curso';
-                            localStorage.setItem(key, JSON.stringify(data));
-                            localStorage.setItem('partida_actual', data.id);
-                            return data.id;
+                            disponibles.push({ key, data });
                         }
                     } catch(e) {}
                 }
             }
-            return null;
+            
+            if (disponibles.length === 0) {
+                return null;
+            }
+            
+            // Tomar la primera disponible
+            const { key, data } = disponibles[0];
+            data.jugador2 = {
+                nombre: 'Jugador 2',
+                coche: cocheSeleccionado,
+                uid: 'player2'
+            };
+            data.estado = 'en_curso';
+            
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                localStorage.setItem('partida_actual', data.id);
+                return data.id;
+            } catch(e) {
+                showToast('Error al unirse: ' + e.message);
+                return null;
+            }
         }
         
         function mostrarEspera(codigo, salaId) {
             salaIdActual = salaId;
             document.getElementById('waitingCodigo').textContent = codigo;
             document.getElementById('waitingScreen').style.display = 'flex';
+            
+            // Verificar automáticamente si alguien se une
+            if (checkInterval) clearInterval(checkInterval);
+            checkInterval = setInterval(() => {
+                const key = `partida_${salaId}`;
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const partida = JSON.parse(data);
+                        if (partida.estado === 'en_curso' && partida.jugador2) {
+                            clearInterval(checkInterval);
+                            window.location.href = `carrera-multijugador.html?sala=${salaId}`;
+                        }
+                    } catch(e) {}
+                }
+            }, 1000);
         }
         
         function ocultarEspera() {
             document.getElementById('waitingScreen').style.display = 'none';
-            if (timerEspera) clearTimeout(timerEspera);
+            if (checkInterval) clearInterval(checkInterval);
         }
         
         // ============================================
@@ -462,8 +579,10 @@
         document.getElementById('btnAleatorio').addEventListener('click', () => {
             let salaId = buscarPartidaAleatoria();
             if (!salaId) {
-                const { salaId: nuevaSala, codigo } = crearPartida();
-                mostrarEspera(codigo, nuevaSala);
+                const result = crearPartida();
+                if (result) {
+                    mostrarEspera(result.codigo, result.salaId);
+                }
             } else {
                 window.location.href = `carrera-multijugador.html?sala=${salaId}`;
             }
@@ -471,26 +590,34 @@
         
         // Botón crear partida
         document.getElementById('btnCrearPartida').addEventListener('click', () => {
-            const { salaId, codigo } = crearPartida();
-            mostrarEspera(codigo, salaId);
+            const result = crearPartida();
+            if (result) {
+                mostrarEspera(result.codigo, result.salaId);
+            }
         });
         
         // Botón unirse
         document.getElementById('btnUnirse').addEventListener('click', () => {
             const codigo = document.getElementById('codigoInput').value.trim();
             if (codigo.length !== 6) {
-                alert('❌ Introduce un código de 6 dígitos');
+                showToast('❌ Introduce un código de 6 dígitos');
                 return;
             }
+            
             const salaId = unirsePorCodigo(codigo);
             if (salaId) {
                 window.location.href = `carrera-multijugador.html?sala=${salaId}`;
-            } else {
-                alert('❌ Partida no encontrada o ya está llena');
             }
         });
         
-        // Botón simular oponente (para demo)
+        // Enter en el input
+        document.getElementById('codigoInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('btnUnirse').click();
+            }
+        });
+        
+        // Botón simular oponente (demo)
         document.getElementById('btnSimularOponente').addEventListener('click', () => {
             if (!salaIdActual) return;
             const key = `partida_${salaIdActual}`;
@@ -509,7 +636,9 @@
                         ocultarEspera();
                         window.location.href = `carrera-multijugador.html?sala=${salaIdActual}`;
                     }
-                } catch(e) {}
+                } catch(e) {
+                    showToast('Error: ' + e.message);
+                }
             }
         });
         

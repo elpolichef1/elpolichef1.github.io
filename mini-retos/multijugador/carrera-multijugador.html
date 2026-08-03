@@ -243,6 +243,29 @@
         }
         .btn-reintentar:hover { transform: scale(1.05); }
         
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 16px 30px;
+            border-radius: 16px;
+            z-index: 3000;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.show { display: flex; animation: slideDown 0.3s ease; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
         @media (max-width: 768px) {
             .game-container { padding: 15px; }
             .score-board { flex-direction: column; gap: 10px; text-align: center; }
@@ -281,6 +304,11 @@
         </div>
     </div>
 
+    <div id="toast" class="toast">
+        <i id="toastIcon" class="fas fa-exclamation-circle"></i>
+        <span id="toastMessage">Mensaje</span>
+    </div>
+
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <script type="module">
@@ -299,9 +327,22 @@
         let timerInterval = null;
         let yaRespondi = false;
         let checkInterval = null;
-        let esperandoRival = false;
         
-        function log(msg) { console.log(`[${new Date().toLocaleTimeString()}] ${msg}`); }
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+            
+            toast.className = `toast ${type}`;
+            icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+            msg.textContent = message;
+            toast.classList.add('show');
+            
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
         
         function seleccionarPreguntas() {
             const mezcladas = [...preguntasMulti];
@@ -356,11 +397,6 @@
         function guardarPartida() {
             if (salaId) {
                 localStorage.setItem(`partida_${salaId}`, JSON.stringify(salaData));
-                // Disparar evento para notificar cambios
-                window.dispatchEvent(new StorageEvent('storage', {
-                    key: `partida_${salaId}`,
-                    newValue: JSON.stringify(salaData)
-                }));
             }
         }
         
@@ -571,7 +607,8 @@
             salaId = urlParams.get('sala');
             
             if (!salaId) {
-                window.location.href = 'lobby.html';
+                showToast('No se encontró la sala');
+                setTimeout(() => window.location.href = 'lobby.html', 2000);
                 return;
             }
             
@@ -579,12 +616,18 @@
             const data = localStorage.getItem(key);
             
             if (!data) {
-                alert('Partida no encontrada');
-                window.location.href = 'lobby.html';
+                showToast('Partida no encontrada');
+                setTimeout(() => window.location.href = 'lobby.html', 2000);
                 return;
             }
             
-            salaData = JSON.parse(data);
+            try {
+                salaData = JSON.parse(data);
+            } catch(e) {
+                showToast('Error al cargar la partida');
+                setTimeout(() => window.location.href = 'lobby.html', 2000);
+                return;
+            }
             
             // Determinar si soy jugador 1 o 2
             const partidaActual = localStorage.getItem('partida_actual');
@@ -606,17 +649,18 @@
                     </div>
                 `;
                 
-                // Verificar si el jugador2 se une
                 if (checkInterval) clearInterval(checkInterval);
                 checkInterval = setInterval(() => {
                     const updated = localStorage.getItem(key);
                     if (updated) {
-                        const newData = JSON.parse(updated);
-                        if (newData.jugador2) {
-                            salaData = newData;
-                            clearInterval(checkInterval);
-                            iniciarJuego();
-                        }
+                        try {
+                            const newData = JSON.parse(updated);
+                            if (newData.jugador2) {
+                                salaData = newData;
+                                clearInterval(checkInterval);
+                                iniciarJuego();
+                            }
+                        } catch(e) {}
                     }
                 }, 1000);
                 return;
