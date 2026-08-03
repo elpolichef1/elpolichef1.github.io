@@ -8,13 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Inter', sans-serif;
             background: #f1f5f9;
             min-height: 100vh;
         }
-        
         .game-header {
             background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
             color: white;
@@ -24,11 +22,7 @@
         .game-header h1 { font-size: 2rem; margin-bottom: 10px; }
         .game-header h1 i { color: #fbbf24; }
         
-        .game-container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-        }
+        .game-container { max-width: 1000px; margin: 40px auto; padding: 20px; }
         
         .race-track {
             background: linear-gradient(135deg, #2d3e2c, #1f2e1a);
@@ -92,20 +86,9 @@
             margin-bottom: 30px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         }
-        .score-item {
-            text-align: center;
-            flex: 1;
-        }
-        .score-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #fbbf24;
-        }
-        .score-label {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 5px;
-        }
+        .score-item { text-align: center; flex: 1; }
+        .score-value { font-size: 2rem; font-weight: 800; color: #fbbf24; }
+        .score-label { font-size: 0.75rem; color: #64748b; margin-top: 5px; }
         
         .question-card {
             background: white;
@@ -120,10 +103,7 @@
             color: #1e293b;
             line-height: 1.5;
         }
-        .options {
-            display: grid;
-            gap: 12px;
-        }
+        .options { display: grid; gap: 12px; }
         .option-btn {
             display: flex;
             align-items: center;
@@ -141,11 +121,7 @@
             border-color: #fbbf24;
             transform: translateX(8px);
         }
-        .option-prefix {
-            font-weight: 800;
-            color: #fbbf24;
-            width: 35px;
-        }
+        .option-prefix { font-weight: 800; color: #fbbf24; width: 35px; }
         .disabled { opacity: 0.6; cursor: not-allowed; }
         .disabled:hover { transform: none !important; background: #f8fafc !important; }
         .correct { background: #d1fae5 !important; border-color: #10b981 !important; }
@@ -278,7 +254,6 @@
             .car { font-size: 2rem; bottom: 8px; }
             .track { height: 80px; }
             .player-name { font-size: 0.65rem; top: -22px; }
-            .turn-indicator { font-size: 0.9rem; padding: 10px; }
         }
     </style>
 </head>
@@ -316,11 +291,42 @@
 
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
-    <script type="module">
+    <script>
         // ============================================
-        // IMPORTAR PREGUNTAS
+        // PREGUNTAS (30 preguntas DGT)
         // ============================================
-        import { preguntasMulti } from './preguntas-multi.js';
+        const preguntasMulti = [
+            { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
+            { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Solo permiso de circulación", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV", "Solo el seguro"], correcta: 2 },
+            { texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
+            { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1 },
+            { texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
+            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar", "Prohibido estacionar", "Zona de carga"], correcta: 0 },
+            { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2 },
+            { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Detenerse", "Prioridad", "Prohibido", "Ceder el paso"], correcta: 3 },
+            { texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2 },
+            { texto: "¿Qué es el recurso de reposición?", opciones: ["Recurso ante el mismo órgano", "Recurso judicial", "Pago", "Denuncia"], correcta: 0 },
+            { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida de adherencia por agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0 },
+            { texto: "¿Qué velocidad máxima puede alcanzar un turismo con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0 },
+            { texto: "¿Cuántos puntos se pierden por usar el móvil al volante?", opciones: ["2 puntos", "3 puntos", "4 puntos", "6 puntos"], correcta: 1 },
+            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1 },
+            { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1 },
+            { texto: "¿Está permitido adelantar en una curva sin visibilidad?", opciones: ["Sí, con precaución", "Sí, si no viene nadie", "No, está prohibido", "Solo de noche"], correcta: 2 },
+            { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 },
+            { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
+            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
+            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde el lado de la continua", "No adelantar desde el lado de la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 },
+            { texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1 },
+            { texto: "¿Qué significa la señal de 'Calle residencial'?", opciones: ["Velocidad máxima 20 km/h", "Prioridad peatones", "Zona de juegos", "Todas son correctas"], correcta: 3 },
+            { texto: "¿Cuándo debe encender las luces de cruce?", opciones: ["Al anochecer", "En túneles", "Con lluvia intensa", "Todas son correctas"], correcta: 3 },
+            { texto: "¿Qué indica una señal circular con fondo rojo y una franja blanca?", opciones: ["Prohibido el paso", "Prohibido girar", "Prohibido adelantar", "Prohibido estacionar"], correcta: 0 },
+            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1 },
+            { texto: "¿Qué es la fatiga al volante?", opciones: ["Cansancio que afecta a la conducción", "Aburrimiento", "Estrés", "Nervios"], correcta: 0 },
+            { texto: "¿Qué debe hacer si tiene sueño al volante?", opciones: ["Parar a descansar", "Aumentar velocidad", "Poner música alta", "Abrir ventana"], correcta: 0 },
+            { texto: "¿Qué significa la señal P-19?", opciones: ["Resalto o lomo de asno", "Curva peligrosa", "Paso de peatones", "Obras"], correcta: 0 },
+            { texto: "¿Qué es el carril VAO?", opciones: ["Carril para vehículos de alta ocupación", "Carril bus", "Carril bici", "Carril de emergencia"], correcta: 0 },
+            { texto: "¿Qué sanción tiene superar la velocidad máxima en 30 km/h en autovía?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 2 }
+        ];
 
         const TOTAL_PREGUNTAS = 10;
         const TIEMPO_RESPUESTA = 15000;
@@ -337,16 +343,12 @@
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toastIcon');
             const msg = document.getElementById('toastMessage');
-            
             toast.className = `toast ${type}`;
             icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
             msg.textContent = message;
             toast.classList.add('show');
-            
             clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
         function seleccionarPreguntas() {
@@ -356,6 +358,12 @@
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
             }
             return mezcladas.slice(0, TOTAL_PREGUNTAS);
+        }
+        
+        function guardarPartida() {
+            if (salaId && salaData) {
+                localStorage.setItem(salaId, JSON.stringify(salaData));
+            }
         }
         
         function iniciarTimer() {
@@ -368,7 +376,7 @@
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, TIEMPO_RESPUESTA - elapsed);
                 const percent = (remaining / TIEMPO_RESPUESTA) * 100;
-                if (timerFill) timerFill.style.width = `${percent}%`;
+                if (timerFill) timerFill.style.width = percent + '%';
                 if (remaining <= 0 && !yaRespondi && gameActivo) {
                     clearInterval(timerInterval);
                     manejarTimeout();
@@ -385,7 +393,7 @@
             
             const feedback = document.createElement('div');
             feedback.className = 'feedback-message feedback-incorrect';
-            feedback.innerHTML = '<i class="fas fa-clock"></i> ⏰ ¡TIEMPO AGOTADO! No respondiste a tiempo';
+            feedback.innerHTML = '<i class="fas fa-clock"></i> ⏰ ¡TIEMPO AGOTADO!';
             document.querySelector('.question-card')?.appendChild(feedback);
             document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
             
@@ -399,39 +407,6 @@
             }
         }
         
-        function guardarPartida() {
-            if (salaId) {
-                localStorage.setItem(`partida_${salaId}`, JSON.stringify(salaData));
-            }
-        }
-        
-        function mostrarCuentaAtras() {
-            return new Promise((resolve) => {
-                const overlay = document.createElement('div');
-                overlay.className = 'countdown-overlay';
-                overlay.innerHTML = `
-                    <div class="countdown-number" id="countdownNum">3</div>
-                    <div style="color:white;font-size:1.5rem;margin-top:10px;">Preparados...</div>
-                    <div style="color:#a8c4b8;font-size:1rem;margin-top:5px;">${esJugador1 ? 'Jugador 1' : 'Jugador 2'}</div>
-                `;
-                document.body.appendChild(overlay);
-                let count = 3;
-                const interval = setInterval(() => {
-                    count--;
-                    if (count >= 1) {
-                        const num = document.getElementById('countdownNum');
-                        if (num) num.textContent = count;
-                    } else {
-                        clearInterval(interval);
-                        setTimeout(() => {
-                            overlay.remove();
-                            resolve();
-                        }, 300);
-                    }
-                }, 1000);
-            });
-        }
-        
         function responder(respuesta) {
             if (!gameActivo || yaRespondi || !salaData) return;
             const turnoActual = salaData.turno;
@@ -442,8 +417,6 @@
             if (timerInterval) clearInterval(timerInterval);
             
             const pregunta = salaData.preguntas[turnoActual];
-            if (!pregunta) return;
-            
             const esCorrecto = (respuesta === pregunta.correcta);
             
             const opciones = document.querySelectorAll('.option-btn');
@@ -461,7 +434,7 @@
                 else salaData.puntuacion2 += 1;
             } else {
                 feedback.className = 'feedback-message feedback-incorrect';
-                feedback.innerHTML = `<i class="fas fa-times-circle"></i> ✗ INCORRECTO. La respuesta correcta era: ${pregunta.opciones[pregunta.correcta]}`;
+                feedback.innerHTML = '<i class="fas fa-times-circle"></i> ✗ INCORRECTO';
             }
             document.querySelector('.question-card')?.appendChild(feedback);
             
@@ -476,10 +449,7 @@
         }
         
         function renderizarJuego() {
-            if (!salaData || !salaData.preguntas) {
-                document.getElementById('gameContainer').innerHTML = '<p>Cargando partida...</p>';
-                return;
-            }
+            if (!salaData || !salaData.preguntas) return;
             
             const p1 = salaData.puntuacion1 || 0;
             const p2 = salaData.puntuacion2 || 0;
@@ -491,40 +461,31 @@
             }
             
             const pregunta = salaData.preguntas[turno];
-            if (!pregunta) {
-                document.getElementById('gameContainer').innerHTML = '<p>Error: Pregunta no encontrada</p>';
-                return;
-            }
+            if (!pregunta) return;
             
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
-            const nombre1 = salaData.jugador1?.nombre || 'Jugador 1';
-            const nombre2 = salaData.jugador2?.nombre || 'Jugador 2';
-            const coche1 = salaData.jugador1?.coche || '🏎️';
-            const coche2 = salaData.jugador2?.coche || '🚗';
-            
-            const esUltimaPregunta = turno === TOTAL_PREGUNTAS - 1;
             
             document.getElementById('gameContainer').innerHTML = `
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche1} ${escapeHtml(nombre1)}</div>
-                        <div class="car" style="left: ${Math.min(avance1, 96)}%">${coche1}</div>
+                        <div class="player-name">🏎️ Jugador 1</div>
+                        <div class="car" style="left: ${Math.min(avance1, 96)}%">${salaData.jugador1 || '🏎️'}</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">${coche2} ${escapeHtml(nombre2)}</div>
-                        <div class="car" style="left: ${Math.min(avance2, 96)}%">${coche2}</div>
+                        <div class="player-name">🚗 Jugador 2</div>
+                        <div class="car" style="left: ${Math.min(avance2, 96)}%">${salaData.jugador2 || '🚗'}</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
                 <div class="score-board">
-                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(nombre1)}</div></div>
-                    <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">${esUltimaPregunta ? '🏁 ¡Última!' : 'Pregunta'}</div></div>
-                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(nombre2)}</div></div>
+                    <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">Jugador 1</div></div>
+                    <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
+                    <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">Jugador 2</div></div>
                 </div>
                 <div class="turn-indicator ${!esMiTurno ? 'waiting' : ''}">
                     ${esMiTurno ? 
@@ -534,12 +495,12 @@
                     ${esMiTurno ? `<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>` : ''}
                 </div>
                 <div class="question-card">
-                    <div class="question-text">${escapeHtml(pregunta.texto)}</div>
+                    <div class="question-text">${pregunta.texto}</div>
                     <div class="options" id="options">
                         ${pregunta.opciones.map((opt, idx) => `
                             <div class="option-btn" data-opcion="${idx}">
                                 <span class="option-prefix">${String.fromCharCode(65+idx)}.</span>
-                                <span>${escapeHtml(opt)}</span>
+                                <span>${opt}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -564,16 +525,14 @@
             
             const p1 = salaData?.puntuacion1 || 0;
             const p2 = salaData?.puntuacion2 || 0;
-            const nombre1 = salaData?.jugador1?.nombre || 'Jugador 1';
-            const nombre2 = salaData?.jugador2?.nombre || 'Jugador 2';
             
             let ganador = "Empate";
             let esGanador = false;
             if (p1 > p2) {
-                ganador = nombre1;
+                ganador = "Jugador 1";
                 esGanador = esJugador1;
             } else if (p2 > p1) {
-                ganador = nombre2;
+                ganador = "Jugador 2";
                 esGanador = !esJugador1;
             }
             
@@ -582,32 +541,46 @@
                     <i class="fas ${esGanador ? 'fa-trophy' : 'fa-flag-checkered'}" style="font-size: 4rem; color: #fbbf24;"></i>
                     <h2 style="margin: 20px 0;">🏁 ¡PARTIDA FINALIZADA! 🏁</h2>
                     <div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;">
-                        <p style="font-size:1.2rem;"><strong>${escapeHtml(nombre1)}</strong>: ${p1} puntos</p>
-                        <p style="font-size:1.2rem;"><strong>${escapeHtml(nombre2)}</strong>: ${p2} puntos</p>
+                        <p style="font-size:1.2rem;"><strong>Jugador 1</strong>: ${p1} puntos</p>
+                        <p style="font-size:1.2rem;"><strong>Jugador 2</strong>: ${p2} puntos</p>
                         <div style="height: 1px; background: #e2e8f0; margin: 15px 0;"></div>
-                        <h3 style="color: #fbbf24; font-size:1.8rem;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${escapeHtml(ganador)} 🏆`)}</h3>
+                        <h3 style="color: #fbbf24; font-size:1.8rem;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${ganador} 🏆`)}</h3>
                     </div>
                     <button class="btn-reintentar" onclick="window.location.href='lobby.html'"><i class="fas fa-redo"></i> Jugar de nuevo</button>
                     <a href="lobby.html" style="display: inline-block; margin-left: 15px; background: #f1f5f9; color: #1e293b; padding: 12px 30px; border-radius: 50px; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al lobby</a>
                 </div>
             `;
             
-            if (salaId) {
-                localStorage.removeItem(`partida_${salaId}`);
-            }
+            if (salaId) localStorage.removeItem(salaId);
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
+        function mostrarCuentaAtras() {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'countdown-overlay';
+                overlay.innerHTML = `
+                    <div class="countdown-number" id="countdownNum">3</div>
+                    <div style="color:white;font-size:1.5rem;margin-top:10px;">Preparados...</div>
+                `;
+                document.body.appendChild(overlay);
+                let count = 3;
+                const interval = setInterval(() => {
+                    count--;
+                    if (count >= 1) {
+                        const num = document.getElementById('countdownNum');
+                        if (num) num.textContent = count;
+                    } else {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            overlay.remove();
+                            resolve();
+                        }, 300);
+                    }
+                }, 1000);
             });
         }
         
-        function cargarPartida() {
+        async function cargarPartida() {
             const urlParams = new URLSearchParams(window.location.search);
             salaId = urlParams.get('sala');
             
@@ -617,9 +590,7 @@
                 return;
             }
             
-            const key = `partida_${salaId}`;
-            const data = localStorage.getItem(key);
-            
+            const data = localStorage.getItem(salaId);
             if (!data) {
                 showToast('Partida no encontrada', 'error');
                 setTimeout(() => window.location.href = 'lobby.html', 2000);
@@ -636,11 +607,7 @@
             
             // Determinar si soy jugador 1 o 2
             const partidaActual = localStorage.getItem('partida_actual');
-            if (partidaActual === salaId) {
-                esJugador1 = true;
-            } else {
-                esJugador1 = false;
-            }
+            esJugador1 = (partidaActual === salaId);
             
             // Si no hay jugador2, esperar
             if (!salaData.jugador2) {
@@ -656,7 +623,7 @@
                 
                 if (checkInterval) clearInterval(checkInterval);
                 checkInterval = setInterval(() => {
-                    const updated = localStorage.getItem(key);
+                    const updated = localStorage.getItem(salaId);
                     if (updated) {
                         try {
                             const newData = JSON.parse(updated);
@@ -675,7 +642,6 @@
         }
         
         async function iniciarJuego() {
-            // Inicializar preguntas si no existen
             if (!salaData.preguntas) {
                 salaData.preguntas = seleccionarPreguntas();
                 salaData.turno = 0;
@@ -687,11 +653,9 @@
             await mostrarCuentaAtras();
             renderizarJuego();
             
-            // Escuchar cambios
             if (checkInterval) clearInterval(checkInterval);
             checkInterval = setInterval(() => {
-                const key = `partida_${salaId}`;
-                const updated = localStorage.getItem(key);
+                const updated = localStorage.getItem(salaId);
                 if (updated) {
                     try {
                         const newData = JSON.parse(updated);
@@ -704,9 +668,7 @@
             }, 500);
         }
         
-        // ============================================
         // INICIAR
-        // ============================================
         cargarPartida();
         
         window.addEventListener('beforeunload', () => {

@@ -18,11 +18,7 @@
             align-items: center;
             padding: 20px;
         }
-        .container {
-            max-width: 550px;
-            width: 100%;
-            margin: 0 auto;
-        }
+        .container { max-width: 550px; width: 100%; }
         .card {
             background: rgba(255,255,255,0.08);
             backdrop-filter: blur(20px);
@@ -41,11 +37,7 @@
             color: transparent;
         }
         h1 i { color: #fbbf24; margin-right: 10px; background: none; -webkit-background-clip: unset; }
-        .subtitle {
-            color: #a8c4b8;
-            margin-bottom: 35px;
-            font-size: 0.95rem;
-        }
+        .subtitle { color: #a8c4b8; margin-bottom: 35px; font-size: 0.95rem; }
         
         .car-selector {
             background: rgba(0,0,0,0.3);
@@ -54,11 +46,7 @@
             margin-bottom: 25px;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .car-selector p {
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            color: #fbbf24;
-        }
+        .car-selector p { margin-bottom: 15px; font-size: 0.9rem; color: #fbbf24; }
         .car-options {
             display: flex;
             justify-content: center;
@@ -77,22 +65,10 @@
             gap: 6px;
             border: 2px solid transparent;
         }
-        .car-option span {
-            font-size: 0.75rem;
-            color: #a8c4b8;
-        }
-        .car-option:hover {
-            background: rgba(251,191,36,0.3);
-            transform: scale(1.05);
-        }
-        .car-option.selected {
-            background: #fbbf24;
-            border-color: white;
-        }
-        .car-option.selected span {
-            color: #1a472a;
-            font-weight: bold;
-        }
+        .car-option span { font-size: 0.75rem; color: #a8c4b8; }
+        .car-option:hover { background: rgba(251,191,36,0.3); transform: scale(1.05); }
+        .car-option.selected { background: #fbbf24; border-color: white; }
+        .car-option.selected span { color: #1a472a; font-weight: bold; }
         
         .btn {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
@@ -111,15 +87,8 @@
             justify-content: center;
             gap: 12px;
         }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(251,191,36,0.4);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #fbbf24;
-            color: #fbbf24;
-        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(251,191,36,0.4); }
+        .btn-outline { background: transparent; border: 2px solid #fbbf24; color: #fbbf24; }
         .btn-outline:hover { background: #fbbf24; color: #1a472a; }
         
         .codigo-container {
@@ -129,11 +98,7 @@
             margin: 15px 0;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .codigo-container p {
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
+        .codigo-container p { margin-bottom: 12px; font-size: 0.9rem; opacity: 0.8; }
         .codigo-input {
             display: flex;
             gap: 12px;
@@ -151,10 +116,7 @@
             color: #1a472a;
             text-transform: uppercase;
         }
-        .codigo-input input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(251,191,36,0.5);
-        }
+        .codigo-input input:focus { outline: none; box-shadow: 0 0 0 3px rgba(251,191,36,0.5); }
         .codigo-input button {
             background: #fbbf24;
             border: none;
@@ -216,11 +178,6 @@
             max-width: 450px;
             width: 90%;
             border: 1px solid rgba(251,191,36,0.4);
-            animation: fadeInUp 0.5s ease;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .waiting-spinner {
             width: 70px;
@@ -243,7 +200,6 @@
             letter-spacing: 10px;
             font-weight: 800;
             color: #fbbf24;
-            text-shadow: 0 0 20px rgba(251,191,36,0.3);
         }
         .btn-cancelar {
             background: rgba(255,255,255,0.15);
@@ -285,29 +241,15 @@
             align-items: center;
             gap: 12px;
             border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
             max-width: 90%;
         }
         .toast.error { border-left: 4px solid #ef4444; }
         .toast.success { border-left: 4px solid #10b981; }
-        .toast.info { border-left: 4px solid #fbbf24; }
         .toast.show { display: flex; animation: slideDown 0.3s ease; }
         @keyframes slideDown {
             from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-        
-        .debug-info {
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            font-size: 0.7rem;
-            color: #64748b;
-            text-align: left;
-            display: none;
-        }
-        .debug-info.show { display: block; }
         
         @media (max-width: 560px) {
             .card { padding: 30px 20px; }
@@ -357,15 +299,9 @@
             </div>
 
             <a href="../index.html" class="volver"><i class="fas fa-arrow-left"></i> Volver a juegos</a>
-            
-            <div class="debug-info" id="debugInfo">
-                <strong>🔍 Debug:</strong><br>
-                <span id="debugText">Esperando acción...</span>
-            </div>
         </div>
     </div>
 
-    <!-- Toast notification -->
     <div id="toast" class="toast">
         <i id="toastIcon" class="fas fa-info-circle"></i>
         <span id="toastMessage">Mensaje</span>
@@ -398,16 +334,14 @@
 
     <script>
         // ============================================
-        // VERSIÓN DEFINITIVA - CON DEBUG
+        // VERSIÓN SIMPLE CON LOCALSTORAGE
         // ============================================
         
         let cocheSeleccionado = localStorage.getItem('multiplayer_car') || '🏎️';
         let salaIdActual = null;
         let checkInterval = null;
         
-        // Array para almacenar TODAS las partidas (persistente)
-        let todasLasPartidas = [];
-        
+        // Inicializar selector de coches
         function initCarSelector() {
             document.querySelectorAll('.car-option').forEach(opt => {
                 if (opt.dataset.car === cocheSeleccionado) {
@@ -430,210 +364,111 @@
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toastIcon');
             const msg = document.getElementById('toastMessage');
-            
             toast.className = `toast ${type}`;
-            icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
-                            type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle';
+            icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
             msg.textContent = message;
             toast.classList.add('show');
-            
             clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        function debugLog(message) {
-            const debugText = document.getElementById('debugText');
-            const debugInfo = document.getElementById('debugInfo');
-            debugInfo.classList.add('show');
-            debugText.textContent = message + ' (código: ' + document.getElementById('codigoInput').value + ')';
-            console.log('[DEBUG]', message);
-        }
-        
-        // Cargar partidas existentes
-        function cargarPartidasExistentes() {
-            todasLasPartidas = [];
-            const keys = Object.keys(localStorage);
-            for (const key of keys) {
-                if (key.startsWith('partida_')) {
-                    try {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        if (data && data.codigo) {
-                            todasLasPartidas.push({
-                                key: key,
-                                data: data
-                            });
-                        }
-                    } catch(e) {}
-                }
-            }
-            debugLog(`Cargadas ${todasLasPartidas.length} partidas existentes`);
-            return todasLasPartidas;
-        }
-        
+        // CREAR PARTIDA
         function crearPartida() {
             const codigo = generarCodigo();
-            const salaId = `sala_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+            const salaId = 'sala_' + Date.now();
             
             const partida = {
-                id: salaId,
                 codigo: codigo,
-                jugador1: {
-                    nombre: 'Jugador 1',
-                    coche: cocheSeleccionado,
-                    uid: 'player1'
-                },
+                jugador1: cocheSeleccionado,
                 jugador2: null,
-                estado: 'esperando',
                 turno: 0,
                 puntuacion1: 0,
                 puntuacion2: 0,
                 preguntas: null,
-                creada: Date.now()
+                estado: 'esperando'
             };
             
-            try {
-                localStorage.setItem(`partida_${salaId}`, JSON.stringify(partida));
-                localStorage.setItem('partida_actual', salaId);
-                cargarPartidasExistentes();
-                debugLog(`Partida creada: ${salaId} con código ${codigo}`);
-                showToast(`✅ Partida creada! Código: ${codigo}`, 'success');
-                return { salaId, codigo };
-            } catch(e) {
-                showToast('Error al crear la partida: ' + e.message);
-                debugLog('ERROR al crear: ' + e.message);
-                return null;
-            }
+            localStorage.setItem(salaId, JSON.stringify(partida));
+            localStorage.setItem('partida_actual', salaId);
+            
+            showToast('✅ Partida creada! Código: ' + codigo, 'success');
+            return { salaId, codigo };
         }
         
-        function buscarPartidaPorCodigo(codigo) {
-            cargarPartidasExistentes();
-            
-            // Buscar en todas las partidas cargadas
-            for (const p of todasLasPartidas) {
-                if (p.data.codigo === codigo) {
-                    return p;
-                }
-            }
-            
-            // Búsqueda directa en localStorage por si acaso
-            const keys = Object.keys(localStorage);
-            for (const key of keys) {
-                if (key.startsWith('partida_')) {
+        // BUSCAR PARTIDA POR CÓDIGO
+        function buscarPartida(codigo) {
+            for (let key in localStorage) {
+                if (key.startsWith('sala_')) {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
-                        if (data && data.codigo === codigo) {
+                        if (data.codigo === codigo) {
                             return { key, data };
                         }
                     } catch(e) {}
                 }
             }
-            
             return null;
         }
         
-        function unirsePorCodigo(codigo) {
-            debugLog(`Buscando partida con código: ${codigo}`);
-            
-            const resultado = buscarPartidaPorCodigo(codigo);
+        // UNIRSE A PARTIDA
+        function unirsePartida(codigo) {
+            const resultado = buscarPartida(codigo);
             
             if (!resultado) {
-                debugLog('❌ Partida NO encontrada');
-                showToast('❌ Partida no encontrada con ese código', 'error');
+                showToast('❌ Partida no encontrada', 'error');
                 return null;
             }
             
             const { key, data } = resultado;
             
             if (data.jugador2) {
-                debugLog('❌ Partida llena');
-                showToast('❌ Esta partida ya está llena', 'error');
+                showToast('❌ Partida llena', 'error');
                 return null;
             }
             
-            if (data.estado === 'en_curso') {
-                debugLog('❌ Partida ya comenzada');
-                showToast('❌ La partida ya ha comenzado', 'error');
-                return null;
-            }
-            
-            // Unirse
-            debugLog('✅ Partida encontrada, uniéndose...');
-            data.jugador2 = {
-                nombre: 'Jugador 2',
-                coche: cocheSeleccionado,
-                uid: 'player2'
-            };
+            data.jugador2 = cocheSeleccionado;
             data.estado = 'en_curso';
+            localStorage.setItem(key, JSON.stringify(data));
+            localStorage.setItem('partida_actual', key);
             
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-                localStorage.setItem('partida_actual', data.id);
-                showToast('✅ Te has unido a la partida!', 'success');
-                debugLog(`✅ Unido a partida: ${data.id}`);
-                return data.id;
-            } catch(e) {
-                showToast('Error al unirse: ' + e.message);
-                debugLog('ERROR al unirse: ' + e.message);
-                return null;
-            }
+            showToast('✅ Unido a la partida!', 'success');
+            return key;
         }
         
+        // BUSCAR PARTIDA ALEATORIA
         function buscarPartidaAleatoria() {
-            cargarPartidasExistentes();
-            
-            // Buscar partidas disponibles
-            const disponibles = todasLasPartidas.filter(p => 
-                p.data.estado === 'esperando' && !p.data.jugador2
-            );
-            
-            debugLog(`Partidas disponibles: ${disponibles.length}`);
-            
-            if (disponibles.length === 0) {
-                debugLog('No hay partidas disponibles');
-                return null;
+            for (let key in localStorage) {
+                if (key.startsWith('sala_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data.estado === 'esperando' && !data.jugador2) {
+                            data.jugador2 = cocheSeleccionado;
+                            data.estado = 'en_curso';
+                            localStorage.setItem(key, JSON.stringify(data));
+                            localStorage.setItem('partida_actual', key);
+                            return key;
+                        }
+                    } catch(e) {}
+                }
             }
-            
-            // Tomar la primera
-            const { key, data } = disponibles[0];
-            debugLog(`Uniéndose a partida: ${data.id} con código ${data.codigo}`);
-            
-            data.jugador2 = {
-                nombre: 'Jugador 2',
-                coche: cocheSeleccionado,
-                uid: 'player2'
-            };
-            data.estado = 'en_curso';
-            
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-                localStorage.setItem('partida_actual', data.id);
-                return data.id;
-            } catch(e) {
-                showToast('Error al unirse: ' + e.message);
-                return null;
-            }
+            return null;
         }
         
         function mostrarEspera(codigo, salaId) {
             salaIdActual = salaId;
             document.getElementById('waitingCodigo').textContent = codigo;
             document.getElementById('waitingScreen').style.display = 'flex';
-            debugLog(`Esperando oponente en sala ${salaId} con código ${codigo}`);
             
-            // Verificar automáticamente si alguien se une
+            // Verificar cada segundo si alguien se unió
             if (checkInterval) clearInterval(checkInterval);
             checkInterval = setInterval(() => {
-                const key = `partida_${salaId}`;
-                const data = localStorage.getItem(key);
+                const data = localStorage.getItem(salaId);
                 if (data) {
                     try {
                         const partida = JSON.parse(data);
-                        if (partida.estado === 'en_curso' && partida.jugador2) {
-                            debugLog('¡Oponente encontrado! Redirigiendo...');
+                        if (partida.jugador2) {
                             clearInterval(checkInterval);
-                            window.location.href = `carrera-multijugador.html?sala=${salaId}`;
+                            window.location.href = 'carrera-multijugador.html?sala=' + salaId;
                         }
                     } catch(e) {}
                 }
@@ -650,130 +485,72 @@
         // ============================================
         
         initCarSelector();
-        cargarPartidasExistentes();
         
-        // Mostrar debug con todos los códigos disponibles
-        const codigosDisponibles = todasLasPartidas
-            .filter(p => p.data.estado === 'esperando' && !p.data.jugador2)
-            .map(p => p.data.codigo);
-        debugLog(`Códigos disponibles: ${codigosDisponibles.join(', ') || 'ninguno'}`);
-        
-        // Botón aleatorio
+        // Emparejamiento aleatorio
         document.getElementById('btnAleatorio').addEventListener('click', () => {
             let salaId = buscarPartidaAleatoria();
             if (!salaId) {
-                const result = crearPartida();
-                if (result) {
-                    mostrarEspera(result.codigo, result.salaId);
-                }
+                const { salaId: nueva, codigo } = crearPartida();
+                mostrarEspera(codigo, nueva);
             } else {
-                window.location.href = `carrera-multijugador.html?sala=${salaId}`;
+                window.location.href = 'carrera-multijugador.html?sala=' + salaId;
             }
         });
         
-        // Botón crear partida
+        // Crear partida
         document.getElementById('btnCrearPartida').addEventListener('click', () => {
-            const result = crearPartida();
-            if (result) {
-                mostrarEspera(result.codigo, result.salaId);
-            }
+            const { salaId, codigo } = crearPartida();
+            mostrarEspera(codigo, salaId);
         });
         
-        // Botón unirse
+        // Unirse
         document.getElementById('btnUnirse').addEventListener('click', () => {
             const codigo = document.getElementById('codigoInput').value.trim();
-            
             if (codigo.length !== 6) {
-                showToast('❌ Introduce un código de 6 dígitos');
+                showToast('❌ Código de 6 dígitos', 'error');
                 return;
             }
             
-            // Mostrar qué códigos están disponibles
-            cargarPartidasExistentes();
-            const disponibles = todasLasPartidas
-                .filter(p => p.data.estado === 'esperando' && !p.data.jugador2)
-                .map(p => p.data.codigo);
-            debugLog(`Códigos disponibles: ${disponibles.join(', ')}`);
-            
-            const salaId = unirsePorCodigo(codigo);
+            const salaId = unirsePartida(codigo);
             if (salaId) {
-                setTimeout(() => {
-                    window.location.href = `carrera-multijugador.html?sala=${salaId}`;
-                }, 500);
+                window.location.href = 'carrera-multijugador.html?sala=' + salaId;
             }
         });
         
-        // Enter en el input
+        // Enter en input
         document.getElementById('codigoInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('btnUnirse').click();
-            }
+            if (e.key === 'Enter') document.getElementById('btnUnirse').click();
         });
         
-        // Botón simular oponente (demo)
+        // Simular oponente
         document.getElementById('btnSimularOponente').addEventListener('click', () => {
-            if (!salaIdActual) {
-                showToast('Error: No hay sala activa');
-                return;
-            }
+            if (!salaIdActual) return;
             
-            const key = `partida_${salaIdActual}`;
-            const data = localStorage.getItem(key);
+            const data = localStorage.getItem(salaIdActual);
             if (data) {
                 try {
                     const partida = JSON.parse(data);
                     if (!partida.jugador2) {
-                        partida.jugador2 = {
-                            nombre: 'Jugador 2 (Demo)',
-                            coche: '🚗',
-                            uid: 'player2_demo'
-                        };
+                        partida.jugador2 = '🚗';
                         partida.estado = 'en_curso';
-                        localStorage.setItem(key, JSON.stringify(partida));
-                        debugLog('✅ Oponente simulado unido');
-                        ocultarEspera();
-                        window.location.href = `carrera-multijugador.html?sala=${salaIdActual}`;
-                    } else {
-                        showToast('La partida ya tiene un oponente');
+                        localStorage.setItem(salaIdActual, JSON.stringify(partida));
+                        showToast('✅ Oponente simulado!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'carrera-multijugador.html?sala=' + salaIdActual;
+                        }, 500);
                     }
-                } catch(e) {
-                    showToast('Error: ' + e.message);
-                    debugLog('ERROR al simular: ' + e.message);
-                }
+                } catch(e) {}
             }
         });
         
-        // Cancelar espera
+        // Cancelar
         document.getElementById('btnCancelarEspera').addEventListener('click', () => {
             ocultarEspera();
             if (salaIdActual) {
-                localStorage.removeItem(`partida_${salaIdActual}`);
+                localStorage.removeItem(salaIdActual);
                 localStorage.removeItem('partida_actual');
-                showToast('Partida cancelada');
-                debugLog('Partida cancelada');
-                cargarPartidasExistentes();
             }
         });
-        
-        // Limpiar partidas antiguas (más de 5 minutos)
-        function limpiarPartidasAntiguas() {
-            const keys = Object.keys(localStorage);
-            const ahora = Date.now();
-            for (const key of keys) {
-                if (key.startsWith('partida_')) {
-                    try {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        if (data && data.creada && (ahora - data.creada) > 300000) {
-                            if (data.estado === 'esperando' && !data.jugador2) {
-                                localStorage.removeItem(key);
-                                debugLog(`Eliminada partida antigua: ${key}`);
-                            }
-                        }
-                    } catch(e) {}
-                }
-            }
-        }
-        limpiarPartidasAntiguas();
     </script>
 </body>
 </html>
