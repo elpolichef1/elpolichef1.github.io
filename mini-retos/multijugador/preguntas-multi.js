@@ -1,63 +1,53 @@
-// Preguntas para el modo multijugador
+// preguntas-multi.js - 50 preguntas reales del examen DGT
 export const preguntasMulti = [
-    {
-        texto: "¿Cuál es la velocidad máxima en autovía para un turismo?",
-        opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"],
-        correcta: 2,
-        explicacion: "La velocidad máxima para turismos en autovía es 120 km/h."
-    },
-    {
-        texto: "¿Qué significa una señal de STOP?",
-        opciones: ["Ceda el paso", "Detenerse obligatoriamente", "Prohibido el paso", "Prioridad"],
-        correcta: 1,
-        explicacion: "La señal de STOP obliga a detenerse completamente."
-    },
-    {
-        texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?",
-        opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"],
-        correcta: 1,
-        explicacion: "Los conductores noveles tienen un límite de 0,3 g/l en sangre."
-    },
-    {
-        texto: "¿Qué sanción tiene usar el teléfono móvil al volante?",
-        opciones: ["100€ y 2 puntos", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"],
-        correcta: 1,
-        explicacion: "Usar el móvil al volante: 200€ de multa y 3 puntos."
-    },
-    {
-        texto: "¿Cuántos puntos tiene un conductor novel al obtener el carnet?",
-        opciones: ["12 puntos", "8 puntos", "6 puntos", "4 puntos"],
-        correcta: 1,
-        explicacion: "Los conductores noveles tienen 8 puntos iniciales."
-    },
-    {
-        texto: "¿Qué indica una línea continua en la calzada?",
-        opciones: ["Prohibido adelantar", "Prohibido estacionar", "Sentido prohibido", "Zona de carga"],
-        correcta: 0,
-        explicacion: "La línea continua prohíbe adelantar."
-    },
-    {
-        texto: "¿Cuál es la tasa de alcohol máxima para conductores profesionales?",
-        opciones: ["0,5 g/l", "0,3 g/l", "0,15 g/l", "0,0 g/l"],
-        correcta: 1,
-        explicacion: "Los conductores profesionales tienen el límite reducido a 0,3 g/l."
-    },
-    {
-        texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?",
-        opciones: ["100€", "200€ y 3 puntos", "300€", "500€"],
-        correcta: 1,
-        explicacion: "No usar el cinturón: 200€ de multa y 3 puntos."
-    },
-    {
-        texto: "¿Qué significa una señal de 'Ceda el paso'?",
-        opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"],
-        correcta: 1,
-        explicacion: "La señal de CEDA EL PASO obliga a ceder el paso."
-    },
-    {
-        texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?",
-        opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"],
-        correcta: 1,
-        explicacion: "En vías urbanas de un solo carril, la velocidad máxima es 30 km/h."
-    }
+    { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
+    { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Solo permiso de circulación", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV", "Solo el seguro"], correcta: 2 },
+    { texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
+    { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1 },
+    { texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
+    { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar", "Prohibido estacionar", "Zona de carga"], correcta: 0 },
+    { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2 },
+    { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Detenerse", "Prioridad", "Prohibido", "Ceder el paso"], correcta: 3 },
+    { texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2 },
+    { texto: "¿Qué es el recurso de reposición?", opciones: ["Recurso ante el mismo órgano", "Recurso judicial", "Pago", "Denuncia"], correcta: 0 },
+    { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida de adherencia por agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0 },
+    { texto: "¿Qué velocidad máxima puede alcanzar un turismo con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0 },
+    { texto: "¿Cuántos puntos se pierden por usar el móvil al volante?", opciones: ["2 puntos", "3 puntos", "4 puntos", "6 puntos"], correcta: 1 },
+    { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1 },
+    { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1 },
+    { texto: "¿Está permitido adelantar en una curva sin visibilidad?", opciones: ["Sí, con precaución", "Sí, si no viene nadie", "No, está prohibido", "Solo de noche"], correcta: 2 },
+    { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 },
+    { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
+    { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
+    { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde el lado de la continua", "No adelantar desde el lado de la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 },
+    { texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1 },
+    { texto: "¿Qué significa la señal de 'Calle residencial'?", opciones: ["Velocidad máxima 20 km/h", "Prioridad peatones", "Zona de juegos", "Todas son correctas"], correcta: 3 },
+    { texto: "¿Cuándo debe encender las luces de cruce?", opciones: ["Al anochecer", "En túneles", "Con lluvia intensa", "Todas son correctas"], correcta: 3 },
+    { texto: "¿Qué indica una señal circular con fondo rojo y una franja blanca?", opciones: ["Prohibido el paso", "Prohibido girar", "Prohibido adelantar", "Prohibido estacionar"], correcta: 0 },
+    { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1 },
+    { texto: "¿Qué es la fatiga al volante?", opciones: ["Cansancio que afecta a la conducción", "Aburrimiento", "Estrés", "Nervios"], correcta: 0 },
+    { texto: "¿Qué debe hacer si tiene sueño al volante?", opciones: ["Parar a descansar", "Aumentar velocidad", "Poner música alta", "Abrir ventana"], correcta: 0 },
+    { texto: "¿Qué significa la señal P-19?", opciones: ["Resalto o lomo de asno", "Curva peligrosa", "Paso de peatones", "Obras"], correcta: 0 },
+    { texto: "¿Qué es el carril VAO?", opciones: ["Carril para vehículos de alta ocupación", "Carril bus", "Carril bici", "Carril de emergencia"], correcta: 0 },
+    { texto: "¿Qué sanción tiene superar la velocidad máxima en 30 km/h en autovía?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 2 },
+    { texto: "¿Cuál es la velocidad máxima en una autopista?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
+    { texto: "¿Qué significa una línea discontinua en el arcén?", opciones: ["Permite estacionar", "Prohibido estacionar", "Zona de carga", "Carril bici"], correcta: 0 },
+    { texto: "¿Cuánto tiempo debe conservar un conductor el justificante de haber pasado la ITV?", opciones: ["3 meses", "6 meses", "1 año", "2 años"], correcta: 1 },
+    { texto: "¿Qué significa la señal de 'Peligro por animales sueltos'?", opciones: ["Animales domésticos", "Animales salvajes", "Animales en la vía", "Zona de caza"], correcta: 2 },
+    { texto: "¿Cuál es la tasa de alcohol máxima para conductores profesionales?", opciones: ["0,5 g/l", "0,3 g/l", "0,15 g/l", "0,0 g/l"], correcta: 1 },
+    { texto: "¿Qué debe hacer al incorporarse a una autovía?", opciones: ["Parar en el carril de aceleración", "Ceder el paso", "Acelerar e incorporarse", "Usar el claxon"], correcta: 2 },
+    { texto: "¿Qué significa la señal de 'Prohibido girar a la izquierda'?", opciones: ["Prohibido girar a la izquierda", "Prohibido girar a la derecha", "Prohibido cambiar de sentido", "Prohibido estacionar"], correcta: 0 },
+    { texto: "¿Cuál es la distancia mínima de seguridad en autovía?", opciones: ["50 metros", "100 metros", "1,5 segundos", "2 segundos"], correcta: 1 },
+    { texto: "¿Qué significa la señal de 'Zona de obras'?", opciones: ["Obras en la vía", "Prohibido el paso", "Desvío obligatorio", "Peligro"], correcta: 0 },
+    { texto: "¿Qué debe hacer si el semáforo está en ámbar intermitente?", opciones: ["Detenerse", "Acelerar", "Extremar la precaución", "Esperar"], correcta: 2 },
+    { texto: "¿Cuántos puntos se pierden por circular sin carnet?", opciones: ["4 puntos", "6 puntos", "8 puntos", "No resta puntos"], correcta: 1 },
+    { texto: "¿Qué significa la señal de 'Sentido único'?", opciones: ["Circulación en ambos sentidos", "Circulación en un solo sentido", "Prohibido circular", "Calle peatonal"], correcta: 1 },
+    { texto: "¿Cuál es la velocidad máxima en vía urbana con dos carriles por sentido?", opciones: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], correcta: 2 },
+    { texto: "¿Qué debe hacer si el vehículo comienza a derrapar?", opciones: ["Frenar bruscamente", "Girar el volante en sentido contrario", "Soltar el acelerador y no frenar", "Acelerar"], correcta: 2 },
+    { texto: "¿Qué significa la señal de 'Ceda el paso' con forma de triángulo?", opciones: ["STOP", "Ceda el paso", "Prohibido el paso", "Prioridad"], correcta: 1 },
+    { texto: "¿Cuánto alcohol puede tener un conductor novel en sangre?", opciones: ["0,5 g/l", "0,3 g/l", "0,0 g/l", "0,15 g/l"], correcta: 1 },
+    { texto: "¿Qué significa la señal de 'Prohibido estacionar'?", opciones: ["Prohibido aparcar", "Prohibido parar", "Prohibido estacionar", "Prohibido circular"], correcta: 2 },
+    { texto: "¿Cuál es la velocidad máxima en una travesía?", opciones: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], correcta: 2 },
+    { texto: "¿Qué significa la señal de 'Carril bus'?", opciones: ["Carril para autobuses", "Carril para bicicletas", "Carril de emergencia", "Carril de alta ocupación"], correcta: 0 },
+    { texto: "¿Qué debe hacer si un peatón está cruzando por un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Detenerse y ceder el paso", "Rodearlo"], correcta: 2 }
 ];

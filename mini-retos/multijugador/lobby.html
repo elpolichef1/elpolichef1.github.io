@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Carrera Multijugador | AprobadoYa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,34 +13,15 @@
             background: linear-gradient(135deg, #0a2f2a 0%, #061a14 100%);
             min-height: 100vh;
             color: white;
-            position: relative;
-            overflow-x: hidden;
-        }
-        body::before {
-            content: "🏁";
-            position: absolute;
-            font-size: 300px;
-            opacity: 0.03;
-            bottom: -50px;
-            right: -50px;
-            pointer-events: none;
-        }
-        body::after {
-            content: "🏎️";
-            position: absolute;
-            font-size: 250px;
-            opacity: 0.03;
-            top: -50px;
-            left: -50px;
-            pointer-events: none;
-            transform: rotate(-15deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         .container {
             max-width: 550px;
+            width: 100%;
             margin: 0 auto;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
         }
         .card {
             background: rgba(255,255,255,0.08);
@@ -49,10 +31,6 @@
             text-align: center;
             border: 1px solid rgba(255,255,255,0.15);
             box-shadow: 0 25px 45px rgba(0,0,0,0.3);
-            transition: transform 0.3s;
-        }
-        .card:hover {
-            transform: translateY(-5px);
         }
         h1 {
             font-size: 2rem;
@@ -69,7 +47,6 @@
             font-size: 0.95rem;
         }
         
-        /* Selector de coche */
         .car-selector {
             background: rgba(0,0,0,0.3);
             border-radius: 28px;
@@ -85,23 +62,23 @@
         .car-options {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         .car-option {
             background: rgba(255,255,255,0.1);
-            padding: 12px 18px;
+            padding: 10px 16px;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 1.3rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             border: 2px solid transparent;
         }
         .car-option span {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #a8c4b8;
         }
         .car-option:hover {
@@ -127,47 +104,39 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            position: relative;
-            overflow: hidden;
         }
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(251,191,36,0.4);
         }
-        .btn:hover::before { left: 100%; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(251,191,36,0.4); }
         .btn-outline {
             background: transparent;
             border: 2px solid #fbbf24;
             color: #fbbf24;
         }
-        .btn-outline:hover { background: #fbbf24; color: #1a472a; box-shadow: 0 10px 25px rgba(251,191,36,0.3); }
+        .btn-outline:hover { background: #fbbf24; color: #1a472a; }
         
         .codigo-container {
             background: rgba(0,0,0,0.3);
             border-radius: 28px;
             padding: 20px;
-            margin: 20px 0;
-            backdrop-filter: blur(4px);
+            margin: 15px 0;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .codigo-container p { margin-bottom: 12px; font-size: 0.9rem; opacity: 0.8; }
+        .codigo-container p {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
         .codigo-input {
             display: flex;
             gap: 12px;
-            margin-top: 15px;
         }
         .codigo-input input {
             flex: 1;
@@ -178,10 +147,11 @@
             text-align: center;
             letter-spacing: 4px;
             font-weight: bold;
-            background: white;
-            transition: all 0.3s;
         }
-        .codigo-input input:focus { outline: none; box-shadow: 0 0 0 3px rgba(251,191,36,0.5); transform: scale(1.02); }
+        .codigo-input input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(251,191,36,0.5);
+        }
         .codigo-input button {
             background: #fbbf24;
             border: none;
@@ -191,12 +161,12 @@
             font-weight: bold;
             transition: 0.3s;
         }
-        .codigo-input button:hover { background: #f59e0b; transform: scale(1.02); }
+        .codigo-input button:hover { background: #f59e0b; }
         
         .divider {
             display: flex;
             align-items: center;
-            margin: 25px 0;
+            margin: 20px 0;
             color: #94a3b8;
             font-size: 0.8rem;
         }
@@ -214,8 +184,8 @@
             color: #fbbf24;
             text-decoration: none;
             font-size: 0.9rem;
-            transition: 0.3s;
             opacity: 0.7;
+            transition: 0.3s;
         }
         .volver:hover { opacity: 1; color: white; }
         
@@ -225,7 +195,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.97);
+            background: rgba(0,0,0,0.95);
             backdrop-filter: blur(15px);
             z-index: 1000;
             display: none;
@@ -241,11 +211,6 @@
             max-width: 450px;
             width: 90%;
             border: 1px solid rgba(251,191,36,0.4);
-            animation: fadeInUp 0.5s ease;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .waiting-spinner {
             width: 70px;
@@ -268,7 +233,6 @@
             letter-spacing: 10px;
             font-weight: 800;
             color: #fbbf24;
-            text-shadow: 0 0 10px rgba(251,191,36,0.5);
         }
         .btn-cancelar {
             background: rgba(255,255,255,0.15);
@@ -280,19 +244,13 @@
             margin-top: 20px;
             transition: 0.3s;
         }
-        .btn-cancelar:hover { background: rgba(255,255,255,0.25); transform: scale(1.02); }
-        .pulse-text {
-            animation: pulse 1.5s infinite;
-            color: #a8c4b8;
-        }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .btn-cancelar:hover { background: rgba(255,255,255,0.25); }
         
         @media (max-width: 560px) {
             .card { padding: 30px 20px; }
             h1 { font-size: 1.6rem; }
             .waiting-codigo span { font-size: 1.6rem; letter-spacing: 5px; }
             .car-option { padding: 8px 12px; font-size: 1rem; }
-            .car-option span { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -302,20 +260,15 @@
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
             <p class="subtitle">🏁 ¡Compite contra otro jugador en tiempo real! 🏁</p>
 
-            <!-- SELECTOR DE COCHE -->
             <div class="car-selector">
                 <p><i class="fas fa-car"></i> Elige tu coche:</p>
                 <div class="car-options" id="carOptions">
-                    <div class="car-option" data-car="🏎️">🏎️ <span>F1</span></div>
+                    <div class="car-option selected" data-car="🏎️">🏎️ <span>F1</span></div>
                     <div class="car-option" data-car="🚗">🚗 <span>Sedán</span></div>
                     <div class="car-option" data-car="🚙">🚙 <span>SUV</span></div>
                     <div class="car-option" data-car="🏍️">🏍️ <span>Moto</span></div>
                     <div class="car-option" data-car="🚕">🚕 <span>Taxi</span></div>
                     <div class="car-option" data-car="🚓">🚓 <span>Policía</span></div>
-                    <div class="car-option" data-car="🚑">🚑 <span>Ambulancia</span></div>
-                    <div class="car-option" data-car="🚒">🚒 <span>Bombero</span></div>
-                    <div class="car-option" data-car="🛵">🛵 <span>Scooter</span></div>
-                    <div class="car-option" data-car="🚚">🚚 <span>Camión</span></div>
                 </div>
             </div>
 
@@ -327,7 +280,7 @@
 
             <div class="codigo-container">
                 <p><i class="fas fa-link"></i> Crear partida privada</p>
-                <button class="btn-outline" id="btnCrearPartida">
+                <button class="btn btn-outline" id="btnCrearPartida">
                     <i class="fas fa-plus-circle"></i> Crear partida
                 </button>
             </div>
@@ -352,20 +305,29 @@
                 <p style="margin-bottom: 10px;">📋 Código de la sala:</p>
                 <span id="waitingCodigo">------</span>
             </div>
-            <p class="pulse-text">🔗 Comparte este código con tu amigo</p>
+            <p style="color: #a8c4b8; animation: pulse 1.5s infinite;">🔗 Comparte este código con tu amigo</p>
             <button class="btn-cancelar" id="btnCancelarEspera">
                 <i class="fas fa-times"></i> Cancelar
             </button>
         </div>
     </div>
 
+    <style>
+        @keyframes pulse {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot } from '../../js/firebase-init.js';
-        import { renderUserZone } from '../../js/global-auth.js';
+        // ============================================
+        // VERSIÓN SIMPLIFICADA - SIN FIREBASE
+        // ============================================
         
-        let currentUser = null;
-        let unsubscribeActual = null;
+        // Estado del juego
         let cocheSeleccionado = localStorage.getItem('multiplayer_car') || '🏎️';
+        let salaCreada = null;
+        let timerEspera = null;
         
         // Inicializar selector de coche
         function initCarSelector() {
@@ -386,114 +348,153 @@
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
         
-        async function crearSala() {
+        // Crear partida (simulada)
+        function crearPartida() {
             const codigo = generarCodigo();
             const salaId = `sala_${Date.now()}`;
-            await setDoc(doc(db, "partidas_multijugador", salaId), {
+            
+            // Guardar en localStorage para simular multijugador
+            const partida = {
                 id: salaId,
                 codigo: codigo,
-                jugador1: currentUser.uid,
-                jugador1Nombre: currentUser.displayName || currentUser.email.split('@')[0],
-                jugador1Coche: cocheSeleccionado,
+                jugador1: {
+                    nombre: 'Jugador 1',
+                    coche: cocheSeleccionado,
+                    uid: 'player1'
+                },
                 jugador2: null,
-                jugador2Nombre: null,
-                jugador2Coche: null,
-                estado: "esperando"
-            });
+                estado: 'esperando',
+                turno: 0,
+                puntuacion1: 0,
+                puntuacion2: 0,
+                preguntas: null
+            };
+            
+            localStorage.setItem(`partida_${salaId}`, JSON.stringify(partida));
+            localStorage.setItem('partida_actual', salaId);
+            
             return { salaId, codigo };
         }
         
-        async function buscarSala() {
-            const salasRef = collection(db, "partidas_multijugador");
-            const q = query(salasRef, where("estado", "==", "esperando"), where("jugador1", "!=", currentUser.uid));
-            const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-                const sala = snapshot.docs[0];
-                await updateDoc(sala.ref, {
-                    jugador2: currentUser.uid,
-                    jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
-                    jugador2Coche: cocheSeleccionado,
-                    estado: "en_curso"
-                });
-                return sala.id;
+        // Unirse a partida por código
+        function unirsePorCodigo(codigo) {
+            // Buscar en localStorage
+            for (let key in localStorage) {
+                if (key.startsWith('partida_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data.codigo === codigo && data.estado === 'esperando' && !data.jugador2) {
+                            // Unirse
+                            data.jugador2 = {
+                                nombre: 'Jugador 2',
+                                coche: cocheSeleccionado,
+                                uid: 'player2'
+                            };
+                            data.estado = 'en_curso';
+                            localStorage.setItem(key, JSON.stringify(data));
+                            localStorage.setItem('partida_actual', data.id);
+                            return data.id;
+                        }
+                    } catch(e) {}
+                }
             }
             return null;
         }
         
-        async function unirsePorCodigo(codigo) {
-            const salasRef = collection(db, "partidas_multijugador");
-            const q = query(salasRef, where("codigo", "==", codigo), where("estado", "==", "esperando"));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) return null;
-            const sala = snapshot.docs[0];
-            await updateDoc(sala.ref, {
-                jugador2: currentUser.uid,
-                jugador2Nombre: currentUser.displayName || currentUser.email.split('@')[0],
-                jugador2Coche: cocheSeleccionado,
-                estado: "en_curso"
-            });
-            return sala.id;
+        // Buscar partida aleatoria
+        function buscarPartidaAleatoria() {
+            for (let key in localStorage) {
+                if (key.startsWith('partida_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data.estado === 'esperando' && !data.jugador2) {
+                            // Unirse
+                            data.jugador2 = {
+                                nombre: 'Jugador 2',
+                                coche: cocheSeleccionado,
+                                uid: 'player2'
+                            };
+                            data.estado = 'en_curso';
+                            localStorage.setItem(key, JSON.stringify(data));
+                            localStorage.setItem('partida_actual', data.id);
+                            return data.id;
+                        }
+                    } catch(e) {}
+                }
+            }
+            return null;
         }
         
         function mostrarEspera(codigo) {
             document.getElementById('waitingCodigo').textContent = codigo;
             document.getElementById('waitingScreen').style.display = 'flex';
+            
+            // Simular que el oponente se une después de 5-10 segundos (solo para demo)
+            if (timerEspera) clearTimeout(timerEspera);
+            timerEspera = setTimeout(() => {
+                // Buscar si alguien se unió
+                const salaId = localStorage.getItem('partida_actual');
+                if (salaId) {
+                    const key = `partida_${salaId}`;
+                    const data = JSON.parse(localStorage.getItem(key));
+                    if (data && data.estado === 'en_curso' && data.jugador2) {
+                        window.location.href = `carrera-multijugador.html?sala=${salaId}`;
+                    }
+                }
+            }, 5000);
         }
         
         function ocultarEspera() {
             document.getElementById('waitingScreen').style.display = 'none';
+            if (timerEspera) clearTimeout(timerEspera);
         }
         
-        function esperarOponente(salaId, codigo) {
-            mostrarEspera(codigo);
-            const salaRef = doc(db, "partidas_multijugador", salaId);
-            unsubscribeActual = onSnapshot(salaRef, (doc) => {
-                if (doc.exists() && doc.data().estado === "en_curso") {
-                    if (unsubscribeActual) unsubscribeActual();
-                    window.location.href = `carrera-multijugador.html?sala=${salaId}`;
-                }
-            });
-        }
+        // ============================================
+        // EVENTOS
+        // ============================================
         
-        onAuthStateChanged(auth, (user) => {
-            renderUserZone();
-            if (!user) { window.location.href = '../../login.html'; return; }
-            currentUser = user;
-            initCarSelector();
-        });
+        initCarSelector();
         
-        document.getElementById('btnAleatorio').addEventListener('click', async () => {
-            let salaId = await buscarSala();
+        // Botón aleatorio
+        document.getElementById('btnAleatorio').addEventListener('click', () => {
+            let salaId = buscarPartidaAleatoria();
             if (!salaId) {
-                const { salaId: nuevaSala, codigo } = await crearSala();
-                esperarOponente(nuevaSala, codigo);
+                const { salaId: nuevaSala, codigo } = crearPartida();
+                mostrarEspera(codigo);
             } else {
                 window.location.href = `carrera-multijugador.html?sala=${salaId}`;
             }
         });
         
-        document.getElementById('btnCrearPartida').addEventListener('click', async () => {
-            const { salaId, codigo } = await crearSala();
-            esperarOponente(salaId, codigo);
+        // Botón crear partida
+        document.getElementById('btnCrearPartida').addEventListener('click', () => {
+            const { salaId, codigo } = crearPartida();
+            mostrarEspera(codigo);
         });
         
-        document.getElementById('btnUnirse').addEventListener('click', async () => {
+        // Botón unirse
+        document.getElementById('btnUnirse').addEventListener('click', () => {
             const codigo = document.getElementById('codigoInput').value.trim();
             if (codigo.length !== 6) {
-                alert("❌ Introduce un código de 6 dígitos");
+                alert('❌ Introduce un código de 6 dígitos');
                 return;
             }
-            const salaId = await unirsePorCodigo(codigo);
+            const salaId = unirsePorCodigo(codigo);
             if (salaId) {
                 window.location.href = `carrera-multijugador.html?sala=${salaId}`;
             } else {
-                alert("❌ Partida no encontrada");
+                alert('❌ Partida no encontrada o ya está llena');
             }
         });
         
+        // Cancelar espera
         document.getElementById('btnCancelarEspera').addEventListener('click', () => {
-            if (unsubscribeActual) unsubscribeActual();
             ocultarEspera();
+            const salaId = localStorage.getItem('partida_actual');
+            if (salaId) {
+                localStorage.removeItem(`partida_${salaId}`);
+                localStorage.removeItem('partida_actual');
+            }
         });
     </script>
 </body>

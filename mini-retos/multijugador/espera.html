@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Esperando oponente | Carrera Multijugador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -15,8 +16,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
-        .container { max-width: 500px; width: 90%; margin: 20px; text-align: center; }
+        .container { max-width: 500px; width: 100%; margin: 20px; text-align: center; }
         .card {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(12px);
@@ -53,8 +55,17 @@
             color: white;
             cursor: pointer;
             margin-top: 20px;
+            transition: 0.3s;
         }
         .btn-cancelar:hover { background: rgba(255,255,255,0.3); }
+        .pulse {
+            animation: pulse 1.5s infinite;
+            color: #a8c4b8;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
@@ -64,48 +75,53 @@
             <h2 style="margin: 15px 0;">Esperando oponente...</h2>
             <div class="spinner"></div>
             <div class="codigo-box">
-                <p>Código de la sala:</p>
+                <p>📋 Código de la sala:</p>
                 <div class="codigo" id="codigoDisplay">------</div>
             </div>
-            <p>Comparte este código con tu amigo</p>
+            <p class="pulse">🔗 Comparte este código con tu amigo</p>
             <button class="btn-cancelar" id="btnCancelar">
                 <i class="fas fa-times"></i> Cancelar
             </button>
         </div>
     </div>
 
-    <script type="module">
-        import { auth, onAuthStateChanged, db, doc, onSnapshot } from '../../js/firebase-init.js';
-        import { renderUserZone } from '../../js/global-auth.js';
-        
-        let salaId = null;
-        let unsubscribe = null;
-        
-        onAuthStateChanged(auth, (user) => {
-            renderUserZone();
-            if (!user) { window.location.href = '../../login.html'; return; }
-        });
+    <script>
+        // ============================================
+        // VERSIÓN SIMPLIFICADA - SIN FIREBASE
+        // ============================================
         
         const urlParams = new URLSearchParams(window.location.search);
-        salaId = urlParams.get('sala');
+        const salaId = urlParams.get('sala');
         const codigo = urlParams.get('codigo');
         
         if (codigo) {
             document.getElementById('codigoDisplay').textContent = codigo;
         }
         
+        // Simular espera y redirección
         if (salaId) {
-            const salaRef = doc(db, "partidas_multijugador", salaId);
-            unsubscribe = onSnapshot(salaRef, (doc) => {
-                if (doc.exists() && doc.data().estado === "en_curso") {
-                    if (unsubscribe) unsubscribe();
-                    window.location.href = `juego.html?sala=${salaId}`;
+            // Verificar cada 3 segundos si alguien se unió
+            const checkInterval = setInterval(() => {
+                const key = `partida_${salaId}`;
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const partida = JSON.parse(data);
+                        if (partida.estado === 'en_curso' && partida.jugador2) {
+                            clearInterval(checkInterval);
+                            window.location.href = `carrera-multijugador.html?sala=${salaId}`;
+                        }
+                    } catch(e) {}
                 }
-            });
+            }, 3000);
         }
         
         document.getElementById('btnCancelar').addEventListener('click', () => {
-            if (unsubscribe) unsubscribe();
+            // Limpiar partida
+            if (salaId) {
+                localStorage.removeItem(`partida_${salaId}`);
+                localStorage.removeItem('partida_actual');
+            }
             window.location.href = 'lobby.html';
         });
     </script>

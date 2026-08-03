@@ -6,9 +6,14 @@
     <title>Carrera Multijugador DGT | AprobadoYa</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+        }
         
         .game-header {
             background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
@@ -25,7 +30,6 @@
             padding: 20px;
         }
         
-        /* Pista de carreras */
         .race-track {
             background: linear-gradient(135deg, #2d3e2c, #1f2e1a);
             border-radius: 30px;
@@ -78,7 +82,6 @@
             white-space: nowrap;
         }
         
-        /* Marcador */
         .score-board {
             display: flex;
             justify-content: space-between;
@@ -103,7 +106,6 @@
             margin-top: 5px;
         }
         
-        /* Pregunta */
         .question-card {
             background: white;
             border-radius: 30px;
@@ -232,6 +234,7 @@
             cursor: pointer;
             margin-top: 20px;
         }
+        .btn-reintentar:hover { transform: scale(1.05); }
         
         @media (max-width: 768px) {
             .game-container { padding: 15px; }
@@ -245,17 +248,20 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo"><i class="fas fa-check-circle"></i><h1>Aprobado<span>Ya</span></h1></div>
-            <div class="nav-container"><div class="nav-wrapper"><nav><ul><li><a href="../index.html">Inicio</a></li><li><a href="../temas/index.html">Temas</a></li><li><a href="../test/index.html">Test</a></li><li><a href="../mini-retos/index.html" class="active">Mini Retos</a></li></ul></nav></div></div>
-            <div class="user-zone" id="userZone"></div>
-            <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+    <header style="background: #1a472a; padding: 15px 0;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px; color: white; font-size: 1.5rem; font-weight: 700;">
+                <i class="fas fa-check-circle" style="color: #fbbf24;"></i>
+                <span>Aprobado<span style="color: #fbbf24;">Ya</span></span>
+            </div>
+            <a href="lobby.html" style="color: #fbbf24; text-decoration: none; padding: 8px 20px; border: 2px solid #fbbf24; border-radius: 50px; font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Salir
+            </a>
         </div>
     </header>
 
     <div class="game-header">
-        <div class="container">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
             <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador DGT</h1>
             <p>Responde preguntas del examen oficial y adelanta a tu rival</p>
         </div>
@@ -271,61 +277,26 @@
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
     <script type="module">
-        import { auth, onAuthStateChanged, db, doc, getDoc, updateDoc, onSnapshot } from '../../js/firebase-init.js';
-        import { renderUserZone } from '../../js/global-auth.js';
-        
         // ============================================
-        // BASE DE PREGUNTAS DGT (50 preguntas reales)
+        // IMPORTAR PREGUNTAS
         // ============================================
-        const BANCO_PREGUNTAS = [
-            { texto: "¿Cuál es la prioridad de paso en una intersección sin señalizar?", opciones: ["La de la izquierda", "La de la derecha", "La del vehículo más rápido", "La del vehículo más grande"], correcta: 1 },
-            { texto: "¿Qué documentación es obligatoria llevar en el vehículo?", opciones: ["Solo permiso de circulación", "Permiso de conducir y permiso de circulación", "Permiso de conducir, permiso de circulación e ITV", "Solo el seguro"], correcta: 2 },
-            { texto: "¿Qué sanción tiene usar el teléfono móvil mientras se conduce?", opciones: ["100€", "200€ y 3 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 1 },
-            { texto: "¿Qué significa la señal de STOP?", opciones: ["Ceda el paso", "Detención obligatoria", "Prohibido el paso", "Prioridad"], correcta: 1 },
-            { texto: "¿A qué velocidad máxima puede circular un turismo en autovía?", opciones: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correcta: 2 },
-            { texto: "¿Qué indica una línea continua en la calzada?", opciones: ["Prohibido adelantar", "Permite adelantar", "Prohibido estacionar", "Zona de carga"], correcta: 0 },
-            { texto: "¿Cuándo está permitido usar el claxon?", opciones: ["Siempre", "Para saludar", "Para evitar un accidente", "En zonas urbanas"], correcta: 2 },
-            { texto: "¿Qué significa la señal de 'Ceda el paso'?", opciones: ["Detenerse", "Prioridad", "Prohibido", "Ceder el paso"], correcta: 3 },
-            { texto: "¿Cuántos puntos tiene inicialmente un conductor novel?", opciones: ["12", "10", "8", "6"], correcta: 2 },
-            { texto: "¿Qué es el recurso de reposición?", opciones: ["Recurso ante el mismo órgano", "Recurso judicial", "Pago", "Denuncia"], correcta: 0 },
-            { texto: "¿Qué es el aquaplaning?", opciones: ["Pérdida de adherencia por agua", "Frenado brusco", "Aceleración", "Derrape"], correcta: 0 },
-            { texto: "¿Qué velocidad máxima puede alcanzar un turismo con remolque en autovía?", opciones: ["80 km/h", "90 km/h", "100 km/h", "120 km/h"], correcta: 0 },
-            { texto: "¿Cuántos puntos se pierden por usar el móvil al volante?", opciones: ["2 puntos", "3 puntos", "4 puntos", "6 puntos"], correcta: 1 },
-            { texto: "¿Cuál es la tasa máxima de alcohol para conductores noveles?", opciones: ["0,5 g/l", "0,3 g/l", "0,25 g/l", "0,0 g/l"], correcta: 1 },
-            { texto: "¿Qué distancia de seguridad debe mantener un turismo?", opciones: ["1 segundo", "2 segundos", "3 segundos", "4 segundos"], correcta: 1 },
-            { texto: "¿Está permitido adelantar en una curva sin visibilidad?", opciones: ["Sí, con precaución", "Sí, si no viene nadie", "No, está prohibido", "Solo de noche"], correcta: 2 },
-            { texto: "¿Qué deben hacer los conductores al aproximarse a un paso a nivel?", opciones: ["Aumentar velocidad", "Detenerse siempre", "Reducir velocidad y extremar precaución", "Tocar claxon"], correcta: 2 },
-            { texto: "¿Qué significa la señal de 'Prohibido adelantar'?", opciones: ["Prohibido adelantar a cualquier vehículo", "Prohibido adelantar a camiones", "Prohibido cambiar de carril", "Prohibido circular"], correcta: 0 },
-            { texto: "¿Qué debe hacer un conductor al aproximarse a un paso de peatones?", opciones: ["Acelerar", "Tocar el claxon", "Reducir velocidad y ceder el paso", "Estacionar"], correcta: 2 },
-            { texto: "¿Qué significa una línea discontinua y otra continua juntas?", opciones: ["No adelantar desde el lado de la continua", "No adelantar desde el lado de la discontinua", "Adelantar por ambos lados", "Prohibido adelantar"], correcta: 0 },
-            { texto: "¿Qué sanción tiene no llevar el cinturón de seguridad?", opciones: ["100€", "200€ y 3 puntos", "300€", "500€"], correcta: 1 },
-            { texto: "¿Qué significa la señal de 'Calle residencial'?", opciones: ["Velocidad máxima 20 km/h", "Prioridad peatones", "Zona de juegos", "Todas son correctas"], correcta: 3 },
-            { texto: "¿Cuándo debe encender las luces de cruce?", opciones: ["Al anochecer", "En túneles", "Con lluvia intensa", "Todas son correctas"], correcta: 3 },
-            { texto: "¿Qué indica una señal circular con fondo rojo y una franja blanca?", opciones: ["Prohibido el paso", "Prohibido girar", "Prohibido adelantar", "Prohibido estacionar"], correcta: 0 },
-            { texto: "¿Cuál es la velocidad máxima en vía urbana de un solo carril?", opciones: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], correcta: 1 },
-            { texto: "¿Qué es la fatiga al volante?", opciones: ["Cansancio que afecta a la conducción", "Aburrimiento", "Estrés", "Nervios"], correcta: 0 },
-            { texto: "¿Qué debe hacer si tiene sueño al volante?", opciones: ["Parar a descansar", "Aumentar velocidad", "Poner música alta", "Abrir ventana"], correcta: 0 },
-            { texto: "¿Qué significa la señal P-19?", opciones: ["Resalto o lomo de asno", "Curva peligrosa", "Paso de peatones", "Obras"], correcta: 0 },
-            { texto: "¿Qué es el carril VAO?", opciones: ["Carril para vehículos de alta ocupación", "Carril bus", "Carril bici", "Carril de emergencia"], correcta: 0 },
-            { texto: "¿Qué sanción tiene superar la velocidad máxima en 30 km/h en autovía?", opciones: ["100€", "200€ y 2 puntos", "300€ y 4 puntos", "500€ y 6 puntos"], correcta: 2 }
-        ];
+        import { preguntasMulti } from './preguntas-multi.js';
 
         const TOTAL_PREGUNTAS = 10;
         const TIEMPO_RESPUESTA = 15000;
         
         let salaId = null;
-        let currentUser = null;
         let salaData = null;
-        let esJugador1 = false;
+        let esJugador1 = true;
         let gameActivo = true;
-        let unsubscribe = null;
         let timerInterval = null;
         let yaRespondi = false;
+        let checkInterval = null;
         
         function log(msg) { console.log(`[${new Date().toLocaleTimeString()}] ${msg}`); }
         
         function seleccionarPreguntas() {
-            const mezcladas = [...BANCO_PREGUNTAS];
+            const mezcladas = [...preguntasMulti];
             for (let i = mezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [mezcladas[i], mezcladas[j]] = [mezcladas[j], mezcladas[i]];
@@ -352,29 +323,40 @@
         }
         
         async function manejarTimeout() {
-            if (!gameActivo || yaRespondi) return;
-            if (!salaData) return;
+            if (!gameActivo || yaRespondi || !salaData) return;
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
             if (!esMiTurno) return;
             yaRespondi = true;
+            
             const feedback = document.createElement('div');
             feedback.className = 'feedback-message feedback-incorrect';
             feedback.innerHTML = '<i class="fas fa-clock"></i> ⏰ ¡TIEMPO AGOTADO! No respondiste a tiempo';
             document.querySelector('.question-card')?.appendChild(feedback);
             document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
-            const nuevoTurno = turnoActual + 1;
-            try {
-                await updateDoc(doc(db, "partidas_multijugador", salaId), { turno: nuevoTurno });
-            } catch (error) { log("Error timeout: " + error.message); }
-            if (nuevoTurno >= TOTAL_PREGUNTAS) setTimeout(() => finalizarJuego(), 2000);
+            
+            // Actualizar turno
+            salaData.turno = turnoActual + 1;
+            guardarPartida();
+            
+            if (salaData.turno >= TOTAL_PREGUNTAS) {
+                setTimeout(() => finalizarJuego(), 2000);
+            } else {
+                setTimeout(() => renderizarJuego(), 2000);
+            }
+        }
+        
+        function guardarPartida() {
+            if (salaId) {
+                localStorage.setItem(`partida_${salaId}`, JSON.stringify(salaData));
+            }
         }
         
         function mostrarCuentaAtras() {
             return new Promise((resolve) => {
                 const overlay = document.createElement('div');
                 overlay.className = 'countdown-overlay';
-                overlay.innerHTML = `<div class="countdown-number" id="countdownNum">3</div><div class="countdown-text">Preparados...</div>`;
+                overlay.innerHTML = `<div class="countdown-number" id="countdownNum">3</div><div style="color:white;font-size:1.5rem;">Preparados...</div>`;
                 document.body.appendChild(overlay);
                 let count = 3;
                 const interval = setInterval(() => {
@@ -391,79 +373,88 @@
             });
         }
         
-        async function iniciarJuego() {
-            const preguntas = seleccionarPreguntas();
-            await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                preguntas: preguntas,
-                turno: 0,
-                puntuacion1: 0,
-                puntuacion2: 0,
-                iniciado: true
-            });
-        }
-        
-        async function responder(respuesta) {
-            if (!gameActivo || yaRespondi) return;
-            if (!salaData) return;
+        function responder(respuesta) {
+            if (!gameActivo || yaRespondi || !salaData) return;
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
             if (!esMiTurno) return;
+            
             yaRespondi = true;
             if (timerInterval) clearInterval(timerInterval);
+            
             const pregunta = salaData.preguntas[turnoActual];
             const esCorrecto = (respuesta === pregunta.correcta);
+            
             const opciones = document.querySelectorAll('.option-btn');
             opciones.forEach((btn, idx) => {
                 btn.classList.add('disabled');
                 if (idx === pregunta.correcta) btn.classList.add('correct');
                 if (idx === respuesta && respuesta !== pregunta.correcta) btn.classList.add('incorrect');
             });
+            
             const feedback = document.createElement('div');
             if (esCorrecto) {
                 feedback.className = 'feedback-message feedback-correct';
                 feedback.innerHTML = '<i class="fas fa-check-circle"></i> ✓ ¡CORRECTO! +1 punto';
+                if (esJugador1) salaData.puntuacion1 += 1;
+                else salaData.puntuacion2 += 1;
             } else {
                 feedback.className = 'feedback-message feedback-incorrect';
                 feedback.innerHTML = `<i class="fas fa-times-circle"></i> ✗ INCORRECTO. La respuesta correcta era: ${pregunta.opciones[pregunta.correcta]}`;
             }
             document.querySelector('.question-card')?.appendChild(feedback);
-            const nuevaP1 = salaData.puntuacion1 + (esJugador1 && esCorrecto ? 1 : 0);
-            const nuevaP2 = salaData.puntuacion2 + (!esJugador1 && esCorrecto ? 1 : 0);
-            const nuevoTurno = turnoActual + 1;
-            try {
-                await updateDoc(doc(db, "partidas_multijugador", salaId), {
-                    puntuacion1: nuevaP1,
-                    puntuacion2: nuevaP2,
-                    turno: nuevoTurno
-                });
-            } catch (error) { log("Error responder: " + error.message); }
-            if (nuevoTurno >= TOTAL_PREGUNTAS) setTimeout(() => finalizarJuego(), 2000);
+            
+            salaData.turno = turnoActual + 1;
+            guardarPartida();
+            
+            if (salaData.turno >= TOTAL_PREGUNTAS) {
+                setTimeout(() => finalizarJuego(), 2000);
+            } else {
+                setTimeout(() => renderizarJuego(), 2000);
+            }
         }
         
         function renderizarJuego() {
-            if (!salaData || !salaData.preguntas) return;
+            if (!salaData || !salaData.preguntas) {
+                document.getElementById('gameContainer').innerHTML = '<p>Cargando partida...</p>';
+                return;
+            }
+            
             const p1 = salaData.puntuacion1 || 0;
             const p2 = salaData.puntuacion2 || 0;
-            const turno = salaData.turno;
-            if (turno >= TOTAL_PREGUNTAS) { finalizarJuego(); return; }
+            const turno = salaData.turno || 0;
+            
+            if (turno >= TOTAL_PREGUNTAS) {
+                finalizarJuego();
+                return;
+            }
+            
             const pregunta = salaData.preguntas[turno];
+            if (!pregunta) {
+                document.getElementById('gameContainer').innerHTML = '<p>Error: Pregunta no encontrada</p>';
+                return;
+            }
+            
             const esMiTurno = (turno === (esJugador1 ? 0 : 1));
             const avance1 = (p1 / TOTAL_PREGUNTAS) * 100;
             const avance2 = (p2 / TOTAL_PREGUNTAS) * 100;
-            const nombre1 = salaData.jugador1Nombre || 'Jugador 1';
-            const nombre2 = salaData.jugador2Nombre || 'Jugador 2';
+            const nombre1 = salaData.jugador1?.nombre || 'Jugador 1';
+            const nombre2 = salaData.jugador2?.nombre || 'Jugador 2';
+            const coche1 = salaData.jugador1?.coche || '🏎️';
+            const coche2 = salaData.jugador2?.coche || '🚗';
+            
             document.getElementById('gameContainer').innerHTML = `
                 <div class="race-track">
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">🏎️ ${escapeHtml(nombre1)}</div>
-                        <div class="car" style="left: ${Math.min(avance1, 96)}%">🏎️</div>
+                        <div class="player-name">${coche1} ${escapeHtml(nombre1)}</div>
+                        <div class="car" style="left: ${Math.min(avance1, 96)}%">${coche1}</div>
                         <div class="finish-line"></div>
                     </div>
                     <div class="track">
                         <div class="track-lines"></div>
-                        <div class="player-name">🏎️ ${escapeHtml(nombre2)}</div>
-                        <div class="car" style="left: ${Math.min(avance2, 96)}%">🏎️</div>
+                        <div class="player-name">${coche2} ${escapeHtml(nombre2)}</div>
+                        <div class="car" style="left: ${Math.min(avance2, 96)}%">${coche2}</div>
                         <div class="finish-line"></div>
                     </div>
                 </div>
@@ -488,6 +479,7 @@
                     </div>
                 </div>
             `;
+            
             yaRespondi = false;
             if (esMiTurno && gameActivo) {
                 document.querySelectorAll('.option-btn').forEach(btn => {
@@ -499,16 +491,26 @@
             }
         }
         
-        async function finalizarJuego() {
+        function finalizarJuego() {
             gameActivo = false;
             if (timerInterval) clearInterval(timerInterval);
-            if (unsubscribe) unsubscribe();
+            if (checkInterval) clearInterval(checkInterval);
+            
             const p1 = salaData?.puntuacion1 || 0;
             const p2 = salaData?.puntuacion2 || 0;
-            const nombre1 = salaData?.jugador1Nombre || 'Jugador 1';
-            const nombre2 = salaData?.jugador2Nombre || 'Jugador 2';
-            const ganador = p1 > p2 ? nombre1 : (p2 > p1 ? nombre2 : "Empate");
-            const esGanador = (p1 > p2 && esJugador1) || (p2 > p1 && !esJugador1);
+            const nombre1 = salaData?.jugador1?.nombre || 'Jugador 1';
+            const nombre2 = salaData?.jugador2?.nombre || 'Jugador 2';
+            
+            let ganador = "Empate";
+            let esGanador = false;
+            if (p1 > p2) {
+                ganador = nombre1;
+                esGanador = esJugador1;
+            } else if (p2 > p1) {
+                ganador = nombre2;
+                esGanador = !esJugador1;
+            }
+            
             document.getElementById('gameContainer').innerHTML = `
                 <div class="resultado-final">
                     <i class="fas ${esGanador ? 'fa-trophy' : 'fa-flag-checkered'}" style="font-size: 4rem; color: #fbbf24;"></i>
@@ -520,9 +522,14 @@
                         <h3 style="color: #fbbf24;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${escapeHtml(ganador)} 🏆`)}</h3>
                     </div>
                     <button class="btn-reintentar" onclick="window.location.href='lobby.html'"><i class="fas fa-redo"></i> Jugar de nuevo</button>
-                    <a href="index.html" style="display: inline-block; margin-left: 15px; background: #f1f5f9; color: #1e293b; padding: 12px 30px; border-radius: 50px; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al menú</a>
+                    <a href="lobby.html" style="display: inline-block; margin-left: 15px; background: #f1f5f9; color: #1e293b; padding: 12px 30px; border-radius: 50px; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al lobby</a>
                 </div>
             `;
+            
+            // Limpiar partida
+            if (salaId) {
+                localStorage.removeItem(`partida_${salaId}`);
+            }
         }
         
         function escapeHtml(str) {
@@ -535,47 +542,72 @@
             });
         }
         
-        async function cargarPartida() {
-            const salaRef = doc(db, "partidas_multijugador", salaId);
-            const salaDoc = await getDoc(salaRef);
-            if (!salaDoc.exists()) { window.location.href = 'lobby.html'; return; }
-            salaData = salaDoc.data();
-            esJugador1 = salaData.jugador1 === currentUser.uid;
-            if (!salaData.iniciado) {
-                await iniciarJuego();
-                await mostrarCuentaAtras();
-                const updatedDoc = await getDoc(salaRef);
-                salaData = updatedDoc.data();
-                renderizarJuego();
-            } else {
-                await mostrarCuentaAtras();
-                renderizarJuego();
+        function cargarPartida() {
+            const urlParams = new URLSearchParams(window.location.search);
+            salaId = urlParams.get('sala');
+            
+            if (!salaId) {
+                window.location.href = 'lobby.html';
+                return;
             }
-            unsubscribe = onSnapshot(salaRef, (doc) => {
-                if (doc.exists() && gameActivo) {
-                    const newData = doc.data();
-                    const oldTurno = salaData?.turno;
-                    salaData = newData;
-                    if (oldTurno !== salaData.turno) {
-                        if (timerInterval) clearInterval(timerInterval);
-                        renderizarJuego();
+            
+            const key = `partida_${salaId}`;
+            const data = localStorage.getItem(key);
+            
+            if (!data) {
+                alert('Partida no encontrada');
+                window.location.href = 'lobby.html';
+                return;
+            }
+            
+            salaData = JSON.parse(data);
+            
+            // Determinar si soy jugador 1 o 2
+            const partidaActual = localStorage.getItem('partida_actual');
+            if (partidaActual === salaId) {
+                // Soy el creador (jugador 1) o el que se unió?
+                // Por simplicidad, el primer jugador es el 1
+                esJugador1 = true;
+            } else {
+                esJugador1 = false;
+            }
+            
+            // Inicializar preguntas si no existen
+            if (!salaData.preguntas) {
+                salaData.preguntas = seleccionarPreguntas();
+                salaData.turno = 0;
+                salaData.puntuacion1 = 0;
+                salaData.puntuacion2 = 0;
+                guardarPartida();
+            }
+            
+            // Iniciar juego
+            mostrarCuentaAtras().then(() => {
+                renderizarJuego();
+                // Iniciar verificación de cambios
+                if (checkInterval) clearInterval(checkInterval);
+                checkInterval = setInterval(() => {
+                    const updated = localStorage.getItem(key);
+                    if (updated) {
+                        const newData = JSON.parse(updated);
+                        if (newData.turno !== salaData.turno) {
+                            salaData = newData;
+                            renderizarJuego();
+                        }
                     }
-                }
+                }, 1000);
             });
         }
         
-        onAuthStateChanged(auth, async (user) => {
-            renderUserZone();
-            if (!user) { window.location.href = '../../login.html'; return; }
-            currentUser = user;
-            const urlParams = new URLSearchParams(window.location.search);
-            salaId = urlParams.get('sala');
-            if (!salaId) { window.location.href = 'lobby.html'; return; }
-            await cargarPartida();
-        });
+        // ============================================
+        // INICIAR
+        // ============================================
+        cargarPartida();
         
-        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-            document.querySelector('.nav-wrapper')?.classList.toggle('active');
+        // Limpiar al cerrar
+        window.addEventListener('beforeunload', () => {
+            if (checkInterval) clearInterval(checkInterval);
+            if (timerInterval) clearInterval(timerInterval);
         });
     </script>
 </body>
