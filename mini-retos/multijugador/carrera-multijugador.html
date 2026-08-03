@@ -21,7 +21,6 @@
         }
         .game-header h1 { font-size: 2rem; margin-bottom: 10px; }
         .game-header h1 i { color: #fbbf24; }
-        
         .game-container { max-width: 1000px; margin: 40px auto; padding: 20px; }
         
         .race-track {
@@ -76,7 +75,6 @@
             white-space: nowrap;
             color: white;
         }
-        
         .score-board {
             display: flex;
             justify-content: space-between;
@@ -89,7 +87,6 @@
         .score-item { text-align: center; flex: 1; }
         .score-value { font-size: 2rem; font-weight: 800; color: #fbbf24; }
         .score-label { font-size: 0.75rem; color: #64748b; margin-top: 5px; }
-        
         .question-card {
             background: white;
             border-radius: 30px;
@@ -126,7 +123,6 @@
         .disabled:hover { transform: none !important; background: #f8fafc !important; }
         .correct { background: #d1fae5 !important; border-color: #10b981 !important; }
         .incorrect { background: #fee2e2 !important; border-color: #ef4444 !important; }
-        
         .turn-indicator {
             text-align: center;
             padding: 12px;
@@ -145,7 +141,6 @@
             background: linear-gradient(135deg, #94a3b8, #64748b);
             color: white;
         }
-        
         .timer-bar {
             height: 6px;
             background: #e2e8f0;
@@ -160,7 +155,6 @@
             width: 100%;
             transition: width 0.1s linear;
         }
-        
         .feedback-message {
             margin-top: 20px;
             padding: 12px;
@@ -171,12 +165,10 @@
         }
         .feedback-correct { background: #d1fae5; color: #065f46; border-left: 4px solid #10b981; }
         .feedback-incorrect { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
         .countdown-overlay {
             position: fixed;
             top: 0;
@@ -201,7 +193,6 @@
             70% { transform: scale(1.2); }
             100% { transform: scale(1); opacity: 1; }
         }
-        
         .resultado-final {
             text-align: center;
             padding: 40px;
@@ -220,7 +211,6 @@
             transition: 0.3s;
         }
         .btn-reintentar:hover { transform: scale(1.05); }
-        
         .toast {
             position: fixed;
             top: 20px;
@@ -245,7 +235,6 @@
             from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-        
         @media (max-width: 768px) {
             .game-container { padding: 15px; }
             .score-board { flex-direction: column; gap: 10px; text-align: center; }
@@ -605,11 +594,9 @@
                 return;
             }
             
-            // Determinar si soy jugador 1 o 2
             const partidaActual = localStorage.getItem('partida_actual');
             esJugador1 = (partidaActual === salaId);
             
-            // Si no hay jugador2, esperar
             if (!salaData.jugador2) {
                 document.getElementById('gameContainer').innerHTML = `
                     <div style="text-align:center;padding:60px 20px;background:white;border-radius:30px;">
@@ -668,7 +655,6 @@
             }, 500);
         }
         
-        // INICIAR
         cargarPartida();
         
         window.addEventListener('beforeunload', () => {
