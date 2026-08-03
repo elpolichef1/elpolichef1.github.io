@@ -59,7 +59,7 @@
             bottom: 10px;
             left: 0%;
             font-size: 2.5rem;
-            transition: left 0.4s ease-out;
+            transition: left 0.6s ease-out;
             filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
             z-index: 10;
         }
@@ -80,6 +80,7 @@
             padding: 4px 12px;
             border-radius: 20px;
             white-space: nowrap;
+            color: white;
         }
         
         .score-board {
@@ -146,8 +147,9 @@
             width: 35px;
         }
         .disabled { opacity: 0.6; cursor: not-allowed; }
-        .correct { background: #d1fae5; border-color: #10b981; }
-        .incorrect { background: #fee2e2; border-color: #ef4444; }
+        .disabled:hover { transform: none !important; background: #f8fafc !important; }
+        .correct { background: #d1fae5 !important; border-color: #10b981 !important; }
+        .incorrect { background: #fee2e2 !important; border-color: #ef4444 !important; }
         
         .turn-indicator {
             text-align: center;
@@ -161,6 +163,10 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
+        }
+        .turn-indicator.waiting {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            color: white;
         }
         
         .timer-bar {
@@ -233,6 +239,7 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 20px;
+            transition: 0.3s;
         }
         .btn-reintentar:hover { transform: scale(1.05); }
         
@@ -254,7 +261,7 @@
                 <i class="fas fa-check-circle" style="color: #fbbf24;"></i>
                 <span>Aprobado<span style="color: #fbbf24;">Ya</span></span>
             </div>
-            <a href="lobby.html" style="color: #fbbf24; text-decoration: none; padding: 8px 20px; border: 2px solid #fbbf24; border-radius: 50px; font-weight: 600;">
+            <a href="lobby.html" style="color: #fbbf24; text-decoration: none; padding: 8px 20px; border: 2px solid #fbbf24; border-radius: 50px; font-weight: 600; transition: 0.3s;">
                 <i class="fas fa-arrow-left"></i> Salir
             </a>
         </div>
@@ -292,6 +299,7 @@
         let timerInterval = null;
         let yaRespondi = false;
         let checkInterval = null;
+        let esperandoRival = false;
         
         function log(msg) { console.log(`[${new Date().toLocaleTimeString()}] ${msg}`); }
         
@@ -322,7 +330,7 @@
             }, 100);
         }
         
-        async function manejarTimeout() {
+        function manejarTimeout() {
             if (!gameActivo || yaRespondi || !salaData) return;
             const turnoActual = salaData.turno;
             const esMiTurno = (turnoActual === (esJugador1 ? 0 : 1));
@@ -335,20 +343,24 @@
             document.querySelector('.question-card')?.appendChild(feedback);
             document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
             
-            // Actualizar turno
             salaData.turno = turnoActual + 1;
             guardarPartida();
             
             if (salaData.turno >= TOTAL_PREGUNTAS) {
                 setTimeout(() => finalizarJuego(), 2000);
             } else {
-                setTimeout(() => renderizarJuego(), 2000);
+                setTimeout(() => renderizarJuego(), 2500);
             }
         }
         
         function guardarPartida() {
             if (salaId) {
                 localStorage.setItem(`partida_${salaId}`, JSON.stringify(salaData));
+                // Disparar evento para notificar cambios
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: `partida_${salaId}`,
+                    newValue: JSON.stringify(salaData)
+                }));
             }
         }
         
@@ -356,7 +368,11 @@
             return new Promise((resolve) => {
                 const overlay = document.createElement('div');
                 overlay.className = 'countdown-overlay';
-                overlay.innerHTML = `<div class="countdown-number" id="countdownNum">3</div><div style="color:white;font-size:1.5rem;">Preparados...</div>`;
+                overlay.innerHTML = `
+                    <div class="countdown-number" id="countdownNum">3</div>
+                    <div style="color:white;font-size:1.5rem;margin-top:10px;">Preparados...</div>
+                    <div style="color:#a8c4b8;font-size:1rem;margin-top:5px;">${esJugador1 ? 'Jugador 1' : 'Jugador 2'}</div>
+                `;
                 document.body.appendChild(overlay);
                 let count = 3;
                 const interval = setInterval(() => {
@@ -366,8 +382,10 @@
                         if (num) num.textContent = count;
                     } else {
                         clearInterval(interval);
-                        overlay.remove();
-                        resolve();
+                        setTimeout(() => {
+                            overlay.remove();
+                            resolve();
+                        }, 300);
                     }
                 }, 1000);
             });
@@ -383,6 +401,8 @@
             if (timerInterval) clearInterval(timerInterval);
             
             const pregunta = salaData.preguntas[turnoActual];
+            if (!pregunta) return;
+            
             const esCorrecto = (respuesta === pregunta.correcta);
             
             const opciones = document.querySelectorAll('.option-btn');
@@ -410,7 +430,7 @@
             if (salaData.turno >= TOTAL_PREGUNTAS) {
                 setTimeout(() => finalizarJuego(), 2000);
             } else {
-                setTimeout(() => renderizarJuego(), 2000);
+                setTimeout(() => renderizarJuego(), 2500);
             }
         }
         
@@ -443,6 +463,8 @@
             const coche1 = salaData.jugador1?.coche || '🏎️';
             const coche2 = salaData.jugador2?.coche || '🚗';
             
+            const esUltimaPregunta = turno === TOTAL_PREGUNTAS - 1;
+            
             document.getElementById('gameContainer').innerHTML = `
                 <div class="race-track">
                     <div class="track">
@@ -460,13 +482,16 @@
                 </div>
                 <div class="score-board">
                     <div class="score-item"><div class="score-value">${p1}</div><div class="score-label">${escapeHtml(nombre1)}</div></div>
-                    <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">Pregunta</div></div>
+                    <div class="score-item"><div class="score-value">${turno+1}/${TOTAL_PREGUNTAS}</div><div class="score-label">${esUltimaPregunta ? '🏁 ¡Última!' : 'Pregunta'}</div></div>
                     <div class="score-item"><div class="score-value">${p2}</div><div class="score-label">${escapeHtml(nombre2)}</div></div>
                 </div>
-                ${!esMiTurno ? 
-                    '<div class="turn-indicator"><i class="fas fa-hourglass-half"></i> ⏳ Esperando respuesta del rival...</div>' : 
-                    '<div class="turn-indicator"><i class="fas fa-clock"></i> 🎯 ¡TU TURNO! Responde antes de 15 segundos<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div></div>'
-                }
+                <div class="turn-indicator ${!esMiTurno ? 'waiting' : ''}">
+                    ${esMiTurno ? 
+                        '<i class="fas fa-clock"></i> 🎯 ¡TU TURNO! Responde antes de 15 segundos' : 
+                        '<i class="fas fa-hourglass-half"></i> ⏳ Esperando respuesta del rival...'
+                    }
+                    ${esMiTurno ? `<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>` : ''}
+                </div>
                 <div class="question-card">
                     <div class="question-text">${escapeHtml(pregunta.texto)}</div>
                     <div class="options" id="options">
@@ -516,17 +541,16 @@
                     <i class="fas ${esGanador ? 'fa-trophy' : 'fa-flag-checkered'}" style="font-size: 4rem; color: #fbbf24;"></i>
                     <h2 style="margin: 20px 0;">🏁 ¡PARTIDA FINALIZADA! 🏁</h2>
                     <div style="background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0;">
-                        <p><strong>${escapeHtml(nombre1)}</strong>: ${p1} puntos</p>
-                        <p><strong>${escapeHtml(nombre2)}</strong>: ${p2} puntos</p>
+                        <p style="font-size:1.2rem;"><strong>${escapeHtml(nombre1)}</strong>: ${p1} puntos</p>
+                        <p style="font-size:1.2rem;"><strong>${escapeHtml(nombre2)}</strong>: ${p2} puntos</p>
                         <div style="height: 1px; background: #e2e8f0; margin: 15px 0;"></div>
-                        <h3 style="color: #fbbf24;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${escapeHtml(ganador)} 🏆`)}</h3>
+                        <h3 style="color: #fbbf24; font-size:1.8rem;">${ganador === "Empate" ? "🤝 ¡EMPATE! 🤝" : (esGanador ? "🎉 ¡HAS GANADO! 🎉" : `🏆 GANÓ ${escapeHtml(ganador)} 🏆`)}</h3>
                     </div>
                     <button class="btn-reintentar" onclick="window.location.href='lobby.html'"><i class="fas fa-redo"></i> Jugar de nuevo</button>
                     <a href="lobby.html" style="display: inline-block; margin-left: 15px; background: #f1f5f9; color: #1e293b; padding: 12px 30px; border-radius: 50px; text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver al lobby</a>
                 </div>
             `;
             
-            // Limpiar partida
             if (salaId) {
                 localStorage.removeItem(`partida_${salaId}`);
             }
@@ -565,13 +589,43 @@
             // Determinar si soy jugador 1 o 2
             const partidaActual = localStorage.getItem('partida_actual');
             if (partidaActual === salaId) {
-                // Soy el creador (jugador 1) o el que se unió?
-                // Por simplicidad, el primer jugador es el 1
                 esJugador1 = true;
             } else {
                 esJugador1 = false;
             }
             
+            // Si no hay jugador2, esperar
+            if (!salaData.jugador2) {
+                document.getElementById('gameContainer').innerHTML = `
+                    <div style="text-align:center;padding:60px 20px;background:white;border-radius:30px;">
+                        <i class="fas fa-users" style="font-size:4rem;color:#fbbf24;"></i>
+                        <h2 style="margin:20px 0;">Esperando oponente...</h2>
+                        <div style="width:50px;height:50px;border:3px solid #fbbf24;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:20px auto;"></div>
+                        <p style="color:#64748b;">Código: <strong style="color:#fbbf24;">${salaData.codigo}</strong></p>
+                        <button onclick="window.location.href='lobby.html'" style="margin-top:20px;padding:10px 25px;border:none;background:#e2e8f0;border-radius:50px;cursor:pointer;">Cancelar</button>
+                    </div>
+                `;
+                
+                // Verificar si el jugador2 se une
+                if (checkInterval) clearInterval(checkInterval);
+                checkInterval = setInterval(() => {
+                    const updated = localStorage.getItem(key);
+                    if (updated) {
+                        const newData = JSON.parse(updated);
+                        if (newData.jugador2) {
+                            salaData = newData;
+                            clearInterval(checkInterval);
+                            iniciarJuego();
+                        }
+                    }
+                }, 1000);
+                return;
+            }
+            
+            iniciarJuego();
+        }
+        
+        async function iniciarJuego() {
             // Inicializar preguntas si no existen
             if (!salaData.preguntas) {
                 salaData.preguntas = seleccionarPreguntas();
@@ -581,22 +635,24 @@
                 guardarPartida();
             }
             
-            // Iniciar juego
-            mostrarCuentaAtras().then(() => {
-                renderizarJuego();
-                // Iniciar verificación de cambios
-                if (checkInterval) clearInterval(checkInterval);
-                checkInterval = setInterval(() => {
-                    const updated = localStorage.getItem(key);
-                    if (updated) {
+            await mostrarCuentaAtras();
+            renderizarJuego();
+            
+            // Escuchar cambios
+            if (checkInterval) clearInterval(checkInterval);
+            checkInterval = setInterval(() => {
+                const key = `partida_${salaId}`;
+                const updated = localStorage.getItem(key);
+                if (updated) {
+                    try {
                         const newData = JSON.parse(updated);
                         if (newData.turno !== salaData.turno) {
                             salaData = newData;
                             renderizarJuego();
                         }
-                    }
-                }, 1000);
-            });
+                    } catch(e) {}
+                }
+            }, 500);
         }
         
         // ============================================
@@ -604,7 +660,6 @@
         // ============================================
         cargarPartida();
         
-        // Limpiar al cerrar
         window.addEventListener('beforeunload', () => {
             if (checkInterval) clearInterval(checkInterval);
             if (timerInterval) clearInterval(timerInterval);

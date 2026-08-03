@@ -147,6 +147,7 @@
             text-align: center;
             letter-spacing: 4px;
             font-weight: bold;
+            background: white;
         }
         .codigo-input input:focus {
             outline: none;
@@ -160,6 +161,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
+            font-size: 1rem;
         }
         .codigo-input button:hover { background: #f59e0b; }
         
@@ -211,6 +213,11 @@
             max-width: 450px;
             width: 90%;
             border: 1px solid rgba(251,191,36,0.4);
+            animation: fadeInUp 0.5s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .waiting-spinner {
             width: 70px;
@@ -233,6 +240,7 @@
             letter-spacing: 10px;
             font-weight: 800;
             color: #fbbf24;
+            text-shadow: 0 0 20px rgba(251,191,36,0.3);
         }
         .btn-cancelar {
             background: rgba(255,255,255,0.15);
@@ -245,6 +253,19 @@
             transition: 0.3s;
         }
         .btn-cancelar:hover { background: rgba(255,255,255,0.25); }
+        
+        .btn-unirse-demo {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .btn-unirse-demo:hover { background: #059669; transform: scale(1.05); }
         
         @media (max-width: 560px) {
             .card { padding: 30px 20px; }
@@ -306,6 +327,9 @@
                 <span id="waitingCodigo">------</span>
             </div>
             <p style="color: #a8c4b8; animation: pulse 1.5s infinite;">🔗 Comparte este código con tu amigo</p>
+            <button class="btn-unirse-demo" id="btnSimularOponente">
+                <i class="fas fa-user-plus"></i> Simular oponente (demo)
+            </button>
             <button class="btn-cancelar" id="btnCancelarEspera">
                 <i class="fas fa-times"></i> Cancelar
             </button>
@@ -321,15 +345,14 @@
 
     <script type="module">
         // ============================================
-        // VERSIÓN SIMPLIFICADA - SIN FIREBASE
+        // VERSIÓN CORREGIDA - CON SOPORTE PARA DEMO
         // ============================================
         
-        // Estado del juego
         let cocheSeleccionado = localStorage.getItem('multiplayer_car') || '🏎️';
         let salaCreada = null;
         let timerEspera = null;
+        let salaIdActual = null;
         
-        // Inicializar selector de coche
         function initCarSelector() {
             document.querySelectorAll('.car-option').forEach(opt => {
                 if (opt.dataset.car === cocheSeleccionado) {
@@ -348,12 +371,10 @@
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
         
-        // Crear partida (simulada)
         function crearPartida() {
             const codigo = generarCodigo();
             const salaId = `sala_${Date.now()}`;
             
-            // Guardar en localStorage para simular multijugador
             const partida = {
                 id: salaId,
                 codigo: codigo,
@@ -376,15 +397,12 @@
             return { salaId, codigo };
         }
         
-        // Unirse a partida por código
         function unirsePorCodigo(codigo) {
-            // Buscar en localStorage
             for (let key in localStorage) {
                 if (key.startsWith('partida_')) {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
                         if (data.codigo === codigo && data.estado === 'esperando' && !data.jugador2) {
-                            // Unirse
                             data.jugador2 = {
                                 nombre: 'Jugador 2',
                                 coche: cocheSeleccionado,
@@ -401,14 +419,12 @@
             return null;
         }
         
-        // Buscar partida aleatoria
         function buscarPartidaAleatoria() {
             for (let key in localStorage) {
                 if (key.startsWith('partida_')) {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
                         if (data.estado === 'esperando' && !data.jugador2) {
-                            // Unirse
                             data.jugador2 = {
                                 nombre: 'Jugador 2',
                                 coche: cocheSeleccionado,
@@ -425,23 +441,10 @@
             return null;
         }
         
-        function mostrarEspera(codigo) {
+        function mostrarEspera(codigo, salaId) {
+            salaIdActual = salaId;
             document.getElementById('waitingCodigo').textContent = codigo;
             document.getElementById('waitingScreen').style.display = 'flex';
-            
-            // Simular que el oponente se une después de 5-10 segundos (solo para demo)
-            if (timerEspera) clearTimeout(timerEspera);
-            timerEspera = setTimeout(() => {
-                // Buscar si alguien se unió
-                const salaId = localStorage.getItem('partida_actual');
-                if (salaId) {
-                    const key = `partida_${salaId}`;
-                    const data = JSON.parse(localStorage.getItem(key));
-                    if (data && data.estado === 'en_curso' && data.jugador2) {
-                        window.location.href = `carrera-multijugador.html?sala=${salaId}`;
-                    }
-                }
-            }, 5000);
         }
         
         function ocultarEspera() {
@@ -460,7 +463,7 @@
             let salaId = buscarPartidaAleatoria();
             if (!salaId) {
                 const { salaId: nuevaSala, codigo } = crearPartida();
-                mostrarEspera(codigo);
+                mostrarEspera(codigo, nuevaSala);
             } else {
                 window.location.href = `carrera-multijugador.html?sala=${salaId}`;
             }
@@ -469,7 +472,7 @@
         // Botón crear partida
         document.getElementById('btnCrearPartida').addEventListener('click', () => {
             const { salaId, codigo } = crearPartida();
-            mostrarEspera(codigo);
+            mostrarEspera(codigo, salaId);
         });
         
         // Botón unirse
@@ -487,12 +490,34 @@
             }
         });
         
+        // Botón simular oponente (para demo)
+        document.getElementById('btnSimularOponente').addEventListener('click', () => {
+            if (!salaIdActual) return;
+            const key = `partida_${salaIdActual}`;
+            const data = localStorage.getItem(key);
+            if (data) {
+                try {
+                    const partida = JSON.parse(data);
+                    if (!partida.jugador2) {
+                        partida.jugador2 = {
+                            nombre: 'Jugador 2 (Demo)',
+                            coche: '🚗',
+                            uid: 'player2_demo'
+                        };
+                        partida.estado = 'en_curso';
+                        localStorage.setItem(key, JSON.stringify(partida));
+                        ocultarEspera();
+                        window.location.href = `carrera-multijugador.html?sala=${salaIdActual}`;
+                    }
+                } catch(e) {}
+            }
+        });
+        
         // Cancelar espera
         document.getElementById('btnCancelarEspera').addEventListener('click', () => {
             ocultarEspera();
-            const salaId = localStorage.getItem('partida_actual');
-            if (salaId) {
-                localStorage.removeItem(`partida_${salaId}`);
+            if (salaIdActual) {
+                localStorage.removeItem(`partida_${salaIdActual}`);
                 localStorage.removeItem('partida_actual');
             }
         });

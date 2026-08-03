@@ -58,6 +58,18 @@
             transition: 0.3s;
         }
         .btn-cancelar:hover { background: rgba(255,255,255,0.3); }
+        .btn-simular {
+            background: #10b981;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .btn-simular:hover { background: #059669; }
         .pulse {
             animation: pulse 1.5s infinite;
             color: #a8c4b8;
@@ -79,6 +91,9 @@
                 <div class="codigo" id="codigoDisplay">------</div>
             </div>
             <p class="pulse">🔗 Comparte este código con tu amigo</p>
+            <button class="btn-simular" id="btnSimular">
+                <i class="fas fa-user-plus"></i> Simular oponente (demo)
+            </button>
             <button class="btn-cancelar" id="btnCancelar">
                 <i class="fas fa-times"></i> Cancelar
             </button>
@@ -86,10 +101,6 @@
     </div>
 
     <script>
-        // ============================================
-        // VERSIÓN SIMPLIFICADA - SIN FIREBASE
-        // ============================================
-        
         const urlParams = new URLSearchParams(window.location.search);
         const salaId = urlParams.get('sala');
         const codigo = urlParams.get('codigo');
@@ -98,9 +109,31 @@
             document.getElementById('codigoDisplay').textContent = codigo;
         }
         
-        // Simular espera y redirección
+        // Botón simular oponente
+        document.getElementById('btnSimular').addEventListener('click', () => {
+            if (salaId) {
+                const key = `partida_${salaId}`;
+                const data = localStorage.getItem(key);
+                if (data) {
+                    try {
+                        const partida = JSON.parse(data);
+                        if (!partida.jugador2) {
+                            partida.jugador2 = {
+                                nombre: 'Jugador 2',
+                                coche: '🚗',
+                                uid: 'player2'
+                            };
+                            partida.estado = 'en_curso';
+                            localStorage.setItem(key, JSON.stringify(partida));
+                            window.location.href = `carrera-multijugador.html?sala=${salaId}`;
+                        }
+                    } catch(e) {}
+                }
+            }
+        });
+        
+        // Verificar automáticamente si alguien se unió
         if (salaId) {
-            // Verificar cada 3 segundos si alguien se unió
             const checkInterval = setInterval(() => {
                 const key = `partida_${salaId}`;
                 const data = localStorage.getItem(key);
@@ -113,11 +146,10 @@
                         }
                     } catch(e) {}
                 }
-            }, 3000);
+            }, 1000);
         }
         
         document.getElementById('btnCancelar').addEventListener('click', () => {
-            // Limpiar partida
             if (salaId) {
                 localStorage.removeItem(`partida_${salaId}`);
                 localStorage.removeItem('partida_actual');
