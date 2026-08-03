@@ -941,6 +941,159 @@ export const tema2 = [
     correcta: 0,
     tema: 2,
     dificultad: "media"
+},
+{
+    id: 2204,
+    texto: "¿Qué indica la señal R-500?",
+    imagen: "../img/R-500.png",
+    opciones: ["Fin de prohibiciones", "Fin de la limitación de velocidad", "Fin de la prohibición de adelantamiento"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "facil"
+},
+{
+    id: 2205,
+    texto: "¿Qué indica la señal R-501?",
+    imagen: "../img/R-501.png",
+    opciones: ["Fin de la limitación de velocidad", "Fin de prohibiciones", "Fin de la prohibición de adelantamiento"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "facil"
+},
+{
+    id: 2206,
+    texto: "¿Qué indica la señal R-502?",
+    imagen: "../img/R-502.png",
+    opciones: ["Fin de la prohibición de adelantamiento", "Fin de la limitación de velocidad", "Fin de la prohibición de adelantamiento para camiones"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "facil"
+},
+{
+    id: 2207,
+    texto: "¿Qué indica la señal R-503?",
+    imagen: "../img/R-503.png",
+    opciones: ["Fin de la prohibición de adelantamiento para camiones", "Fin de la prohibición de adelantamiento", "Fin de la limitación de velocidad"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2208,
+    texto: "¿Qué indica la señal R-504?",
+    imagen: "../img/R-504.png",
+    opciones: ["Fin de zona de estacionamiento limitado", "Fin de prohibiciones", "Fin de vía reservada y obligatoria para ciclos"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2209,
+    texto: "¿Qué indica la señal R-505?",
+    imagen: "../img/R-505.png",
+    opciones: ["Fin de vía reservada y obligatoria para ciclos", "Fin de zona de estacionamiento limitado", "Fin de velocidad mínima"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2210,
+    texto: "¿Qué indica la señal R-506?",
+    imagen: "../img/R-506.png",
+    opciones: ["Fin de velocidad mínima", "Fin de la limitación de velocidad", "Fin de vía obligatoria para automóviles"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "facil"
+},
+{
+    id: 2211,
+    texto: "¿Qué indica la señal R-507?",
+    imagen: "../img/R-507.png",
+    opciones: ["Fin de vía obligatoria para automóviles, excepto motocicletas de dos ruedas", "Fin de vía obligatoria para motocicletas de dos ruedas", "Fin de vía obligatoria para camiones"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "dificil"
+},
+{
+    id: 2212,
+    texto: "¿Qué indica la señal R-508?",
+    imagen: "../img/R-508.png",
+    opciones: ["Fin de vía obligatoria para motocicletas de dos ruedas", "Fin de vía obligatoria para automóviles, excepto motocicletas de dos ruedas", "Fin de vía obligatoria para camiones"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "dificil"
+},
+{
+    id: 2213,
+    texto: "¿Qué indica la señal R-509?",
+    imagen: "../img/R-509.png",
+    opciones: ["Fin de vía obligatoria para camiones, tractocamiones y furgones o furgonetas", "Fin de vía obligatoria para automóviles", "Fin de vía obligatoria para motocicletas"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "dificil"
+},
+{
+    id: 2214,
+    texto: "¿Qué indica la señal R-510?",
+    imagen: "../img/R-510.png",
+    opciones: ["Fin de vía reservada y obligatoria para ciclomotores", "Fin de vía reservada y obligatoria para ciclos", "Fin de vía reservada y obligatoria para vehículos de movilidad personal"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2215,
+    texto: "¿Qué indica la señal R-511?",
+    imagen: "../img/R-511.png",
+    opciones: ["Fin de camino obligatorio para vehículos de tracción animal", "Fin de camino reservado y obligatorio para animales de montura", "Fin de camino reservado y obligatorio para peatones"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2216,
+    texto: "¿Qué indica la señal R-512?",
+    imagen: "../img/R-512.png",
+    opciones: ["Fin de camino reservado y obligatorio para animales de montura", "Fin de camino obligatorio para vehículos de tracción animal", "Fin de camino reservado y obligatorio para peatones"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2217,
+    texto: "¿Qué indica la señal R-513?",
+    imagen: "../img/R-513.png",
+    opciones: ["Fin de camino reservado y obligatorio para peatones", "Fin de camino obligatorio para vehículos de tracción animal", "Fin de camino reservado y obligatorio para animales de montura"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "facil"
+},
+{
+    id: 2218,
+    texto: "¿Qué indica la señal R-514?",
+    imagen: "../img/R-514.png",
+    opciones: ["Fin de camino obligatorio a tractores", "Fin de camino obligatorio para vehículos de tracción animal", "Fin de camino reservado y obligatorio para animales de montura"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2219,
+    texto: "¿Qué indica la señal R-515?",
+    imagen: "../img/R-515.png",
+    opciones: ["Fin de vía reservada y obligatoria para vehículos de movilidad personal", "Fin de vía reservada y obligatoria para ciclos", "Fin de vía reservada y obligatoria para ciclomotores"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
+},
+{
+    id: 2220,
+    texto: "¿Qué indica la señal R-516?",
+    imagen: "../img/R-516.png",
+    opciones: ["Fin de vía reservada y obligatoria para ciclos y para vehículos de movilidad personal", "Fin de vía reservada y obligatoria para ciclos", "Fin de vía reservada y obligatoria para vehículos de movilidad personal"],
+    correcta: 0,
+    tema: 2,
+    dificultad: "media"
 }
 ];
 

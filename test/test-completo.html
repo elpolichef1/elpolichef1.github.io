@@ -379,53 +379,73 @@
             nav ul { flex-wrap: wrap; justify-content: center; gap: 16px; }
         }
         .test-item {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 15px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.test-aprobado {
-    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-    border: 2px solid #10b981;
-}
-
-.test-suspendido {
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    border: 2px solid #ef4444;
-}
-
-.test-pendiente {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-}
-
-.test-estado {
-    margin-top: 10px;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.test-aprobado .test-estado {
-    color: #065f46;
-    font-weight: 600;
-}
-
-.test-suspendido .test-estado {
-    color: #991b1b;
-    font-weight: 600;
-}
-
-.test-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .test-aprobado {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 2px solid #10b981;
+        }
+        .test-suspendido {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border: 2px solid #ef4444;
+        }
+        .test-pendiente {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .test-estado {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .test-aprobado .test-estado {
+            color: #065f46;
+            font-weight: 600;
+        }
+        .test-suspendido .test-estado {
+            color: #991b1b;
+            font-weight: 600;
+        }
+        .test-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: white;
+            border-radius: 32px;
+            margin-bottom: 40px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f5b042;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .cargando-texto {
+            font-size: 1.1rem;
+            color: #1a472a;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -463,7 +483,13 @@
 
     <main>
         <div class="container">
-            <div class="nivel-section" id="nivelSection">
+            <!-- Cargando -->
+            <div id="loadingContainer" class="loading-container">
+                <div class="spinner"></div>
+                <span class="cargando-texto">Cargando preguntas de todos los temas...</span>
+            </div>
+
+            <div class="nivel-section" id="nivelSection" style="display: none;">
                 <div class="nivel-title">
                     <i class="fas fa-chart-line"></i> Selecciona tu nivel de dificultad
                 </div>
@@ -531,259 +557,450 @@
         </div>
     </footer>
 
- <script type="module">
-    import { auth, onAuthStateChanged } from '../js/firebase-init.js';
-    import { renderUserZone } from '../js/global-auth.js';
-    import { generarTestsPorNivel, guardarResultadoTest } from './data/preguntas-completas.js';
-    
-    // Generar 100 tests por nivel
-    const TESTS = {
-        facil: generarTestsPorNivel('facil', 100, 30),
-        medio: generarTestsPorNivel('medio', 100, 30),
-        dificil: generarTestsPorNivel('dificil', 100, 30)
-    };
-    
-    let testActual = null;
-    let indiceActual = 0;
-    let aciertos = 0;
-    let fallos = 0;
-    let respuestaSeleccionada = false;
-    let testActivo = false;
-    let nivelSeleccionadoActual = null;
-    let currentUser = null;
-    
-    function mostrarToast(mensaje) {
-        const toast = document.createElement('div');
-        toast.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:9999; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><i class="fas fa-check-circle"></i> ${mensaje}</div>`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    function mostrarTestsPorNivel(nivel) {
-        nivelSeleccionadoActual = nivel;
-        const tests = TESTS[nivel];
-        const titulo = nivel === 'facil' ? '📋 Tests Fáciles' : nivel === 'medio' ? '📋 Tests Medios' : '📋 Tests Difíciles';
-        document.getElementById('nivelSeleccionadoTitle').textContent = titulo;
-        
-        const grid = document.getElementById('testsGrid');
-        grid.innerHTML = tests.map(test => `
-            <div class="test-item" data-test-id="${test.id}" data-test-nivel="${nivel}">
-                <div class="test-numero">Test ${test.numero}</div>
-                <div class="test-titulo">30 preguntas</div>
-            </div>
-        `).join('');
-        
-        document.querySelectorAll('.test-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const testId = parseInt(item.dataset.testId);
-                const testNivel = item.dataset.testNivel;
-                iniciarTest(testNivel, testId);
+    <script type="module">
+        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+        import { renderUserZone } from '../js/global-auth.js';
+        import { guardarResultadoTest } from './data/preguntas-completas.js';
+
+        // Variable global para almacenar todas las preguntas
+        let todasLasPreguntas = {
+            facil: [],
+            medio: [],
+            dificil: []
+        };
+
+        // Variable para almacenar los tests generados
+        let TESTS = {
+            facil: [],
+            medio: [],
+            dificil: []
+        };
+
+        let testActual = null;
+        let indiceActual = 0;
+        let aciertos = 0;
+        let fallos = 0;
+        let respuestaSeleccionada = false;
+        let testActivo = false;
+        let nivelSeleccionadoActual = null;
+        let currentUser = null;
+        let testsCargados = false;
+
+        // Función para cargar todos los temas dinámicamente
+        async function cargarTodosLosTemas() {
+            const temas = [];
+            for (let i = 1; i <= 20; i++) {
+                temas.push(`./data/temas/tema${i}.js`);
+            }
+            
+            const promesas = temas.map(async (temaPath) => {
+                try {
+                    const modulo = await import(temaPath);
+                    return modulo;
+                } catch (error) {
+                    console.warn(`No se pudo cargar ${temaPath}:`, error);
+                    return null;
+                }
+            });
+            
+            const modulos = await Promise.all(promesas);
+            
+            // Procesar cada módulo cargado
+            modulos.forEach((modulo, index) => {
+                if (!modulo) return;
+                
+                // Buscar las preguntas en el módulo (puede tener diferentes nombres de exportación)
+                const preguntas = modulo.default || modulo.preguntas || modulo.preguntasTema || modulo;
+                
+                // Determinar el nivel de las preguntas (si no tienen nivel, asignar según el tema)
+                if (Array.isArray(preguntas)) {
+                    // Si es un array plano, lo distribuimos en los 3 niveles
+                    const tercia = Math.floor(preguntas.length / 3);
+                    const facil = preguntas.slice(0, tercia);
+                    const medio = preguntas.slice(tercia, tercia * 2);
+                    const dificil = preguntas.slice(tercia * 2);
+                    
+                    todasLasPreguntas.facil.push(...facil);
+                    todasLasPreguntas.medio.push(...medio);
+                    todasLasPreguntas.dificil.push(...dificil);
+                } else if (preguntas.facil && preguntas.medio && preguntas.dificil) {
+                    // Si tiene estructura de niveles
+                    todasLasPreguntas.facil.push(...(preguntas.facil || []));
+                    todasLasPreguntas.medio.push(...(preguntas.medio || []));
+                    todasLasPreguntas.dificil.push(...(preguntas.dificil || []));
+                }
+            });
+            
+            console.log(`Preguntas cargadas: Fácil=${todasLasPreguntas.facil.length}, Medio=${todasLasPreguntas.medio.length}, Difícil=${todasLasPreguntas.dificil.length}`);
+        }
+
+        // Función para generar tests desde las preguntas cargadas
+        function generarTestsDesdePreguntas(preguntas, nivel, numTests) {
+            if (!preguntas || preguntas.length === 0) {
+                // Si no hay preguntas, generar preguntas de respaldo
+                return generarPreguntasRespaldo(nivel, numTests);
+            }
+            
+            const tests = [];
+            const preguntasPorTest = 30;
+            
+            // Mezclar todas las preguntas disponibles
+            const todasLasPreguntasMezcladas = [...preguntas].sort(() => Math.random() - 0.5);
+            
+            // Calcular cuántos tests completos podemos generar
+            const maxTests = Math.floor(todasLasPreguntasMezcladas.length / preguntasPorTest);
+            const testsReales = Math.min(numTests, maxTests);
+            
+            for (let i = 0; i < testsReales; i++) {
+                const inicio = i * preguntasPorTest;
+                const seleccionadas = todasLasPreguntasMezcladas.slice(inicio, inicio + preguntasPorTest);
+                
+                tests.push({
+                    id: i + 1,
+                    numero: i + 1,
+                    nombre: `Test ${i + 1}`,
+                    nivel: nivel,
+                    preguntas: seleccionadas.map((p) => ({
+                        texto: p.texto || p.pregunta || '',
+                        opciones: p.opciones || p.options || p.opts || [],
+                        correcta: p.correcta !== undefined ? p.correcta : p.respuesta,
+                        explicacion: p.explicacion || p.descripcion || ''
+                    }))
+                });
+            }
+            
+            return tests;
+        }
+
+        // Función para generar preguntas de respaldo si no hay suficientes
+        function generarPreguntasRespaldo(nivel, numTests) {
+            const tests = [];
+            const preguntasPorTest = 30;
+            const temasBase = [
+                { texto: '¿Qué es JavaScript?', opciones: ['Lenguaje de programación', 'Framework', 'Base de datos', 'Sistema operativo'], correcta: 0, explicacion: 'JavaScript es un lenguaje de programación' },
+                { texto: '¿Qué significa HTML?', opciones: ['HyperText Markup Language', 'High Tech Modern Language', 'Hyper Transfer Markup Language', 'Home Tool Markup Language'], correcta: 0, explicacion: 'HTML significa HyperText Markup Language' },
+                { texto: '¿Qué es CSS?', opciones: ['Cascading Style Sheets', 'Computer Style System', 'Creative Style Sheets', 'Cascading System Style'], correcta: 0, explicacion: 'CSS significa Cascading Style Sheets' }
+            ];
+            
+            for (let i = 0; i < numTests; i++) {
+                const preguntas = [];
+                for (let j = 0; j < preguntasPorTest; j++) {
+                    const base = temasBase[j % temasBase.length];
+                    preguntas.push({
+                        ...base,
+                        texto: `${base.texto} (${nivel} - Test ${i+1} - Pregunta ${j+1})`
+                    });
+                }
+                tests.push({
+                    id: i + 1,
+                    numero: i + 1,
+                    nombre: `Test ${i + 1}`,
+                    nivel: nivel,
+                    preguntas: preguntas
+                });
+            }
+            return tests;
+        }
+
+        // Inicializar cargando todos los temas
+        async function inicializarTests() {
+            try {
+                await cargarTodosLosTemas();
+                
+                TESTS = {
+                    facil: generarTestsDesdePreguntas(todasLasPreguntas.facil, 'facil', 100),
+                    medio: generarTestsDesdePreguntas(todasLasPreguntas.medio, 'medio', 100),
+                    dificil: generarTestsDesdePreguntas(todasLasPreguntas.dificil, 'dificil', 100)
+                };
+                
+                testsCargados = true;
+                document.getElementById('loadingContainer').style.display = 'none';
+                document.getElementById('nivelSection').style.display = 'block';
+                
+                console.log('Tests generados:', {
+                    facil: TESTS.facil.length,
+                    medio: TESTS.medio.length,
+                    dificil: TESTS.dificil.length
+                });
+            } catch (error) {
+                console.error('Error al inicializar tests:', error);
+                document.getElementById('loadingContainer').innerHTML = `
+                    <div style="text-align: center; color: #991b1b;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
+                        <p>Error al cargar las preguntas. Por favor, recarga la página.</p>
+                        <button onclick="location.reload()" style="margin-top: 10px; padding: 10px 20px; background: #f5b042; border: none; border-radius: 10px; cursor: pointer; font-weight: 600;">Recargar</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Llamar a la inicialización
+        inicializarTests();
+
+        function mostrarToast(mensaje) {
+            const toast = document.createElement('div');
+            toast.innerHTML = `<div style="position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:12px 24px; border-radius:50px; z-index:9999; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.2);"><i class="fas fa-check-circle"></i> ${mensaje}</div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function mostrarTestsPorNivel(nivel) {
+            if (!testsCargados) {
+                mostrarToast('Cargando preguntas, espera un momento...');
+                return;
+            }
+            
+            nivelSeleccionadoActual = nivel;
+            const tests = TESTS[nivel];
+            const titulo = nivel === 'facil' ? '📋 Tests Fáciles' : nivel === 'medio' ? '📋 Tests Medios' : '📋 Tests Difíciles';
+            document.getElementById('nivelSeleccionadoTitle').textContent = titulo;
+            
+            const grid = document.getElementById('testsGrid');
+            if (tests.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">
+                        <i class="fas fa-info-circle" style="font-size: 2rem;"></i>
+                        <p>No hay suficientes preguntas para generar tests de este nivel.</p>
+                        <p style="font-size: 0.9rem;">Se generarán tests con preguntas de respaldo.</p>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = tests.map(test => `
+                    <div class="test-item" data-test-id="${test.id}" data-test-nivel="${nivel}">
+                        <div class="test-numero">Test ${test.numero}</div>
+                        <div class="test-titulo">${test.preguntas.length} preguntas</div>
+                    </div>
+                `).join('');
+            }
+            
+            document.querySelectorAll('.test-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const testId = parseInt(item.dataset.testId);
+                    const testNivel = item.dataset.testNivel;
+                    iniciarTest(testNivel, testId);
+                });
+            });
+            
+            document.getElementById('nivelSection').style.display = 'none';
+            document.getElementById('testsSection').style.display = 'block';
+            document.getElementById('statsTest').style.display = 'none';
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('resultadoFinal').style.display = 'none';
+        }
+
+        function iniciarTest(nivel, testId) {
+            const tests = TESTS[nivel];
+            if (!tests || tests.length === 0) {
+                mostrarToast('No hay tests disponibles para este nivel');
+                return;
+            }
+            
+            testActual = tests.find(t => t.id === testId);
+            if (!testActual) {
+                mostrarToast('Test no encontrado');
+                return;
+            }
+            
+            indiceActual = 0;
+            aciertos = 0;
+            fallos = 0;
+            respuestaSeleccionada = false;
+            testActivo = true;
+            
+            document.getElementById('totalPreguntas').textContent = testActual.preguntas.length;
+            document.getElementById('aciertos').textContent = aciertos;
+            document.getElementById('fallos').textContent = fallos;
+            document.getElementById('statsTest').style.display = 'flex';
+            document.getElementById('testsSection').style.display = 'none';
+            document.getElementById('resultadoFinal').style.display = 'none';
+            
+            cargarPregunta();
+        }
+
+        function cargarPregunta() {
+            if (indiceActual >= testActual.preguntas.length) {
+                finalizarTest();
+                return;
+            }
+            
+            const pregunta = testActual.preguntas[indiceActual];
+            document.getElementById('preguntaActual').textContent = indiceActual + 1;
+            actualizarProgreso();
+            
+            const questionCard = document.getElementById('questionCard');
+            questionCard.style.display = 'block';
+            questionCard.innerHTML = `
+                <div class="question-header">
+                    <div class="pregunta-numero">Pregunta ${indiceActual + 1}</div>
+                </div>
+                <div class="question-text">${escapeHtml(pregunta.texto)}</div>
+                <div class="options" id="optionsContainer">
+                    ${pregunta.opciones.map((opt, idx) => `
+                        <div class="option-btn" data-opcion="${idx}">
+                            <span class="option-prefix">${String.fromCharCode(65 + idx)}.</span>
+                            <span>${escapeHtml(opt)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div id="feedback" class="feedback"></div>
+                <button class="btn-siguiente" id="btnSiguiente">Siguiente pregunta →</button>
+            `;
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
+            });
+            
+            document.getElementById('btnSiguiente').addEventListener('click', () => {
+                if (respuestaSeleccionada) {
+                    indiceActual++;
+                    respuestaSeleccionada = false;
+                    cargarPregunta();
+                }
+            });
+            
+            respuestaSeleccionada = false;
+            document.getElementById('btnSiguiente').style.display = 'none';
+        }
+
+        function responder(opcion) {
+            if (respuestaSeleccionada || !testActivo) return;
+            
+            const pregunta = testActual.preguntas[indiceActual];
+            const esCorrecto = (opcion === pregunta.correcta);
+            
+            respuestaSeleccionada = true;
+            
+            if (esCorrecto) {
+                aciertos++;
+                document.getElementById('aciertos').textContent = aciertos;
+                mostrarFeedback(true, pregunta.explicacion || "¡Respuesta correcta!");
+            } else {
+                fallos++;
+                document.getElementById('fallos').textContent = fallos;
+                const letraCorrecta = String.fromCharCode(65 + pregunta.correcta);
+                mostrarFeedback(false, `Respuesta incorrecta. La correcta era ${letraCorrecta}. ${pregunta.explicacion || ''}`);
+            }
+            
+            actualizarProgreso();
+            
+            const opciones = document.querySelectorAll('.option-btn');
+            opciones.forEach((btn, idx) => {
+                btn.classList.add('disabled');
+                if (idx === pregunta.correcta) btn.classList.add('correct');
+                if (idx === opcion && opcion !== pregunta.correcta) btn.classList.add('incorrect');
+            });
+            
+            document.getElementById('btnSiguiente').style.display = 'block';
+        }
+
+        function mostrarFeedback(esCorrecto, mensaje) {
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.className = `feedback ${esCorrecto ? 'correct' : 'wrong'}`;
+            feedbackDiv.innerHTML = `<i class="fas ${esCorrecto ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${mensaje}`;
+            feedbackDiv.style.display = 'block';
+        }
+
+        function actualizarProgreso() {
+            const porcentaje = ((indiceActual + 1) / testActual.preguntas.length) * 100;
+            document.getElementById('progressFill').style.width = `${porcentaje}%`;
+        }
+
+        async function finalizarTest() {
+            testActivo = false;
+            const porcentaje = Math.round((aciertos / testActual.preguntas.length) * 100);
+            const aprobado = porcentaje >= 90;
+            
+            const resultadoDiv = document.getElementById('resultadoFinal');
+            resultadoDiv.style.display = 'block';
+            resultadoDiv.innerHTML = `
+                <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 4rem; color: #f5b042;"></i>
+                <h2>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h2>
+                <div class="puntuacion-final">${porcentaje}%</div>
+                <p>Has acertado <strong>${aciertos}</strong> de <strong>${testActual.preguntas.length}</strong> preguntas</p>
+                <p>Test: <strong>${testActual.nombre}</strong> - Nivel: ${testActual.nivel === 'facil' ? '🌱 Fácil' : testActual.nivel === 'medio' ? '⚡ Medio' : '🔥 Difícil'}</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn-reiniciar" id="btnReiniciar"><i class="fas fa-redo"></i> Volver a tests</button>
+                    <button class="btn-reiniciar" id="btnVolverMenu" style="background: #64748b; margin-left: 10px;"><i class="fas fa-home"></i> Volver al inicio</button>
+                </div>
+            `;
+            
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('statsTest').style.display = 'none';
+            
+            document.getElementById('btnReiniciar').addEventListener('click', () => {
+                mostrarTestsPorNivel(testActual.nivel);
+            });
+            
+            document.getElementById('btnVolverMenu').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            
+            // Guardar resultado
+            if (currentUser) {
+                try {
+                    await guardarResultadoTest(
+                        currentUser.uid,
+                        `test-completo_${testActual.nivel}`,
+                        testActual.id,
+                        testActual.nombre,
+                        {
+                            aprobado: aprobado,
+                            porcentaje: porcentaje,
+                            aciertos: aciertos,
+                            total: testActual.preguntas.length
+                        }
+                    );
+                    mostrarToast(`${testActual.nombre}: ${aprobado ? 'APROBADO' : 'SUSPENDIDO'} (${porcentaje}%)`);
+                } catch (error) {
+                    console.error('Error al guardar resultado:', error);
+                }
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.nivel-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const nivel = card.dataset.nivel;
+                mostrarTestsPorNivel(nivel);
             });
         });
-        
-        document.getElementById('nivelSection').style.display = 'none';
-        document.getElementById('testsSection').style.display = 'block';
-        document.getElementById('statsTest').style.display = 'none';
-        document.getElementById('questionCard').style.display = 'none';
-        document.getElementById('resultadoFinal').style.display = 'none';
-    }
-    
-    function iniciarTest(nivel, testId) {
-        const tests = TESTS[nivel];
-        testActual = tests.find(t => t.id === testId);
-        if (!testActual) return;
-        
-        indiceActual = 0;
-        aciertos = 0;
-        fallos = 0;
-        respuestaSeleccionada = false;
-        testActivo = true;
-        
-        document.getElementById('totalPreguntas').textContent = testActual.preguntas.length;
-        document.getElementById('aciertos').textContent = aciertos;
-        document.getElementById('fallos').textContent = fallos;
-        document.getElementById('statsTest').style.display = 'flex';
-        document.getElementById('testsSection').style.display = 'none';
-        document.getElementById('resultadoFinal').style.display = 'none';
-        
-        cargarPregunta();
-    }
-    
-    function cargarPregunta() {
-        if (indiceActual >= testActual.preguntas.length) {
-            finalizarTest();
-            return;
-        }
-        
-        const pregunta = testActual.preguntas[indiceActual];
-        document.getElementById('preguntaActual').textContent = indiceActual + 1;
-        actualizarProgreso();
-        
-        const questionCard = document.getElementById('questionCard');
-        questionCard.style.display = 'block';
-        questionCard.innerHTML = `
-            <div class="question-header">
-                <div class="pregunta-numero">Pregunta ${indiceActual + 1}</div>
-            </div>
-            <div class="question-text">${escapeHtml(pregunta.texto)}</div>
-            <div class="options" id="optionsContainer">
-                ${pregunta.opciones.map((opt, idx) => `
-                    <div class="option-btn" data-opcion="${idx}">
-                        <span class="option-prefix">${String.fromCharCode(65 + idx)}.</span>
-                        <span>${escapeHtml(opt)}</span>
-                    </div>
-                `).join('')}
-            </div>
-            <div id="feedback" class="feedback"></div>
-            <button class="btn-siguiente" id="btnSiguiente">Siguiente pregunta →</button>
-        `;
-        
-        document.querySelectorAll('.option-btn').forEach(btn => {
-            btn.addEventListener('click', () => responder(parseInt(btn.dataset.opcion)));
+
+        document.getElementById('btnVolverNivel').addEventListener('click', () => {
+            document.getElementById('nivelSection').style.display = 'block';
+            document.getElementById('testsSection').style.display = 'none';
+            document.getElementById('statsTest').style.display = 'none';
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('resultadoFinal').style.display = 'none';
         });
-        
-        document.getElementById('btnSiguiente').addEventListener('click', () => {
-            if (respuestaSeleccionada) {
-                indiceActual++;
-                respuestaSeleccionada = false;
-                cargarPregunta();
-            }
-        });
-        
-        respuestaSeleccionada = false;
-        document.getElementById('btnSiguiente').style.display = 'none';
-    }
-    
-    function responder(opcion) {
-        if (respuestaSeleccionada || !testActivo) return;
-        
-        const pregunta = testActual.preguntas[indiceActual];
-        const esCorrecto = (opcion === pregunta.correcta);
-        
-        respuestaSeleccionada = true;
-        
-        if (esCorrecto) {
-            aciertos++;
-            document.getElementById('aciertos').textContent = aciertos;
-            mostrarFeedback(true, pregunta.explicacion || "¡Respuesta correcta!");
-        } else {
-            fallos++;
-            document.getElementById('fallos').textContent = fallos;
-            const letraCorrecta = String.fromCharCode(65 + pregunta.correcta);
-            mostrarFeedback(false, `Respuesta incorrecta. La correcta era ${letraCorrecta}. ${pregunta.explicacion || ''}`);
-        }
-        
-        actualizarProgreso();
-        
-        const opciones = document.querySelectorAll('.option-btn');
-        opciones.forEach((btn, idx) => {
-            btn.classList.add('disabled');
-            if (idx === pregunta.correcta) btn.classList.add('correct');
-            if (idx === opcion && opcion !== pregunta.correcta) btn.classList.add('incorrect');
-        });
-        
-        document.getElementById('btnSiguiente').style.display = 'block';
-    }
-    
-    function mostrarFeedback(esCorrecto, mensaje) {
-        const feedbackDiv = document.getElementById('feedback');
-        feedbackDiv.className = `feedback ${esCorrecto ? 'correct' : 'wrong'}`;
-        feedbackDiv.innerHTML = `<i class="fas ${esCorrecto ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${mensaje}`;
-        feedbackDiv.style.display = 'block';
-    }
-    
-    function actualizarProgreso() {
-        const porcentaje = ((indiceActual + 1) / testActual.preguntas.length) * 100;
-        document.getElementById('progressFill').style.width = `${porcentaje}%`;
-    }
-    
-    async function finalizarTest() {
-        testActivo = false;
-        const porcentaje = Math.round((aciertos / testActual.preguntas.length) * 100);
-        const aprobado = porcentaje >= 90;
-        
-        const resultadoDiv = document.getElementById('resultadoFinal');
-        resultadoDiv.style.display = 'block';
-        resultadoDiv.innerHTML = `
-            <i class="fas ${aprobado ? 'fa-trophy' : 'fa-book-open'}" style="font-size: 4rem; color: #f5b042;"></i>
-            <h2>${aprobado ? '🎉 ¡Enhorabuena! ¡Has aprobado! 🎉' : '📚 No has aprobado'}</h2>
-            <div class="puntuacion-final">${porcentaje}%</div>
-            <p>Has acertado <strong>${aciertos}</strong> de <strong>${testActual.preguntas.length}</strong> preguntas</p>
-            <p>Test: <strong>${testActual.nombre}</strong> - Nivel: ${testActual.nivel === 'facil' ? '🌱 Fácil' : testActual.nivel === 'medio' ? '⚡ Medio' : '🔥 Difícil'}</p>
-            <div style="margin-top: 20px;">
-                <button class="btn-reiniciar" id="btnReiniciar"><i class="fas fa-redo"></i> Volver a tests</button>
-                <button id="btnVolverMenu" style="background: #64748b; margin-left: 10px;"><i class="fas fa-home"></i> Volver al inicio</button>
-            </div>
-        `;
-        
-        document.getElementById('questionCard').style.display = 'none';
-        document.getElementById('statsTest').style.display = 'none';
-        
-        document.getElementById('btnReiniciar').addEventListener('click', () => {
-            mostrarTestsPorNivel(testActual.nivel);
-        });
-        
-        document.getElementById('btnVolverMenu').addEventListener('click', () => {
+
+        document.getElementById('btnVolverIndex').addEventListener('click', () => {
             window.location.href = 'index.html';
         });
-        
-        // Guardar resultado
-        if (currentUser) {
-            await guardarResultadoTest(
-                currentUser.uid,
-                `test-completo_${testActual.nivel}`,
-                testActual.id,
-                testActual.nombre,
-                {
-                    aprobado: aprobado,
-                    porcentaje: porcentaje,
-                    aciertos: aciertos,
-                    total: testActual.preguntas.length
-                }
-            );
-            mostrarToast(`${testActual.nombre}: ${aprobado ? 'APROBADO' : 'SUSPENDIDO'} (${porcentaje}%)`);
-        }
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-    
-    document.querySelectorAll('.nivel-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const nivel = card.dataset.nivel;
-            mostrarTestsPorNivel(nivel);
-        });
-    });
-    
-    document.getElementById('btnVolverNivel').addEventListener('click', () => {
-        document.getElementById('nivelSection').style.display = 'block';
-        document.getElementById('testsSection').style.display = 'none';
-        document.getElementById('statsTest').style.display = 'none';
-        document.getElementById('questionCard').style.display = 'none';
-        document.getElementById('resultadoFinal').style.display = 'none';
-    });
-    
-    onAuthStateChanged(auth, (user) => {
-        renderUserZone();
-        if (!user) {
-            window.location.href = '../login.html';
-        } else {
-            currentUser = user;
-        }
-    });
-    
-    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-        const wrapper = document.getElementById('navWrapper');
-        if (wrapper) wrapper.classList.toggle('active');
-    });
-</script>
 
+        // Auth
+        onAuthStateChanged(auth, (user) => {
+            renderUserZone();
+            if (!user) {
+                window.location.href = '../login.html';
+            } else {
+                currentUser = user;
+            }
+        });
+
+        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+            const wrapper = document.getElementById('navWrapper');
+            if (wrapper) wrapper.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
