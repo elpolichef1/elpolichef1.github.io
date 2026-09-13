@@ -1,448 +1,97 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carrera Multijugador DGT</title>
-
-  <!-- PeerJS -->
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: white;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .contenedor {
-      width: min(500px, 90%);
-      background: #1f2937;
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 10px 40px #0008;
-    }
-
-    h1 {
-      margin-top: 0;
-    }
-
-    input, button, select {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 14px;
-      margin: 8px 0;
-      border: 0;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
-    input {
-      background: #374151;
-      color: white;
-    }
-
-    button {
-      cursor: pointer;
-      background: #2563eb;
-      color: white;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    .codigo {
-      font-size: 32px;
-      font-weight: bold;
-      letter-spacing: 5px;
-      background: #111827;
-      padding: 15px;
-      border-radius: 10px;
-      margin: 15px 0;
-    }
-
-    .estado {
-      margin-top: 15px;
-      color: #d1d5db;
-    }
-
-    .coches {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .coche {
-      font-size: 30px;
-      padding: 12px 5px;
-      background: #374151;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .coche.seleccionado {
-      outline: 3px solid #22c55e;
-      background: #065f46;
-    }
-
-    .oculto {
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrera Multijugador DGT</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#111827;color:white;margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.contenedor{width:min(520px,100%);background:#1f2937;padding:30px;border-radius:20px;text-align:center;box-shadow:0 10px 40px #0008}
+h1{margin-top:0}.coches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:15px 0 25px}.coche{font-size:30px;padding:12px 5px;background:#374151;border-radius:10px;cursor:pointer}.coche.seleccionado{outline:3px solid #22c55e;background:#065f46}
+input,button{width:100%;box-sizing:border-box;padding:14px;margin:8px 0;border:0;border-radius:10px;font-size:16px}input{background:#374151;color:white;text-align:center;letter-spacing:4px}button{cursor:pointer;background:#2563eb;color:white;font-weight:bold}button:hover{background:#1d4ed8}button:disabled{opacity:.5;cursor:not-allowed}
+.codigo{font-size:32px;font-weight:bold;letter-spacing:5px;background:#111827;padding:15px;border-radius:10px;margin:15px 0;color:#fbbf24}.estado{margin-top:15px;color:#d1d5db;min-height:24px}.sala{display:none;background:#111827;padding:20px;border-radius:15px;margin-top:20px}.separador{margin:25px 0;color:#9ca3af}
+</style>
 </head>
-
 <body>
-
 <div class="contenedor">
+<h1>🏁 Carrera Multijugador DGT</h1>
+<p>Elige tu coche:</p>
+<div class="coches">
+<div class="coche seleccionado" data-car="🏎️">🏎️</div>
+<div class="coche" data-car="🚗">🚗</div>
+<div class="coche" data-car="🚙">🚙</div>
+<div class="coche" data-car="🏍️">🏍️</div>
+<div class="coche" data-car="🚕">🚕</div>
+<div class="coche" data-car="🚓">🚓</div>
+<div class="coche" data-car="🚑">🚑</div>
+<div class="coche" data-car="🚒">🚒</div>
+</div>
 
-  <h1>🏁 Carrera Multijugador DGT</h1>
+<button id="crearBtn">🎮 Crear partida</button>
+<div id="sala" class="sala">
+<p>Comparte este código:</p>
+<div id="codigo" class="codigo">------</div>
+<button id="copiarBtn">📋 Copiar código</button>
+<div id="estadoHost" class="estado">Preparando...</div>
+</div>
 
-  <h3>Elige tu coche</h3>
+<div class="separador">──────── o ────────</div>
 
-  <div class="coches">
-    <div class="coche seleccionado" data-car="🏎️">🏎️</div>
-    <div class="coche" data-car="🚗">🚗</div>
-    <div class="coche" data-car="🚙">🚙</div>
-    <div class="coche" data-car="🏎️">🏎️</div>
-    <div class="coche" data-car="🚕">🚕</div>
-    <div class="coche" data-car="🚓">🚓</div>
-    <div class="coche" data-car="🚑">🚑</div>
-    <div class="coche" data-car="🚒">🚒</div>
-  </div>
-
-  <hr>
-
-  <button id="crearBtn">🎮 Crear partida</button>
-
-  <div id="salaCreada" class="oculto">
-
-    <p>Comparte este código con tu rival:</p>
-
-    <div id="codigo" class="codigo">------</div>
-
-    <button id="copiarBtn">📋 Copiar código</button>
-
-    <p id="estadoHost" class="estado">
-      Esperando al otro jugador...
-    </p>
-
-  </div>
-
-  <hr>
-
-  <h3>Unirse a una partida</h3>
-
-  <input
-    id="codigoInput"
-    type="text"
-    maxlength="6"
-    inputmode="numeric"
-    placeholder="Código de 6 números"
-  >
-
-  <button id="unirseBtn">
-    🚀 Unirse a partida
-  </button>
-
-  <p id="estado" class="estado"></p>
-
+<input id="codigoInput" maxlength="6" inputmode="numeric" placeholder="CÓDIGO DE 6 DÍGITOS">
+<button id="unirseBtn">🚀 Unirse a partida</button>
+<div id="estado" class="estado"></div>
 </div>
 
 <script>
 "use strict";
-
-const PREFIX = "aprobadoya-dgt-";
-
-let peer = null;
-let connection = null;
-let cocheSeleccionado = "🏎️";
-let codigoSala = null;
-
-
-/* =========================
-   SELECCIÓN DEL COCHE
-========================= */
-
-document.querySelectorAll(".coche").forEach(coche => {
-
-  coche.addEventListener("click", () => {
-
-    document.querySelectorAll(".coche")
-      .forEach(x => x.classList.remove("seleccionado"));
-
-    coche.classList.add("seleccionado");
-
-    cocheSeleccionado = coche.dataset.car;
-  });
-
+let coche="🏎️", codigo=null;
+document.querySelectorAll(".coche").forEach(el=>{
+  el.onclick=()=>{
+    document.querySelectorAll(".coche").forEach(x=>x.classList.remove("seleccionado"));
+    el.classList.add("seleccionado");
+    coche=el.dataset.car;
+  };
 });
-
-
-/* =========================
-   GENERAR CÓDIGO
-========================= */
-
-function generarCodigo() {
-
-  return Math.floor(
-    100000 + Math.random() * 900000
-  ).toString();
-
+function ir(c,rol){
+  const p=new URLSearchParams();
+  p.set("sala",c); p.set("rol",rol); p.set("coche",coche);
+  location.href="carrera-multijugador.html?"+p.toString();
 }
+function generarCodigo(){return String(Math.floor(100000+Math.random()*900000));}
 
+document.getElementById("crearBtn").onclick=()=>{
+  codigo=generarCodigo();
+  document.getElementById("codigo").textContent=codigo;
+  document.getElementById("sala").style.display="block";
+  document.getElementById("crearBtn").disabled=true;
+  document.getElementById("estadoHost").textContent="Abriendo la sala...";
+  /*
+    La conexión PeerJS se crea en carrera-multijugador.html.
+    Así no se destruye al cambiar de página.
+  */
+  setTimeout(()=>ir(codigo,"host"),250);
+};
 
-/* =========================
-   CREAR PARTIDA
-========================= */
-
-document.getElementById("crearBtn").addEventListener("click", () => {
-
-  codigoSala = generarCodigo();
-
-  const peerId = PREFIX + codigoSala;
-
-  mostrarEstado("Creando partida...");
-
-  peer = new Peer(peerId, {
-    debug: 0
-  });
-
-
-  peer.on("open", id => {
-
-    console.log("Sala creada:", id);
-
-    document.getElementById("codigo").textContent = codigoSala;
-
-    document
-      .getElementById("salaCreada")
-      .classList.remove("oculto");
-
-    document.getElementById("crearBtn").disabled = true;
-
-    mostrarEstadoHost(
-      "Esperando al segundo jugador..."
-    );
-
-  });
-
-
-  peer.on("connection", conn => {
-
-    connection = conn;
-
-    mostrarEstadoHost(
-      "Jugador encontrado. Conectando..."
-    );
-
-    conn.on("open", () => {
-
-      console.log("Jugador conectado");
-
-      const url =
-        "carrera-multijugador.html" +
-        "?sala=" + encodeURIComponent(codigoSala) +
-        "&rol=host" +
-        "&coche=" + encodeURIComponent(cocheSeleccionado);
-
-      window.location.href = url;
-
-    });
-
-  });
-
-
-  peer.on("error", error => {
-
-    console.error(error);
-
-    if (error.type === "unavailable-id") {
-
-      mostrarEstado(
-        "Ese código ya está ocupado. Creando otro..."
-      );
-
-      if (peer) {
-        peer.destroy();
-      }
-
-      setTimeout(() => {
-        document.getElementById("crearBtn").click();
-      }, 500);
-
-      return;
-    }
-
-    mostrarEstado(
-      "Error de conexión: " + error.type
-    );
-
-  });
-
-});
-
-
-/* =========================
-   UNIRSE
-========================= */
-
-document.getElementById("unirseBtn").addEventListener("click", () => {
-
-  const codigo =
-    document.getElementById("codigoInput")
-      .value
-      .trim();
-
-  if (!/^\d{6}$/.test(codigo)) {
-
-    mostrarEstado(
-      "Introduce un código válido de 6 números."
-    );
-
+document.getElementById("unirseBtn").onclick=()=>{
+  const c=document.getElementById("codigoInput").value.trim();
+  if(!/^\d{6}$/.test(c)){
+    document.getElementById("estado").textContent="❌ Introduce un código de 6 números.";
     return;
   }
-
-
-  mostrarEstado("Conectando con la partida...");
-
-
-  peer = new Peer({
-    debug: 0
-  });
-
-
-  peer.on("open", () => {
-
-    const peerId = PREFIX + codigo;
-
-    connection = peer.connect(
-      peerId,
-      {
-        reliable: true,
-        serialization: "json",
-        metadata: {
-          car: cocheSeleccionado
-        }
-      }
-    );
-
-
-    connection.on("open", () => {
-
-      console.log("Conectado al anfitrión");
-
-      const url =
-        "carrera-multijugador.html" +
-        "?sala=" + encodeURIComponent(codigo) +
-        "&rol=guest" +
-        "&coche=" + encodeURIComponent(cocheSeleccionado);
-
-      window.location.href = url;
-
-    });
-
-
-    connection.on("error", error => {
-
-      console.error(error);
-
-      mostrarEstado(
-        "No se pudo conectar con la partida."
-      );
-
-    });
-
-
-    connection.on("close", () => {
-
-      mostrarEstado(
-        "El anfitrión cerró la partida."
-      );
-
-    });
-
-  });
-
-
-  peer.on("error", error => {
-
-    console.error(error);
-
-    mostrarEstado(
-      "No se encontró esa partida."
-    );
-
-  });
-
-});
-
-
-/* =========================
-   COPIAR CÓDIGO
-========================= */
-
-document.getElementById("copiarBtn").addEventListener("click", async () => {
-
-  try {
-
-    await navigator.clipboard.writeText(codigoSala);
-
-    document.getElementById("copiarBtn").textContent =
-      "✅ Código copiado";
-
-  } catch {
-
-    mostrarEstado(
-      "No se pudo copiar automáticamente."
-    );
-
+  ir(c,"guest");
+};
+document.getElementById("codigoInput").onkeydown=e=>{
+  if(e.key==="Enter") document.getElementById("unirseBtn").click();
+};
+document.getElementById("copiarBtn").onclick=async()=>{
+  try{
+    await navigator.clipboard.writeText(codigo);
+    document.getElementById("copiarBtn").textContent="✅ Código copiado";
+  }catch{
+    document.getElementById("estadoHost").textContent="Código: "+codigo;
   }
-
-});
-
-
-/* =========================
-   MENSAJES
-========================= */
-
-function mostrarEstado(texto) {
-
-  document.getElementById("estado").textContent =
-    texto;
-
-}
-
-function mostrarEstadoHost(texto) {
-
-  document.getElementById("estadoHost").textContent =
-    texto;
-
-}
-
-
-/* =========================
-   LIMPIEZA
-========================= */
-
-window.addEventListener("beforeunload", () => {
-
-  if (peer) {
-    try {
-      peer.destroy();
-    } catch {}
-  }
-
-});
-
+};
 </script>
-
 </body>
 </html>

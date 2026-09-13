@@ -1,1585 +1,350 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Carrera Multijugador</title>
-
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-
-  <style>
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: white;
-      min-height: 100vh;
-    }
-
-    .contenedor {
-      width: min(900px, 94%);
-      margin: auto;
-      padding: 20px;
-    }
-
-    header {
-      text-align: center;
-    }
-
-    .marcador {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin: 20px 0;
-    }
-
-    .jugador {
-      background: #1f2937;
-      border-radius: 15px;
-      padding: 15px;
-      text-align: center;
-    }
-
-    .jugador.activo {
-      outline: 3px solid #22c55e;
-    }
-
-    .coche {
-      font-size: 50px;
-      transition: transform .3s;
-    }
-
-    .puntos {
-      font-size: 30px;
-      font-weight: bold;
-    }
-
-    .carrera {
-      background: #374151;
-      height: 70px;
-      border-radius: 20px;
-      margin: 20px 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .meta {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      width: 8px;
-      background: white;
-    }
-
-    .auto {
-      position: absolute;
-      left: 0;
-      top: 5px;
-      font-size: 50px;
-      transition: left .5s ease;
-    }
-
-    .auto2 {
-      top: 35px;
-      font-size: 35px;
-    }
-
-    .pregunta {
-      background: #1f2937;
-      padding: 25px;
-      border-radius: 20px;
-      margin-top: 20px;
-    }
-
-    .pregunta h2 {
-      line-height: 1.4;
-    }
-
-    .opciones {
-      display: grid;
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .opcion {
-      border: 0;
-      background: #4b5563;
-      color: white;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 17px;
-      cursor: pointer;
-      text-align: left;
-    }
-
-    .opcion:hover:not(:disabled) {
-      background: #2563eb;
-    }
-
-    .opcion:disabled {
-      cursor: not-allowed;
-      opacity: .7;
-    }
-
-    .correcta {
-      background: #15803d !important;
-    }
-
-    .incorrecta {
-      background: #b91c1c !important;
-    }
-
-    .temporizador {
-      font-size: 28px;
-      text-align: center;
-      font-weight: bold;
-      margin: 15px;
-    }
-
-    .turno {
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      margin: 15px;
-    }
-
-    .estado {
-      text-align: center;
-      padding: 15px;
-      background: #1f2937;
-      border-radius: 10px;
-      margin: 15px 0;
-    }
-
-    .pantalla-final {
-      position: fixed;
-      inset: 0;
-      background: #111827ee;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-    }
-
-    .final-box {
-      width: min(500px, 90%);
-      background: #1f2937;
-      padding: 35px;
-      border-radius: 20px;
-      text-align: center;
-    }
-
-    .final-box h1 {
-      font-size: 40px;
-    }
-
-    .final-box button {
-      width: 100%;
-      padding: 15px;
-      border: 0;
-      border-radius: 10px;
-      background: #2563eb;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .oculto {
-      display: none !important;
-    }
-
-  </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Carrera Multijugador DGT</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#1e293b}
+header{background:#14532d;color:white;padding:18px;text-align:center}header h1{margin:0 0 8px}header a{color:#fbbf24;text-decoration:none}
+.wrap{width:min(950px,94%);margin:22px auto}.card{background:white;border-radius:20px;padding:25px;box-shadow:0 8px 25px #0001}.center{text-align:center}
+.race{background:#263a25;border-radius:20px;padding:15px;margin-bottom:18px}.track{height:65px;background:#596d55;border-radius:40px;position:relative;overflow:hidden;margin:8px 0}.track:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ffffff22 0 25px,transparent 25px 50px)}.car{position:absolute;left:1%;top:10px;font-size:38px;transition:left .4s;z-index:2}.finish{position:absolute;right:0;top:0;width:20px;height:100%;background:repeating-linear-gradient(90deg,#fff 0 10px,#111 10px 20px)}
+.score{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px;text-align:center}.score div{background:white;border-radius:15px;padding:12px;box-shadow:0 5px 15px #0001}.num{font-size:27px;font-weight:bold;color:#166534}
+.turn{text-align:center;padding:13px;border-radius:25px;background:#fbbf24;font-weight:bold;margin-bottom:15px}.turn.wait{background:#64748b;color:white}
+.question{background:white;border-radius:20px;padding:25px;box-shadow:0 8px 25px #0001}.qtext{font-size:20px;font-weight:bold;line-height:1.45;margin-bottom:18px}.options{display:grid;gap:10px}.option{border:2px solid #e2e8f0;background:#f8fafc;padding:15px;border-radius:12px;text-align:left;cursor:pointer;font-size:16px}.option:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}.option:disabled{opacity:.6;cursor:not-allowed}
+.timer{height:8px;background:#e5e7eb;border-radius:8px;overflow:hidden;margin-top:10px}.fill{height:100%;width:100%;background:#f59e0b}.loading{text-align:center;padding:40px}.error{color:#991b1b;background:#fee2e2;border-radius:12px;padding:15px}.result{text-align:center;padding:35px}.result h2{font-size:32px}.result button{border:0;border-radius:25px;padding:14px 25px;background:#fbbf24;font-weight:bold;cursor:pointer}
+@media(max-width:650px){.score{grid-template-columns:1fr}.qtext{font-size:18px}}
+</style>
 </head>
-
 <body>
-
-<div class="contenedor">
-
-  <header>
-    <h1>🏁 Carrera Multijugador DGT</h1>
-    <p id="codigoSala"></p>
-  </header>
-
-
-  <!-- MARCADOR -->
-
-  <div class="marcador">
-
-    <div id="jugador1" class="jugador">
-
-      <div id="nombre1">
-        Tú
-      </div>
-
-      <div id="coche1" class="coche">
-        🏎️
-      </div>
-
-      <div id="puntos1" class="puntos">
-        0
-      </div>
-
-    </div>
-
-
-    <div id="jugador2" class="jugador">
-
-      <div>
-        Rival
-      </div>
-
-      <div id="coche2" class="coche">
-        🚗
-      </div>
-
-      <div id="puntos2" class="puntos">
-        0
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- CARRERA -->
-
-  <div class="carrera">
-
-    <div id="meta" class="meta"></div>
-
-    <div id="auto1" class="auto">
-      🏎️
-    </div>
-
-    <div id="auto2" class="auto auto2">
-      🚗
-    </div>
-
-  </div>
-
-
-  <div id="estado" class="estado">
-    Conectando...
-  </div>
-
-
-  <div id="turno" class="turno"></div>
-
-  <div id="temporizador" class="temporizador"></div>
-
-
-  <!-- PREGUNTA -->
-
-  <div id="preguntaBox" class="pregunta oculto">
-
-    <h2 id="textoPregunta"></h2>
-
-    <div id="opciones" class="opciones"></div>
-
-  </div>
-
-</div>
-
-
-<!-- FINAL -->
-
-<div id="pantallaFinal" class="pantalla-final">
-
-  <div class="final-box">
-
-    <h1 id="resultadoFinal">
-      🏁
-    </h1>
-
-    <p id="resultadoPuntos"></p>
-
-    <button onclick="volverLobby()">
-      Volver al lobby
-    </button>
-
-  </div>
-
-</div>
-
-
-<script>
-"use strict";
-
-
-/* =====================================================
-   CONFIGURACIÓN
-===================================================== */
-
-const TOTAL_PREGUNTAS = 10;
-const TIEMPO_PREGUNTA = 15;
-
-const PREFIX = "aprobadoya-dgt-";
-
-
-/* =====================================================
-   DATOS URL
-===================================================== */
-
-const params = new URLSearchParams(
-  window.location.search
-);
-
-const salaCodigo = params.get("sala");
-const rol = params.get("rol");
-
-let cochePropio =
-  params.get("coche") || "🏎️";
-
-
-try {
-  cochePropio =
-    decodeURIComponent(cochePropio);
-} catch {}
-
-
-/* =====================================================
-   VARIABLES
-===================================================== */
-
-let peer = null;
-let connection = null;
-
-let preguntas = [];
-
-let partida = null;
-
-let temporizador = null;
-
-let tiempoRestante = TIEMPO_PREGUNTA;
-
-let respondido = false;
-
-let juegoTerminado = false;
-
-
-/* =====================================================
-   INICIAR
-===================================================== */
-
-window.addEventListener("load", async () => {
-
-  if (!salaCodigo || !rol) {
-
-    mostrarEstado(
-      "Faltan datos de la partida."
-    );
-
-    return;
+<header><h1>🏁 Carrera Multijugador DGT</h1><div>Sala: <span id="room">------</span> · <a href="lobby.html">Salir</a></div></header>
+<div id="app" class="wrap"><div class="card loading"><h2 id="estado">Conectando...</h2><p id="detalle">No cierres esta página.</p></div></div>
+
+<script type="module">
+import { preguntasMulti } from "./preguntas-multi.js";
+
+const TOTAL=10;
+const TIEMPO=15000;
+const PREFIX="aprobadoya-dgt-";
+
+const params=new URLSearchParams(location.search);
+const sala=params.get("sala");
+const rol=params.get("rol");
+const coche=params.get("coche")||"🏎️";
+
+let peer=null;
+let conn=null;
+let partida=null;
+let intervalo=null;
+let terminada=false;
+let intentoConexion=0;
+
+document.getElementById("room").textContent=sala||"------";
+
+function setEstado(t,d=""){
+  const e=document.getElementById("estado"), x=document.getElementById("detalle");
+  if(e)e.textContent=t;
+  if(x)x.textContent=d;
+}
+
+function mezclar(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
   }
+  return a;
+}
 
+function crearPreguntas(){
+  if(!Array.isArray(preguntasMulti)||!preguntasMulti.length)
+    throw new Error("preguntas-multi.js no contiene preguntas.");
 
-  document.getElementById("codigoSala").textContent =
-    "Sala: " + salaCodigo;
+  const validas=preguntasMulti.filter(p=>
+    p && typeof p.texto==="string" &&
+    Array.isArray(p.opciones) && p.opciones.length>=2 &&
+    Number.isInteger(Number(p.correcta)) &&
+    Number(p.correcta)>=0 && Number(p.correcta)<p.opciones.length
+  );
 
+  if(!validas.length) throw new Error("No hay preguntas válidas.");
+  return mezclar(validas).slice(0,TOTAL).map(p=>({
+    texto:p.texto,
+    opciones:[...p.opciones],
+    correcta:Number(p.correcta)
+  }));
+}
 
-  try {
+function enviar(msg){
+  if(conn && conn.open) conn.send(msg);
+}
 
-    if (rol === "host") {
+function cerrarTimer(){
+  if(intervalo){clearInterval(intervalo);intervalo=null;}
+}
 
-      await iniciarHost();
+function esMiTurno(){
+  if(!partida)return false;
+  return rol==="host" ? partida.turno%2===0 : partida.turno%2===1;
+}
 
-    } else {
+/* ---------- HOST ---------- */
+function iniciarHost(){
+  setEstado("Creando sala online...","Esperando al segundo jugador.");
+  peer=new Peer(PREFIX+sala,{debug:0});
 
-      await iniciarGuest();
+  peer.on("open",()=>{
+    setEstado("Sala lista","Código "+sala+". Esperando al rival...");
+  });
 
-    }
+  peer.on("connection",c=>{
+    if(conn){try{c.close()}catch{};return;}
+    conn=c;
 
-  } catch (error) {
-
-    console.error(error);
-
-    mostrarEstado(
-      "Error iniciando la partida."
-    );
-
-  }
-
-});
-
-
-/* =====================================================
-   CARGAR TEMA 1-20
-===================================================== */
-
-async function cargarPreguntas() {
-
-  const todas = [];
-
-
-  for (let i = 1; i <= 20; i++) {
-
-    const archivo =
-      "./test/data/temas/tema" +
-      i +
-      ".js";
-
-
-    try {
-
-      const modulo =
-        await import(
-          archivo + "?v=" + Date.now()
-        );
-
-
-      /*
-       * Buscamos arrays exportados.
-       */
-
-      for (
-        const valor
-        of Object.values(modulo)
-      ) {
-
-        if (Array.isArray(valor)) {
-
-          for (const pregunta of valor) {
-
-            normalizarPregunta(
-              pregunta,
-              todas
-            );
-
-          }
-
-        }
-
-
-        /*
-         * También soporta:
-         *
-         * export default {
-         *   preguntas: [...]
-         * }
-         */
-
-        else if (
-          valor &&
-          Array.isArray(valor.preguntas)
-        ) {
-
-          for (
-            const pregunta
-            of valor.preguntas
-          ) {
-
-            normalizarPregunta(
-              pregunta,
-              todas
-            );
-
-          }
-
-        }
-
+    conn.on("open",()=>{
+      try{
+        partida={
+          turno:0,
+          puntos1:0,
+          puntos2:0,
+          coche1:coche,
+          coche2:(c.metadata&&c.metadata.car)||"🚗",
+          preguntas:crearPreguntas(),
+          deadline:Date.now()+TIEMPO
+        };
+      }catch(e){
+        console.error(e);
+        setEstado("❌ Error con las preguntas",e.message);
+        return;
       }
-
-    } catch (error) {
-
-      console.warn(
-        "No se pudo cargar:",
-        archivo,
-        error
-      );
-
-    }
-
-  }
-
-
-  if (todas.length === 0) {
-
-    throw new Error(
-      "No se encontraron preguntas."
-    );
-
-  }
-
-
-  mezclar(todas);
-
-
-  return todas.slice(
-    0,
-    Math.min(
-      TOTAL_PREGUNTAS,
-      todas.length
-    )
-  );
-
-}
-
-
-/* =====================================================
-   NORMALIZAR PREGUNTA
-===================================================== */
-
-function normalizarPregunta(
-  pregunta,
-  destino
-) {
-
-  if (
-    !pregunta ||
-    typeof pregunta !== "object"
-  ) {
-
-    return;
-  }
-
-
-  const texto =
-    pregunta.texto ??
-    pregunta.pregunta ??
-    pregunta.question;
-
-
-  const opciones =
-    pregunta.opciones ??
-    pregunta.respuestas ??
-    pregunta.answers;
-
-
-  if (
-    !texto ||
-    !Array.isArray(opciones) ||
-    opciones.length === 0
-  ) {
-
-    return;
-  }
-
-
-  let correcta =
-    pregunta.correcta ??
-    pregunta.respuestaCorrecta ??
-    pregunta.correctAnswer ??
-    pregunta.correct ??
-    0;
-
-
-  /*
-   * Si la respuesta correcta viene
-   * como texto en lugar de índice.
-   */
-
-  if (typeof correcta === "string") {
-
-    const indice =
-      opciones.indexOf(correcta);
-
-    if (indice >= 0) {
-      correcta = indice;
-    }
-
-  }
-
-
-  correcta = Number(correcta);
-
-
-  if (
-    !Number.isInteger(correcta) ||
-    correcta < 0 ||
-    correcta >= opciones.length
-  ) {
-
-    correcta = 0;
-
-  }
-
-
-  destino.push({
-
-    texto: String(texto),
-
-    opciones: opciones.map(
-      x => String(x)
-    ),
-
-    correcta: correcta
-
-  });
-
-}
-
-
-/* =====================================================
-   MEZCLAR ARRAY
-===================================================== */
-
-function mezclar(array) {
-
-  for (
-    let i = array.length - 1;
-    i > 0;
-    i--
-  ) {
-
-    const j =
-      Math.floor(
-        Math.random() * (i + 1)
-      );
-
-
-    [
-      array[i],
-      array[j]
-    ] =
-    [
-      array[j],
-      array[i]
-    ];
-
-  }
-
-}
-
-
-/* =====================================================
-   HOST
-===================================================== */
-
-async function iniciarHost() {
-
-  mostrarEstado(
-    "Cargando preguntas..."
-  );
-
-
-  preguntas =
-    await cargarPreguntas();
-
-
-  mostrarEstado(
-    "Esperando al rival..."
-  );
-
-
-  peer =
-    new Peer(
-      PREFIX + salaCodigo,
-      {
-        debug: 0
+      enviar({type:"state",partida});
+      render();
+    });
+
+    conn.on("data",msg=>{
+      if(msg && msg.type==="answer"){
+        recibirRespuestaJugador2(Number(msg.index));
       }
-    );
+    });
 
-
-  peer.on("open", () => {
-
-    console.log(
-      "Host conectado:",
-      peer.id
-    );
-
+    conn.on("close",()=>{
+      if(!terminada)setEstado("❌ El rival se ha desconectado","Vuelve al lobby para crear otra partida.");
+    });
   });
 
-
-  peer.on("connection", conn => {
-
-    connection = conn;
-
-
-    connection.on("open", () => {
-
-      console.log(
-        "Rival conectado"
-      );
-
-
-      /*
-       * Creamos la partida SOLO
-       * cuando el segundo jugador
-       * está conectado.
-       */
-
-      partida = {
-
-        turno: 0,
-
-        puntos1: 0,
-
-        puntos2: 0,
-
-        coche1: cochePropio,
-
-        coche2:
-          connection.metadata?.car ||
-          "🚗",
-
-        preguntas: preguntas
-
-      };
-
-
-      enviarEstado();
-
-
-      pintar();
-
-
-    });
-
-
-    connection.on("data", mensaje => {
-
-      procesarMensajeHost(
-        mensaje
-      );
-
-    });
-
-
-    connection.on("close", () => {
-
-      if (!juegoTerminado) {
-
-        mostrarEstado(
-          "❌ El rival se ha desconectado."
-        );
-
-      }
-
-    });
-
-
-    connection.on("error", error => {
-
-      console.error(error);
-
-    });
-
+  peer.on("error",e=>{
+    console.error("PeerJS:",e);
+    if(e.type==="unavailable-id")
+      setEstado("❌ Código ocupado","Vuelve al lobby y crea otra partida.");
+    else
+      setEstado("❌ Error de conexión",e.type||"PeerJS");
   });
-
-
-  peer.on("error", error => {
-
-    console.error(
-      "PeerJS:",
-      error
-    );
-
-
-    mostrarEstado(
-      "Error de conexión: " +
-      error.type
-    );
-
-  });
-
 }
 
+/* ---------- GUEST ---------- */
+function iniciarGuest(){
+  setEstado("Buscando la partida...","Si el anfitrión aún está entrando, se reintentará automáticamente.");
+  peer=new Peer({debug:0});
 
-/* =====================================================
-   GUEST
-===================================================== */
-
-async function iniciarGuest() {
-
-  mostrarEstado(
-    "Conectando con el anfitrión..."
-  );
-
-
-  peer =
-    new Peer({
-      debug: 0
-    });
-
-
-  peer.on("open", () => {
-
-    const idHost =
-      PREFIX + salaCodigo;
-
-
-    connection =
-      peer.connect(
-        idHost,
-        {
-          reliable: true,
-          serialization: "json",
-          metadata: {
-            car: cochePropio
-          }
-        }
-      );
-
-
-    connection.on("open", () => {
-
-      console.log(
-        "Conectado al host"
-      );
-
-
-      mostrarEstado(
-        "Conectado. Esperando partida..."
-      );
-
-    });
-
-
-    connection.on("data", mensaje => {
-
-      procesarMensajeGuest(
-        mensaje
-      );
-
-    });
-
-
-    connection.on("close", () => {
-
-      if (!juegoTerminado) {
-
-        mostrarEstado(
-          "❌ El anfitrión se ha desconectado."
-        );
-
-      }
-
-    });
-
-
-    connection.on("error", error => {
-
-      console.error(error);
-
-      mostrarEstado(
-        "Error de conexión."
-      );
-
-    });
-
+  peer.on("open",()=>{
+    conectarAlHost();
   });
 
-
-  peer.on("error", error => {
-
-    console.error(error);
-
-    mostrarEstado(
-      "No se pudo conectar a la partida."
-    );
-
+  peer.on("error",e=>{
+    console.error("PeerJS guest:",e);
+    if(e.type==="network")setEstado("⚠️ Problema de red","Comprueba tu conexión a Internet.");
   });
-
 }
 
+function conectarAlHost(){
+  if(terminada || !peer || (conn && conn.open))return;
 
-/* =====================================================
-   MENSAJES DEL HOST
-===================================================== */
+  intentoConexion++;
+  const c=peer.connect(PREFIX+sala,{
+    reliable:true,
+    serialization:"json",
+    metadata:{car:coche}
+  });
 
-function procesarMensajeHost(
-  mensaje
-) {
+  let resuelto=false;
 
-  if (!mensaje) {
-    return;
-  }
+  c.on("open",()=>{
+    if(resuelto)return;
+    resuelto=true;
+    conn=c;
+    setEstado("✅ Conectado","Esperando la partida...");
+  });
 
-
-  if (
-    mensaje.type === "answer"
-  ) {
-
-    /*
-     * El host es el único que
-     * decide si una respuesta
-     * es correcta.
-     */
-
-    if (
-      !partida ||
-      partida.turno % 2 !== 1 ||
-      respondido
-    ) {
-
-      return;
-
+  c.on("data",msg=>{
+    if(msg && msg.type==="state"){
+      partida=msg.partida;
+      render();
     }
-
-
-    const indice =
-      Number(mensaje.index);
-
-
-    aplicarRespuesta(
-      indice
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   MENSAJES DEL GUEST
-===================================================== */
-
-function procesarMensajeGuest(
-  mensaje
-) {
-
-  if (!mensaje) {
-    return;
-  }
-
-
-  if (
-    mensaje.type === "state"
-  ) {
-
-    partida =
-      mensaje.partida;
-
-
-    preguntas =
-      partida.preguntas;
-
-
-    pintar();
-
-  }
-
-}
-
-
-/* =====================================================
-   ENVIAR ESTADO
-===================================================== */
-
-function enviarEstado() {
-
-  if (
-    !connection ||
-    connection.open !== true
-  ) {
-
-    return;
-
-  }
-
-
-  connection.send({
-
-    type: "state",
-
-    partida: partida
-
   });
 
-}
-
-
-/* =====================================================
-   PINTAR
-===================================================== */
-
-function pintar() {
-
-  if (!partida) {
-    return;
-  }
-
-
-  document.getElementById(
-    "puntos1"
-  ).textContent =
-    partida.puntos1;
-
-
-  document.getElementById(
-    "puntos2"
-  ).textContent =
-    partida.puntos2;
-
-
-  document.getElementById(
-    "coche1"
-  ).textContent =
-    partida.coche1;
-
-
-  document.getElementById(
-    "coche2"
-  ).textContent =
-    partida.coche2;
-
-
-  document.getElementById(
-    "auto1"
-  ).textContent =
-    partida.coche1;
-
-
-  document.getElementById(
-    "auto2"
-  ).textContent =
-    partida.coche2;
-
-
-  /*
-   * Movimiento visual de los coches.
-   */
-
-  const porcentaje1 =
-    (partida.puntos1 /
-      TOTAL_PREGUNTAS) * 100;
-
-
-  const porcentaje2 =
-    (partida.puntos2 /
-      TOTAL_PREGUNTAS) * 100;
-
-
-  document.getElementById(
-    "auto1"
-  ).style.left =
-    Math.min(
-      porcentaje1,
-      90
-    ) + "%";
-
-
-  document.getElementById(
-    "auto2"
-  ).style.left =
-    Math.min(
-      porcentaje2,
-      90
-    ) + "%";
-
-
-  if (
-    partida.turno >=
-    TOTAL_PREGUNTAS
-  ) {
-
-    finalizar();
-
-    return;
-
-  }
-
-
-  const soyJugador1 =
-    rol === "host";
-
-
-  const turnoJugador1 =
-    partida.turno % 2 === 0;
-
-
-  const esMiTurno =
-    soyJugador1 ===
-    turnoJugador1;
-
-
-  document
-    .getElementById("jugador1")
-    .classList.toggle(
-      "activo",
-      turnoJugador1
-    );
-
-
-  document
-    .getElementById("jugador2")
-    .classList.toggle(
-      "activo",
-      !turnoJugador1
-    );
-
-
-  if (esMiTurno) {
-
-    mostrarEstado(
-      "🟢 Es tu turno"
-    );
-
-    mostrarPregunta();
-
-  } else {
-
-    mostrarEstado(
-      "🔴 Turno del rival..."
-    );
-
-    ocultarPregunta();
-
-  }
-
-}
-
-
-/* =====================================================
-   MOSTRAR PREGUNTA
-===================================================== */
-
-function mostrarPregunta() {
-
-  if (
-    !partida ||
-    !preguntas[partida.turno]
-  ) {
-
-    return;
-
-  }
-
-
-  const pregunta =
-    preguntas[partida.turno];
-
-
-  respondido = false;
-
-
-  document
-    .getElementById("preguntaBox")
-    .classList.remove("oculto");
-
-
-  document.getElementById(
-    "textoPregunta"
-  ).textContent =
-    pregunta.texto;
-
-
-  const contenedor =
-    document.getElementById(
-      "opciones"
-    );
-
-
-  contenedor.innerHTML = "";
-
-
-  pregunta.opciones.forEach(
-    (opcion, indice) => {
-
-      const boton =
-        document.createElement(
-          "button"
-        );
-
-
-      boton.className =
-        "opcion";
-
-
-      boton.textContent =
-        opcion;
-
-
-      boton.addEventListener(
-        "click",
-        () => responder(indice)
-      );
-
-
-      contenedor.appendChild(
-        boton
-      );
-
+  c.on("close",()=>{
+    if(!terminada)setEstado("❌ El anfitrión se desconectó","Vuelve al lobby para crear otra partida.");
+  });
+
+  c.on("error",e=>{
+    if(resuelto)return;
+    resuelto=true;
+    try{c.close()}catch{}
+    setEstado("Buscando la partida...","Intento "+intentoConexion);
+    setTimeout(conectarAlHost,1200);
+  });
+
+  setTimeout(()=>{
+    if(!resuelto && !terminada){
+      try{c.close()}catch{}
+      setTimeout(conectarAlHost,800);
     }
-  );
-
-
-  iniciarTemporizador();
-
+  },2500);
 }
 
+/* ---------- JUEGO ---------- */
+function recibirRespuestaJugador2(index){
+  if(!partida || partida.turno%2!==1 || Date.now()>partida.deadline)return;
 
-/* =====================================================
-   OCULTAR PREGUNTA
-===================================================== */
+  const q=partida.preguntas[partida.turno];
+  if(index===q.correcta)partida.puntos2++;
 
-function ocultarPregunta() {
-
-  document
-    .getElementById("preguntaBox")
-    .classList.add("oculto");
-
-
-  detenerTemporizador();
-
-
-  document.getElementById(
-    "temporizador"
-  ).textContent = "";
-
+  avanzarTurno();
 }
 
+function responder(index){
+  if(!partida || terminada || !esMiTurno())return;
 
-/* =====================================================
-   RESPONDER
-===================================================== */
+  const q=partida.preguntas[partida.turno];
 
-function responder(indice) {
-
-  if (
-    respondido ||
-    !partida ||
-    juegoTerminado
-  ) {
-
+  if(rol==="guest"){
+    enviar({type:"answer",index});
+    bloquearBotones();
     return;
-
   }
 
+  if(Date.now()>partida.deadline)return;
 
-  respondido = true;
-
-  detenerTemporizador();
-
-
-  /*
-   * Bloqueamos botones inmediatamente.
-   */
-
-  document
-    .querySelectorAll(".opcion")
-    .forEach(
-      boton => boton.disabled = true
-    );
-
-
-  if (rol === "host") {
-
-    /*
-     * El jugador 1 responde
-     * directamente en el host.
-     */
-
-    if (
-      partida.turno % 2 === 0
-    ) {
-
-      aplicarRespuesta(
-        indice
-      );
-
-    }
-
-  } else {
-
-    /*
-     * El jugador 2 manda la respuesta
-     * al host.
-     */
-
-    if (
-      connection &&
-      connection.open
-    ) {
-
-      connection.send({
-
-        type: "answer",
-
-        index: indice
-
-      });
-
-    }
-
-  }
-
+  if(index===q.correcta)partida.puntos1++;
+  avanzarTurno();
 }
 
-
-/* =====================================================
-   APLICAR RESPUESTA
-===================================================== */
-
-function aplicarRespuesta(
-  indice
-) {
-
-  if (
-    !partida ||
-    partida.turno >= TOTAL_PREGUNTAS
-  ) {
-
-    return;
-
-  }
-
-
-  const pregunta =
-    partida.preguntas[
-      partida.turno
-    ];
-
-
-  const correcta =
-    Number(indice) ===
-    Number(pregunta.correcta);
-
-
-  if (correcta) {
-
-    if (
-      partida.turno % 2 === 0
-    ) {
-
-      partida.puntos1++;
-
-    } else {
-
-      partida.puntos2++;
-
-    }
-
-  }
-
-
+function avanzarTurno(){
+  cerrarTimer();
   partida.turno++;
+  partida.deadline=partida.turno<TOTAL?Date.now()+TIEMPO:0;
+  enviar({type:"state",partida});
+  render();
+}
 
+function tiempoAgotado(){
+  if(!partida || !esMiTurno() || Date.now()<partida.deadline)return;
 
-  enviarEstado();
-
-
-  pintar();
-
-
-  if (
-    partida.turno >=
-    TOTAL_PREGUNTAS
-  ) {
-
-    finalizar();
-
+  if(rol==="guest"){
+    enviar({type:"answer",index:-1});
+    bloquearBotones();
+  }else{
+    avanzarTurno();
   }
-
 }
 
-
-/* =====================================================
-   TIEMPO
-===================================================== */
-
-function iniciarTemporizador() {
-
-  detenerTemporizador();
-
-
-  tiempoRestante =
-    TIEMPO_PREGUNTA;
-
-
-  actualizarTemporizador();
-
-
-  temporizador =
-    setInterval(() => {
-
-      tiempoRestante--;
-
-
-      actualizarTemporizador();
-
-
-      if (
-        tiempoRestante <= 0
-      ) {
-
-        detenerTemporizador();
-
-
-        if (!respondido) {
-
-          responder(-1);
-
-        }
-
-      }
-
-    }, 1000);
-
+function bloquearBotones(){
+  document.querySelectorAll(".option").forEach(b=>b.disabled=true);
 }
 
+function render(){
+  if(!partida)return;
+  if(partida.turno>=TOTAL){finalizar();return;}
 
-function actualizarTemporizador() {
+  cerrarTimer();
 
-  document.getElementById(
-    "temporizador"
-  ).textContent =
-    "⏱️ " +
-    tiempoRestante +
-    " s";
+  const miTurno=esMiTurno();
+  const q=partida.preguntas[partida.turno];
+  const p1=partida.puntos1||0, p2=partida.puntos2||0;
+  const avance1=Math.min(96,p1/TOTAL*100);
+  const avance2=Math.min(96,p2/TOTAL*100);
 
+  document.getElementById("app").innerHTML=`
+    <div class="race">
+      <div class="track"><div class="car" style="left:${avance1}%">${escapeHtml(partida.coche1)}</div><div class="finish"></div></div>
+      <div class="track"><div class="car" style="left:${avance2}%">${escapeHtml(partida.coche2)}</div><div class="finish"></div></div>
+    </div>
+    <div class="score">
+      <div><div class="num">${p1}</div><small>Jugador 1</small></div>
+      <div><div class="num">${partida.turno+1}/${TOTAL}</div><small>Pregunta</small></div>
+      <div><div class="num">${p2}</div><small>Jugador 2</small></div>
+    </div>
+    <div class="turn ${miTurno?"":"wait"}">
+      ${miTurno?"🎯 TU TURNO":"⏳ Turno del rival"}
+      ${miTurno?'<div class="timer"><div id="fill" class="fill"></div></div>':""}
+    </div>
+    <div class="question">
+      <div class="qtext">${escapeHtml(q.texto)}</div>
+      <div class="options">
+        ${q.opciones.map((o,i)=>`<button class="option" data-i="${i}" ${miTurno?"":"disabled"}>${String.fromCharCode(65+i)}. ${escapeHtml(o)}</button>`).join("")}
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll(".option").forEach(b=>{
+    b.onclick=()=>responder(Number(b.dataset.i));
+  });
+
+  if(miTurno)iniciarTimer();
 }
 
-
-function detenerTemporizador() {
-
-  if (temporizador) {
-
-    clearInterval(
-      temporizador
-    );
-
-    temporizador = null;
-
-  }
-
-}
-
-
-/* =====================================================
-   FINAL
-===================================================== */
-
-function finalizar() {
-
-  if (juegoTerminado) {
-    return;
-  }
-
-
-  juegoTerminado = true;
-
-
-  detenerTemporizador();
-
-
-  ocultarPregunta();
-
-
-  const p1 =
-    partida?.puntos1 ?? 0;
-
-
-  const p2 =
-    partida?.puntos2 ?? 0;
-
-
-  let resultado;
-
-
-  if (p1 === p2) {
-
-    resultado =
-      "🤝 ¡Empate!";
-
-  } else if (
-    (rol === "host" && p1 > p2) ||
-    (rol === "guest" && p2 > p1)
-  ) {
-
-    resultado =
-      "🏆 ¡Has ganado!";
-
-  } else {
-
-    resultado =
-      "😢 Has perdido";
-
-  }
-
-
-  document.getElementById(
-    "resultadoFinal"
-  ).textContent =
-    resultado;
-
-
-  document.getElementById(
-    "resultadoPuntos"
-  ).textContent =
-    "Tú: " +
-    (rol === "host" ? p1 : p2) +
-    " puntos — Rival: " +
-    (rol === "host" ? p2 : p1) +
-    " puntos";
-
-
-  document
-    .getElementById("pantallaFinal")
-    .style.display =
-    "flex";
-
-}
-
-
-/* =====================================================
-   LOBBY
-===================================================== */
-
-function volverLobby() {
-
-  if (peer) {
-
-    try {
-      peer.destroy();
-    } catch {}
-
-  }
-
-
-  window.location.href =
-    "lobby.html";
-
-}
-
-
-/* =====================================================
-   ESTADO
-===================================================== */
-
-function mostrarEstado(
-  texto
-) {
-
-  document.getElementById(
-    "estado"
-  ).textContent =
-    texto;
-
-}
-
-
-/* =====================================================
-   LIMPIEZA
-===================================================== */
-
-window.addEventListener(
-  "beforeunload",
-  () => {
-
-    detenerTemporizador();
-
-    if (peer) {
-
-      try {
-        peer.destroy();
-      } catch {}
-
+function iniciarTimer(){
+  const deadline=partida.deadline;
+  intervalo=setInterval(()=>{
+    const restante=Math.max(0,deadline-Date.now());
+    const fill=document.getElementById("fill");
+    if(fill)fill.style.width=(restante/TIEMPO*100)+"%";
+    if(restante<=0){
+      cerrarTimer();
+      tiempoAgotado();
     }
+  },100);
+}
 
-  }
-);
+function finalizar(){
+  if(terminada)return;
+  terminada=true;
+  cerrarTimer();
 
+  const p1=partida?.puntos1||0, p2=partida?.puntos2||0;
+  const yo=rol==="host"?p1:p2, rival=rol==="host"?p2:p1;
+  const texto=yo===rival?"🤝 ¡EMPATE!":yo>rival?"🏆 ¡HAS GANADO!":"😢 HAS PERDIDO";
+
+  document.getElementById("app").innerHTML=`
+    <div class="card result">
+      <h2>${texto}</h2>
+      <p>Tu puntuación: <b>${yo}</b></p>
+      <p>Puntuación del rival: <b>${rival}</b></p>
+      <button onclick="location.href='lobby.html'">Volver al lobby</button>
+    </div>
+  `;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+if(!sala || !["host","guest"].includes(rol)){
+  setEstado("❌ Partida incorrecta","Vuelve al lobby.");
+}else if(rol==="host"){
+  try{crearPreguntas();iniciarHost();}
+  catch(e){console.error(e);setEstado("❌ Error iniciando la partida",e.message);}
+}else{
+  iniciarGuest();
+}
+
+window.addEventListener("beforeunload",()=>{
+  cerrarTimer();
+  try{if(peer)peer.destroy()}catch{}
+});
 </script>
-
 </body>
 </html>
