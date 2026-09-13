@@ -7,62 +7,140 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#f0f9f0 0%,#e8f0e8 100%);color:#1e293b;margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-.contenedor{width:min(520px,100%);background:#ffffff;padding:30px;border-radius:20px;text-align:center;box-shadow:0 10px 40px rgba(26,71,42,.15);border:1px solid rgba(251,191,36,.2)}
+body{
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:linear-gradient(135deg,#f0f9f0 0%,#e8f0e8 100%);
+  color:#1e293b;margin:0;min-height:100vh;
+  display:flex;justify-content:center;align-items:center;padding:20px;
+}
+.contenedor{
+  width:min(520px,100%);
+  background:#ffffff;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 10px 40px rgba(26,71,42,.15);
+  border:1px solid rgba(251,191,36,.2);
+}
 h1{margin-top:0;color:#1a472a}
+p{color:#475569}
 .coches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:15px 0 25px}
-.coche{font-size:30px;padding:12px 5px;background:#fefaf5;border-radius:10px;cursor:pointer;border:2px solid #f0e5d4;transition:all .25s}
-.coche:hover{border-color:#fbbf24}
-.coche.seleccionado{outline:3px solid #22c55e;background:#ecfdf5;border-color:#22c55e}
-input,button{width:100%;box-sizing:border-box;padding:14px;margin:8px 0;border:0;border-radius:10px;font-size:16px;font-family:inherit}
-input{background:#f1f5f9;color:#1e293b;text-align:center;letter-spacing:4px;border:2px solid #e2e8f0}
-input:focus{outline:none;border-color:#fbbf24}
-button{cursor:pointer;background:#1a472a;color:white;font-weight:bold;transition:all .25s}
-button:hover{background:#0f2a1a}
-button:disabled{opacity:.5;cursor:not-allowed}
+.coche{
+  font-size:30px;padding:12px 5px;
+  background:#fefaf5;border-radius:10px;
+  cursor:pointer;border:2px solid #f0e5d4;
+  transition:all .25s;user-select:none;
+}
+.coche:hover{border-color:#fbbf24;transform:translateY(-2px)}
+.coche.seleccionado{
+  outline:3px solid #22c55e;
+  background:#ecfdf5;border-color:#22c55e;
+}
+input,button{
+  width:100%;box-sizing:border-box;
+  padding:14px;margin:8px 0;
+  border:0;border-radius:10px;
+  font-size:16px;font-family:inherit;
+  transition:all .25s;
+}
+input{
+  background:#f1f5f9;color:#1e293b;
+  text-align:center;letter-spacing:4px;
+  border:2px solid #e2e8f0;font-weight:600;
+}
+input:focus{outline:none;border-color:#fbbf24;background:white}
+input::placeholder{
+  color:#94a3b8;letter-spacing:2px;
+  font-weight:400;font-size:.95rem;
+}
+button{cursor:pointer;background:#1a472a;color:white;font-weight:bold}
+button:hover:not(:disabled){background:#0f2a1a;transform:translateY(-2px)}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 #unirseBtn{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a472a}
-#unirseBtn:hover{background:linear-gradient(135deg,#f59e0b,#d97706)}
+#unirseBtn:hover:not(:disabled){background:linear-gradient(135deg,#f59e0b,#d97706)}
 #copiarBtn{background:#fbbf24;color:#1a472a}
-#copiarBtn:hover{background:#f59e0b}
-.codigo{font-size:32px;font-weight:bold;letter-spacing:5px;background:#1a472a;padding:15px;border-radius:10px;margin:15px 0;color:#fbbf24}
-.estado{margin-top:15px;color:#64748b;min-height:24px}
-.sala{display:none;background:#f8fafc;padding:20px;border-radius:15px;margin-top:20px;border:2px dashed #fbbf24}
-.separador{margin:25px 0;color:#94a3b8}
+#copiarBtn:hover:not(:disabled){background:#f59e0b}
+#salirBtn{
+  background:transparent;
+  color:#64748b;
+  border:2px solid #e2e8f0;
+  text-decoration:none;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-weight:600;margin-top:14px;
+}
+#salirBtn:hover{
+  background:#f8fafc;
+  color:#1a472a;
+  border-color:#fbbf24;
+  transform:translateY(-2px);
+}
+.codigo{
+  font-size:32px;font-weight:bold;letter-spacing:5px;
+  background:#1a472a;padding:15px;border-radius:10px;
+  margin:15px 0;color:#fbbf24;
+  font-family:'Courier New',monospace;
+}
+.estado{margin-top:15px;color:#64748b;min-height:24px;font-weight:500}
+.sala{
+  display:none;background:#f8fafc;padding:20px;
+  border-radius:15px;margin-top:20px;
+  border:2px dashed #fbbf24;
+}
+.sala p{color:#1a472a;font-weight:600;margin-bottom:10px}
+.separador{
+  margin:25px 0;color:#94a3b8;
+  display:flex;align-items:center;gap:12px;font-size:.9rem;
+}
+.separador::before,.separador::after{
+  content:"";flex:1;height:1px;background:#e2e8f0;
+}
+@media(max-width:480px){
+  .contenedor{padding:22px}
+}
 </style>
 </head>
 <body>
 <div class="contenedor">
-<h1>🏁 Carrera Multijugador DGT</h1>
-<p>Elige tu coche:</p>
-<div class="coches">
-<div class="coche seleccionado" data-car="🏎️">🏎️</div>
-<div class="coche" data-car="🚗">🚗</div>
-<div class="coche" data-car="🚙">🚙</div>
-<div class="coche" data-car="🏍️">🏍️</div>
-<div class="coche" data-car="🚕">🚕</div>
-<div class="coche" data-car="🚓">🚓</div>
-<div class="coche" data-car="🚑">🚑</div>
-<div class="coche" data-car="🚒">🚒</div>
-</div>
 
-<button id="crearBtn">🎮 Crear partida</button>
-<div id="sala" class="sala">
-<p>Comparte este código:</p>
-<div id="codigo" class="codigo">------</div>
-<button id="copiarBtn">📋 Copiar código</button>
-<div id="estadoHost" class="estado">Preparando...</div>
-</div>
+  <h1>🏁 Carrera Multijugador DGT</h1>
+  <p>Elige tu coche:</p>
 
-<div class="separador">──────── o ────────</div>
+  <div class="coches">
+    <div class="coche seleccionado" data-car="🏎️">🏎️</div>
+    <div class="coche" data-car="🚗">🚗</div>
+    <div class="coche" data-car="🚙">🚙</div>
+    <div class="coche" data-car="🏍️">🏍️</div>
+    <div class="coche" data-car="🚕">🚕</div>
+    <div class="coche" data-car="🚓">🚓</div>
+    <div class="coche" data-car="🚑">🚑</div>
+    <div class="coche" data-car="🚒">🚒</div>
+  </div>
 
-<input id="codigoInput" maxlength="6" inputmode="numeric" placeholder="CÓDIGO DE 6 DÍGITOS">
-<button id="unirseBtn">🚀 Unirse a partida</button>
-<div id="estado" class="estado"></div>
+  <button id="crearBtn">🎮 Crear partida</button>
+
+  <div id="sala" class="sala">
+    <p>📋 Comparte este código:</p>
+    <div id="codigo" class="codigo">------</div>
+    <button id="copiarBtn">📋 Copiar código</button>
+    <div id="estadoHost" class="estado">Preparando...</div>
+  </div>
+
+  <div class="separador">o únete con un código</div>
+
+  <input id="codigoInput" maxlength="6" inputmode="numeric" placeholder="CÓDIGO DE 6 DÍGITOS" autocomplete="off">
+  <button id="unirseBtn">🚀 Unirse a partida</button>
+
+  <div id="estado" class="estado"></div>
+
+  <!-- BOTÓN SALIR debajo del unirse -->
+  <a href="../index.html" id="salirBtn">← Volver a Mini Retos</a>
+
 </div>
 
 <script>
 "use strict";
 let coche="🏎️", codigo=null;
+
 document.querySelectorAll(".coche").forEach(el=>{
   el.onclick=()=>{
     document.querySelectorAll(".coche").forEach(x=>x.classList.remove("seleccionado"));
@@ -70,11 +148,13 @@ document.querySelectorAll(".coche").forEach(el=>{
     coche=el.dataset.car;
   };
 });
+
 function ir(c,rol){
   const p=new URLSearchParams();
   p.set("sala",c); p.set("rol",rol); p.set("coche",coche);
   location.href="carrera-multijugador.html?"+p.toString();
 }
+
 function generarCodigo(){return String(Math.floor(100000+Math.random()*900000));}
 
 document.getElementById("crearBtn").onclick=()=>{
@@ -94,13 +174,21 @@ document.getElementById("unirseBtn").onclick=()=>{
   }
   ir(c,"guest");
 };
+
 document.getElementById("codigoInput").onkeydown=e=>{
   if(e.key==="Enter") document.getElementById("unirseBtn").click();
 };
+
+document.getElementById("codigoInput").addEventListener("input",e=>{
+  e.target.value=e.target.value.replace(/\D/g,"").slice(0,6);
+});
+
 document.getElementById("copiarBtn").onclick=async()=>{
+  const btn=document.getElementById("copiarBtn");
   try{
     await navigator.clipboard.writeText(codigo);
-    document.getElementById("copiarBtn").textContent="✅ Código copiado";
+    btn.textContent="✅ Código copiado";
+    setTimeout(()=>btn.textContent="📋 Copiar código",2000);
   }catch{
     document.getElementById("estadoHost").textContent="Código: "+codigo;
   }
