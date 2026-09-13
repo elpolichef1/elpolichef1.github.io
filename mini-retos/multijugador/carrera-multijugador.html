@@ -3,23 +3,462 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Carrera Multijugador DGT</title>
+<title>Carrera Multijugador DGT | AprobadoYa</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#1e293b}
-header{background:#14532d;color:white;padding:18px;text-align:center}header h1{margin:0 0 8px}header a{color:#fbbf24;text-decoration:none}
-.wrap{width:min(950px,94%);margin:22px auto}.card{background:white;border-radius:20px;padding:25px;box-shadow:0 8px 25px #0001}.center{text-align:center}
-.race{background:#263a25;border-radius:20px;padding:15px;margin-bottom:18px}.track{height:65px;background:#596d55;border-radius:40px;position:relative;overflow:hidden;margin:8px 0}.track:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ffffff22 0 25px,transparent 25px 50px)}.car{position:absolute;left:1%;top:10px;font-size:38px;transition:left .4s;z-index:2}.finish{position:absolute;right:0;top:0;width:20px;height:100%;background:repeating-linear-gradient(90deg,#fff 0 10px,#111 10px 20px)}
-.score{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px;text-align:center}.score div{background:white;border-radius:15px;padding:12px;box-shadow:0 5px 15px #0001}.num{font-size:27px;font-weight:bold;color:#166534}
-.turn{text-align:center;padding:13px;border-radius:25px;background:#fbbf24;font-weight:bold;margin-bottom:15px}.turn.wait{background:#64748b;color:white}
-.question{background:white;border-radius:20px;padding:25px;box-shadow:0 8px 25px #0001}.qtext{font-size:20px;font-weight:bold;line-height:1.45;margin-bottom:18px}.options{display:grid;gap:10px}.option{border:2px solid #e2e8f0;background:#f8fafc;padding:15px;border-radius:12px;text-align:left;cursor:pointer;font-size:16px}.option:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}.option:disabled{opacity:.6;cursor:not-allowed}
-.timer{height:8px;background:#e5e7eb;border-radius:8px;overflow:hidden;margin-top:10px}.fill{height:100%;width:100%;background:#f59e0b}.loading{text-align:center;padding:40px}.error{color:#991b1b;background:#fee2e2;border-radius:12px;padding:15px}.result{text-align:center;padding:35px}.result h2{font-size:32px}.result button{border:0;border-radius:25px;padding:14px 25px;background:#fbbf24;font-weight:bold;cursor:pointer}
-@media(max-width:650px){.score{grid-template-columns:1fr}.qtext{font-size:18px}}
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  body{
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:linear-gradient(135deg,#f0f9f0 0%,#e8f0e8 100%);
+    color:#1e293b;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ============ HEADER ============ */
+  header{
+    background:linear-gradient(135deg,#1a472a 0%,#0f2a1a 100%);
+    color:white;
+    padding:18px 0;
+    box-shadow:0 4px 15px rgba(0,0,0,.15);
+    position:sticky;
+    top:0;
+    z-index:100;
+  }
+  header .header-inner{
+    width:min(1100px,94%);
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  header h1{
+    font-size:1.5rem;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:white;
+  }
+  header h1 i{color:#fbbf24;}
+  header .header-info{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    font-size:.9rem;
+    font-weight:600;
+  }
+  header .header-info .sala{
+    background:rgba(0,0,0,.25);
+    padding:8px 16px;
+    border-radius:30px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  header .header-info .sala span{color:#fbbf24;letter-spacing:2px;font-family:'Courier New',monospace;}
+  header .header-info a{
+    color:#fbbf24;
+    text-decoration:none;
+    padding:8px 16px;
+    border-radius:30px;
+    background:rgba(0,0,0,.25);
+    transition:all .25s;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  header .header-info a:hover{background:rgba(251,191,36,.2);}
+
+  /* ============ LAYOUT ============ */
+  .wrap{
+    width:min(1000px,94%);
+    margin:30px auto 60px;
+    flex:1;
+  }
+
+  .card{
+    background:white;
+    border-radius:30px;
+    padding:30px;
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+    border:1px solid rgba(251,191,36,.2);
+    margin-bottom:22px;
+  }
+
+  /* ============ CARGANDO ============ */
+  .loading{
+    text-align:center;
+    padding:60px 30px;
+  }
+  .loading h2{
+    color:#1a472a;
+    font-size:1.6rem;
+    margin-bottom:12px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+  }
+  .loading h2 i{color:#fbbf24;}
+  .loading p{color:#64748b;font-size:1rem;}
+
+  /* ============ CARRERA (pistas) ============ */
+  .race{
+    background:linear-gradient(135deg,#1a472a 0%,#0f2a1a 100%);
+    border-radius:25px;
+    padding:22px;
+    margin-bottom:22px;
+    box-shadow:0 15px 35px rgba(26,71,42,.2);
+    position:relative;
+    overflow:hidden;
+  }
+  .race::before{
+    content:"🏁";
+    position:absolute;
+    font-size:150px;
+    opacity:.05;
+    bottom:-30px;
+    right:-20px;
+    transform:rotate(-15deg);
+    pointer-events:none;
+  }
+
+  .track{
+    height:70px;
+    background:#596d55;
+    border-radius:40px;
+    position:relative;
+    overflow:hidden;
+    margin:10px 0;
+    box-shadow:inset 0 4px 15px rgba(0,0,0,.25);
+  }
+  .track:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(90deg,#ffffff22 0 25px,transparent 25px 50px);
+  }
+  .car{
+    position:absolute;
+    left:1%;
+    top:12px;
+    font-size:42px;
+    transition:left .5s ease;
+    z-index:2;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));
+  }
+  .car::after{
+    content:"";
+    position:absolute;
+    bottom:-6px;
+    left:0;
+    right:0;
+    height:6px;
+    background:rgba(0,0,0,.3);
+    border-radius:50%;
+    filter:blur(3px);
+  }
+  .finish{
+    position:absolute;
+    right:0;
+    top:0;
+    width:24px;
+    height:100%;
+    background:repeating-linear-gradient(90deg,#fff 0 10px,#111 10px 20px);
+    box-shadow:-2px 0 10px rgba(0,0,0,.3);
+    z-index:1;
+  }
+
+  /* ============ SCORE ============ */
+  .score{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .score > div{
+    background:linear-gradient(135deg,#fefaf5,#ffffff);
+    border-radius:22px;
+    padding:18px 12px;
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+    border:1px solid #f0e5d4;
+    text-align:center;
+    transition:transform .25s;
+  }
+  .score > div:hover{transform:translateY(-3px);}
+  .score .num{
+    font-size:1.8rem;
+    font-weight:800;
+    color:#1a472a;
+    line-height:1.1;
+  }
+  .score small{
+    display:block;
+    margin-top:6px;
+    color:#64748b;
+    font-size:.75rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  .score .question-num .num{color:#fbbf24;}
+
+  /* ============ TURNO ============ */
+  .turn{
+    text-align:center;
+    padding:16px;
+    border-radius:50px;
+    background:linear-gradient(135deg,#fbbf24,#f59e0b);
+    color:#1a472a;
+    font-weight:800;
+    font-size:1.05rem;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    box-shadow:0 8px 20px rgba(251,191,36,.35);
+    flex-wrap:wrap;
+  }
+  .turn.wait{
+    background:linear-gradient(135deg,#64748b,#475569);
+    color:white;
+    box-shadow:0 8px 20px rgba(100,116,139,.3);
+  }
+  .turn .timer-wrap{
+    width:100%;
+    margin-top:8px;
+  }
+  .timer{
+    height:8px;
+    background:rgba(0,0,0,.15);
+    border-radius:8px;
+    overflow:hidden;
+    width:100%;
+  }
+  .fill{
+    height:100%;
+    width:100%;
+    background:#1a472a;
+    border-radius:8px;
+    transition:width .1s linear;
+  }
+  .turn.wait .fill{background:#fbbf24;}
+
+  /* ============ PREGUNTA ============ */
+  .question{
+    background:white;
+    border-radius:25px;
+    padding:30px;
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+    border:1px solid rgba(251,191,36,.2);
+    position:relative;
+    overflow:hidden;
+  }
+  .question::before{
+    content:"❓";
+    position:absolute;
+    font-size:120px;
+    opacity:.03;
+    top:-20px;
+    right:-20px;
+    transform:rotate(15deg);
+    pointer-events:none;
+  }
+
+  .qtext{
+    font-size:1.25rem;
+    font-weight:700;
+    line-height:1.5;
+    margin-bottom:22px;
+    color:#1a472a;
+    position:relative;
+    z-index:1;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .qtext::before{
+    content:"💭";
+    font-size:1.4rem;
+    flex-shrink:0;
+  }
+
+  .options{
+    display:grid;
+    gap:12px;
+    position:relative;
+    z-index:1;
+  }
+  .option{
+    border:2px solid #e2e8f0;
+    background:#f8fafc;
+    padding:16px 20px;
+    border-radius:16px;
+    text-align:left;
+    cursor:pointer;
+    font-size:1rem;
+    font-weight:600;
+    color:#1e293b;
+    font-family:inherit;
+    transition:all .25s;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .option::before{
+    content:attr(data-letter);
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:#e2e8f0;
+    color:#475569;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:.9rem;
+    flex-shrink:0;
+    transition:all .25s;
+  }
+  .option:hover:not(:disabled){
+    border-color:#fbbf24;
+    background:#fffbeb;
+    transform:translateX(4px);
+    box-shadow:0 6px 18px rgba(251,191,36,.2);
+  }
+  .option:hover:not(:disabled)::before{
+    background:#fbbf24;
+    color:#1a472a;
+  }
+  .option:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+  }
+
+  /* ============ RESULTADO ============ */
+  .result{
+    text-align:center;
+    padding:50px 30px;
+    position:relative;
+    overflow:hidden;
+  }
+  .result::before{
+    content:"🏆";
+    position:absolute;
+    font-size:200px;
+    opacity:.04;
+    bottom:-50px;
+    right:-30px;
+    transform:rotate(-15deg);
+    pointer-events:none;
+  }
+  .result h2{
+    font-size:2.2rem;
+    font-weight:800;
+    color:#1a472a;
+    margin-bottom:20px;
+    position:relative;
+    z-index:1;
+  }
+  .result p{
+    font-size:1.1rem;
+    color:#475569;
+    margin-bottom:10px;
+    position:relative;
+    z-index:1;
+  }
+  .result p b{
+    color:#fbbf24;
+    font-size:1.3rem;
+  }
+  .result button{
+    border:0;
+    border-radius:50px;
+    padding:16px 40px;
+    background:linear-gradient(135deg,#1a472a,#0f2a1a);
+    color:white;
+    font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
+    margin-top:22px;
+    transition:all .3s;
+    position:relative;
+    z-index:1;
+    font-family:inherit;
+    box-shadow:0 10px 25px rgba(26,71,42,.3);
+  }
+  .result button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 15px 35px rgba(26,71,42,.4);
+  }
+
+  /* ============ ERROR ============ */
+  .error{
+    color:#991b1b;
+    background:#fee2e2;
+    border-radius:16px;
+    padding:18px 20px;
+    border-left:4px solid #dc2626;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .error::before{
+    content:"⚠️";
+    font-size:1.4rem;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media(max-width:650px){
+    .score{grid-template-columns:1fr 1fr 1fr;}
+    .score .num{font-size:1.5rem;}
+    .qtext{font-size:1.1rem;}
+    .option{font-size:.92rem;padding:14px 16px;}
+    .option::before{width:30px;height:30px;font-size:.85rem;}
+    .car{font-size:34px;top:16px;}
+    .track{height:60px;}
+    header h1{font-size:1.15rem;}
+    header .header-info{font-size:.8rem;gap:10px;}
+    .result h2{font-size:1.6rem;}
+    .card{padding:22px;border-radius:22px;}
+    .question{padding:22px;}
+  }
 </style>
 </head>
 <body>
-<header><h1>🏁 Carrera Multijugador DGT</h1><div>Sala: <span id="room">------</span> · <a href="lobby.html">Salir</a></div></header>
-<div id="app" class="wrap"><div class="card loading"><h2 id="estado">Conectando...</h2><p id="detalle">No cierres esta página.</p></div></div>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="header-inner">
+    <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador DGT</h1>
+    <div class="header-info">
+      <div class="sala">
+        <i class="fas fa-hashtag"></i>
+        <span id="room">------</span>
+      </div>
+      <a href="lobby.html">
+        <i class="fas fa-sign-out-alt"></i> Salir
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= APP ================= -->
+<div id="app" class="wrap">
+  <div class="card loading">
+    <h2><i class="fas fa-spinner fa-spin"></i> Conectando...</h2>
+    <p id="detalle">No cierres esta página.</p>
+  </div>
+</div>
 
 <script type="module">
 import { preguntasMulti } from "./preguntas-multi.js";
@@ -262,27 +701,45 @@ function render(){
   const miTurno=esMiTurno();
   const q=partida.preguntas[partida.turno];
   const p1=partida.puntos1||0, p2=partida.puntos2||0;
-  const avance1=Math.min(96,p1/TOTAL*100);
-  const avance2=Math.min(96,p2/TOTAL*100);
+  const avance1=Math.min(92,p1/TOTAL*100);
+  const avance2=Math.min(92,p2/TOTAL*100);
 
   document.getElementById("app").innerHTML=`
     <div class="race">
-      <div class="track"><div class="car" style="left:${avance1}%">${escapeHtml(partida.coche1)}</div><div class="finish"></div></div>
-      <div class="track"><div class="car" style="left:${avance2}%">${escapeHtml(partida.coche2)}</div><div class="finish"></div></div>
+      <div class="track">
+        <div class="car" style="left:${avance1}%">${escapeHtml(partida.coche1)}</div>
+        <div class="finish"></div>
+      </div>
+      <div class="track">
+        <div class="car" style="left:${avance2}%">${escapeHtml(partida.coche2)}</div>
+        <div class="finish"></div>
+      </div>
     </div>
+
     <div class="score">
-      <div><div class="num">${p1}</div><small>Jugador 1</small></div>
-      <div><div class="num">${partida.turno+1}/${TOTAL}</div><small>Pregunta</small></div>
-      <div><div class="num">${p2}</div><small>Jugador 2</small></div>
+      <div>
+        <div class="num">${p1}</div>
+        <small>🏎️ Jugador 1</small>
+      </div>
+      <div class="question-num">
+        <div class="num">${partida.turno+1}/${TOTAL}</div>
+        <small>Pregunta</small>
+      </div>
+      <div>
+        <div class="num">${p2}</div>
+        <small>🚗 Jugador 2</small>
+      </div>
     </div>
+
     <div class="turn ${miTurno?"":"wait"}">
-      ${miTurno?"🎯 TU TURNO":"⏳ Turno del rival"}
-      ${miTurno?'<div class="timer"><div id="fill" class="fill"></div></div>':""}
+      ${miTurno?'<i class="fas fa-crosshairs"></i> TU TURNO':'<i class="fas fa-hourglass-half"></i> Turno del rival'}
+      ${miTurno?'<div class="timer-wrap"><div class="timer"><div id="fill" class="fill"></div></div></div>':""}
     </div>
+
     <div class="question">
       <div class="qtext">${escapeHtml(q.texto)}</div>
       <div class="options">
-        ${q.opciones.map((o,i)=>`<button class="option" data-i="${i}" ${miTurno?"":"disabled"}>${String.fromCharCode(65+i)}. ${escapeHtml(o)}</button>`).join("")}
+        ${q.opciones.map((o,i)=>`<button class="option" data-i="${i}" data-letter="${String.fromCharCode(65+i)}" ${miTurno?"":"disabled"}>${escapeHtml(o)}</button>`).join("")}
       </div>
     </div>
   `;
@@ -314,14 +771,20 @@ function finalizar(){
 
   const p1=partida?.puntos1||0, p2=partida?.puntos2||0;
   const yo=rol==="host"?p1:p2, rival=rol==="host"?p2:p1;
-  const texto=yo===rival?"🤝 ¡EMPATE!":yo>rival?"🏆 ¡HAS GANADO!":"😢 HAS PERDIDO";
+
+  let texto, emoji;
+  if(yo===rival){texto="¡EMPATE!";emoji="🤝";}
+  else if(yo>rival){texto="¡HAS GANADO!";emoji="🏆";}
+  else{texto="HAS PERDIDO";emoji="😢";}
 
   document.getElementById("app").innerHTML=`
     <div class="card result">
-      <h2>${texto}</h2>
+      <h2>${emoji} ${texto}</h2>
       <p>Tu puntuación: <b>${yo}</b></p>
       <p>Puntuación del rival: <b>${rival}</b></p>
-      <button onclick="location.href='lobby.html'">Volver al lobby</button>
+      <button onclick="location.href='lobby.html'">
+        <i class="fas fa-home"></i> Volver al lobby
+      </button>
     </div>
   `;
 }
