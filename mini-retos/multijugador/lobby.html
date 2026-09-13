@@ -2,96 +2,685 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carrera Multijugador DGT</title>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Carrera Multijugador DGT | AprobadoYa</title>
+<meta name="description" content="Compite en tiempo real contra otro jugador en la Carrera Multijugador DGT.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#111827;color:white;margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-.contenedor{width:min(520px,100%);background:#1f2937;padding:30px;border-radius:20px;text-align:center;box-shadow:0 10px 40px #0008}
-h1{margin-top:0}.coches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:15px 0 25px}.coche{font-size:30px;padding:12px 5px;background:#374151;border-radius:10px;cursor:pointer}.coche.seleccionado{outline:3px solid #22c55e;background:#065f46}
-input,button{width:100%;box-sizing:border-box;padding:14px;margin:8px 0;border:0;border-radius:10px;font-size:16px}input{background:#374151;color:white;text-align:center;letter-spacing:4px}button{cursor:pointer;background:#2563eb;color:white;font-weight:bold}button:hover{background:#1d4ed8}button:disabled{opacity:.5;cursor:not-allowed}
-.codigo{font-size:32px;font-weight:bold;letter-spacing:5px;background:#111827;padding:15px;border-radius:10px;margin:15px 0;color:#fbbf24}.estado{margin-top:15px;color:#d1d5db;min-height:24px}.sala{display:none;background:#111827;padding:20px;border-radius:15px;margin-top:20px}.separador{margin:25px 0;color:#9ca3af}
+  /* ============================================================
+     RESET Y BASE
+     ============================================================ */
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: linear-gradient(135deg, #f0f9f0 0%, #e8f0e8 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1e293b;
+  }
+
+  a { text-decoration: none; color: inherit; }
+  ul { list-style: none; }
+  img { max-width: 100%; }
+  button { font-family: inherit; }
+
+  .container {
+    width: min(1200px, 92%);
+    margin: 0 auto;
+  }
+
+  /* ============================================================
+     HEADER VERDE OSCURO (autosuficiente)
+     ============================================================ */
+  header {
+    background: #1a472a;
+    color: white;
+    padding: 14px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header .logo i {
+    color: #fbbf24;
+    font-size: 1.8rem;
+  }
+  header .logo h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  header .logo h1 span {
+    color: #fbbf24;
+  }
+
+  header nav ul {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  header nav a {
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.25s;
+    display: inline-block;
+  }
+  header nav a:hover {
+    background: rgba(255,255,255,0.12);
+  }
+  header nav a.active {
+    color: #fbbf24;
+    background: rgba(251,191,36,0.12);
+  }
+
+  .user-zone {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0,0,0,0.25);
+    padding: 6px 8px 6px 6px;
+    border-radius: 30px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .user-zone .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
+  .user-zone a {
+    color: #fbbf24;
+    font-weight: 600;
+  }
+  .user-zone a:hover { text-decoration: underline; }
+
+  .menu-mobile {
+    display: none;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  /* ============================================================
+     PAGE HEADER VERDE (banner bajo el nav)
+     ============================================================ */
+  @keyframes fadeInUp {
+    from { opacity:0; transform: translateY(30px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .page-header {
+    text-align: center;
+    padding: 50px 0 45px;
+    background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+    color: white;
+    margin-bottom: 45px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 50px 50px;
+  }
+  .page-header::before {
+    content: "🏁";
+    position: absolute;
+    font-size: 220px;
+    opacity: 0.07;
+    bottom: -50px;
+    right: -30px;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+  .page-header::after {
+    content: "🏎️";
+    position: absolute;
+    font-size: 140px;
+    opacity: 0.05;
+    top: -30px;
+    left: -20px;
+    transform: rotate(15deg);
+    pointer-events: none;
+  }
+  .page-header h1 {
+    font-size: 2.6rem;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+    font-weight: 800;
+  }
+  .page-header h1 i { color:#fbbf24; margin-right:12px; }
+  .page-header p {
+    font-size: 1.15rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ============================================================
+     TARJETA PRINCIPAL estilo index (amarillo degradado)
+     ============================================================ */
+  .lobby-wrap {
+    width: min(620px, 94%);
+    margin: 0 auto 60px;
+  }
+
+  .lobby-card {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 35px;
+    padding: 35px 32px;
+    box-shadow: 0 15px 35px rgba(251,191,36,0.2);
+    border: 1px solid rgba(251,191,36,0.4);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease forwards;
+  }
+  .lobby-card::before {
+    content: "🏆";
+    position: absolute;
+    font-size: 160px;
+    opacity: 0.08;
+    bottom: -40px;
+    right: -25px;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+
+  .lobby-card h2 {
+    font-size: 1.5rem;
+    color: #1a472a;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+    font-weight: 800;
+  }
+  .lobby-card h2 i { color:#b45309; }
+
+  .lobby-sub {
+    text-align: center;
+    color: #78350f;
+    font-size: 0.95rem;
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- COCHES ---------- */
+  .coches {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 26px;
+    position: relative;
+    z-index: 1;
+  }
+  .coche {
+    font-size: 32px;
+    padding: 14px 5px;
+    background: white;
+    border-radius: 16px;
+    cursor: pointer;
+    border: 2px solid #fde68a;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+  .coche:hover {
+    transform: translateY(-3px);
+    border-color: #fbbf24;
+    box-shadow: 0 8px 20px rgba(251,191,36,0.3);
+  }
+  .coche.seleccionado {
+    outline: 3px solid #22c55e;
+    background: #ecfdf5;
+    border-color: #22c55e;
+    box-shadow: 0 8px 20px rgba(34,197,94,0.25);
+  }
+
+  /* ---------- BOTONES E INPUTS ---------- */
+  .lobby-card button,
+  .lobby-card input {
+    width: 100%;
+    padding: 16px 18px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-family: inherit;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .lobby-card input {
+    background: white;
+    color: #1e293b;
+    text-align: center;
+    letter-spacing: 6px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    border: 2px solid #fde68a;
+  }
+  .lobby-card input:focus {
+    outline: none;
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 4px rgba(251,191,36,0.25);
+  }
+  .lobby-card input::placeholder {
+    color: #92400e;
+    letter-spacing: 2px;
+    font-weight: 400;
+    font-size: 0.95rem;
+    opacity: 0.6;
+  }
+
+  .lobby-card button {
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .lobby-card button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  #crearBtn {
+    background: #1a472a;
+    color: white;
+  }
+  #crearBtn:hover:not(:disabled) {
+    background: #0f2a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(26,71,42,0.35);
+  }
+
+  #unirseBtn {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1a472a;
+  }
+  #unirseBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(251,191,36,0.5);
+  }
+
+  #copiarBtn {
+    background: #1a472a;
+    color: white;
+  }
+  #copiarBtn:hover:not(:disabled) {
+    background: #0f2a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(26,71,42,0.35);
+  }
+  #copiarBtn.copiado {
+    background: #22c55e;
+    color: white;
+  }
+
+  /* ---------- SALA ---------- */
+  .sala {
+    display: none;
+    background: white;
+    padding: 22px;
+    border-radius: 20px;
+    margin-top: 18px;
+    border: 2px dashed #fbbf24;
+    position: relative;
+    z-index: 1;
+  }
+  .sala p {
+    font-weight: 600;
+    color: #1a472a;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .codigo {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 8px;
+    background: #1a472a;
+    padding: 18px;
+    border-radius: 16px;
+    margin: 12px 0;
+    color: #fbbf24;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+  }
+
+  .estado {
+    margin-top: 14px;
+    color: #78350f;
+    min-height: 22px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .separador {
+    margin: 24px 0;
+    color: #92400e;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+  }
+  .separador::before,
+  .separador::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #fbbf24;
+    opacity: 0.5;
+  }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  footer {
+    background: #1a472a;
+    color: white;
+    padding: 40px 0 20px;
+    margin-top: 40px;
+  }
+  footer .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-bottom: 25px;
+  }
+  footer .footer-col h4 {
+    color: #fbbf24;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+  }
+  footer .footer-col p {
+    color: #d1d5db;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  footer .footer-col ul li {
+    margin-bottom: 8px;
+  }
+  footer .footer-col ul a {
+    color: #d1d5db;
+    font-size: 0.9rem;
+    transition: color 0.25s;
+  }
+  footer .footer-col ul a:hover {
+    color: #fbbf24;
+  }
+  footer .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 18px;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.85rem;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 900px) {
+    header nav ul { gap: 2px; }
+    header nav a { padding: 6px 10px; font-size: 0.85rem; }
+  }
+  @media (max-width: 768px) {
+    header nav {
+      display: none;
+      width: 100%;
+      order: 3;
+      margin-top: 10px;
+    }
+    header nav.open {
+      display: block;
+    }
+    header nav ul {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    header nav a {
+      display: block;
+      padding: 12px 14px;
+    }
+    .menu-mobile { display: block; }
+    .page-header h1 { font-size: 2rem; }
+    .page-header p  { font-size: 1rem; }
+  }
+  @media (max-width: 480px) {
+    .lobby-card { padding: 26px 20px; }
+    .coche { font-size: 26px; padding: 10px 4px; }
+    .codigo { font-size: 28px; letter-spacing: 5px; }
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
 </style>
 </head>
 <body>
-<div class="contenedor">
-<h1>🏁 Carrera Multijugador DGT</h1>
-<p>Elige tu coche:</p>
-<div class="coches">
-<div class="coche seleccionado" data-car="🏎️">🏎️</div>
-<div class="coche" data-car="🚗">🚗</div>
-<div class="coche" data-car="🚙">🚙</div>
-<div class="coche" data-car="🏍️">🏍️</div>
-<div class="coche" data-car="🚕">🚕</div>
-<div class="coche" data-car="🚓">🚓</div>
-<div class="coche" data-car="🚑">🚑</div>
-<div class="coche" data-car="🚒">🚒</div>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-check-circle"></i>
+      <h1>Aprobado<span>Ya</span></h1>
+    </div>
+
+    <nav id="navMenu">
+      <ul>
+        <li><a href="../index.html">Inicio</a></li>
+                            <li><a href="../temas/index.html">Temas</a></li>
+                            <li><a href="../test/index.html">Test</a></li>
+                            <li><a href="../simulacro/index.html">Simulacro</a></li>
+                            <li><a href="../ranking/index.html">Ranking</a></li>
+                            <li><a href="index.html" class="active">🏎️ Mini Retos</a></li>
+      </ul>
+    </nav>
+
+    <div class="user-zone" id="userZone">
+      <div class="avatar"><i class="fas fa-user"></i></div>
+    </div>
+
+    <button class="menu-mobile" id="menuMobileBtn"><i class="fas fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- ================= PAGE HEADER VERDE ================= -->
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-flag-checkered"></i> Carrera Multijugador</h1>
+    <p>🏎️ Elige tu coche y compite contra otro jugador en tiempo real</p>
+  </div>
 </div>
 
-<button id="crearBtn">🎮 Crear partida</button>
-<div id="sala" class="sala">
-<p>Comparte este código:</p>
-<div id="codigo" class="codigo">------</div>
-<button id="copiarBtn">📋 Copiar código</button>
-<div id="estadoHost" class="estado">Preparando...</div>
-</div>
+<!-- ================= LOBBY ================= -->
+<main>
+  <div class="lobby-wrap">
+    <div class="lobby-card">
 
-<div class="separador">──────── o ────────</div>
+      <h2><i class="fas fa-car-side"></i> Elige tu vehículo</h2>
+      <p class="lobby-sub">Selecciona el coche con el que competirás</p>
 
-<input id="codigoInput" maxlength="6" inputmode="numeric" placeholder="CÓDIGO DE 6 DÍGITOS">
-<button id="unirseBtn">🚀 Unirse a partida</button>
-<div id="estado" class="estado"></div>
-</div>
+      <div class="coches">
+        <div class="coche seleccionado" data-car="🏎️">🏎️</div>
+        <div class="coche" data-car="🚗">🚗</div>
+        <div class="coche" data-car="🚙">🚙</div>
+        <div class="coche" data-car="🏍️">🏍️</div>
+        <div class="coche" data-car="🚕">🚕</div>
+        <div class="coche" data-car="🚓">🚓</div>
+        <div class="coche" data-car="🚑">🚑</div>
+        <div class="coche" data-car="🚒">🚒</div>
+      </div>
 
+      <button id="crearBtn">
+        <i class="fas fa-plus-circle"></i> Crear partida
+      </button>
+
+      <div id="sala" class="sala">
+        <p><i class="fas fa-share-alt"></i> Comparte este código con tu rival:</p>
+        <div id="codigo" class="codigo">------</div>
+        <button id="copiarBtn">
+          <i class="fas fa-copy"></i> Copiar código
+        </button>
+        <div id="estadoHost" class="estado">Preparando sala...</div>
+      </div>
+
+      <div class="separador">o únete con un código</div>
+
+      <input id="codigoInput" maxlength="6" inputmode="numeric"
+             placeholder="CÓDIGO DE 6 DÍGITOS" autocomplete="off">
+      <button id="unirseBtn">
+        <i class="fas fa-rocket"></i> Unirse a partida
+      </button>
+
+      <div id="estado" class="estado"></div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ================= FOOTER ================= -->
+ <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>AprobadoYa</h4>
+                    <p>Tu plataforma para aprobar el carnet de conducir al primer intento.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces rápidos</h4>
+                    <ul>
+                        <li><a href="../index.html">Inicio</a></li>
+                        <li><a href="../temas/index.html">Temas</a></li>
+                        <li><a href="../test/index.html">Test</a></li>
+                        <li><a href="index.html">Mini Retos</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 AprobadoYa | Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+
+<!-- ================= SCRIPT ================= -->
 <script>
-"use strict";
-let coche="🏎️", codigo=null;
-document.querySelectorAll(".coche").forEach(el=>{
-  el.onclick=()=>{
-    document.querySelectorAll(".coche").forEach(x=>x.classList.remove("seleccionado"));
-    el.classList.add("seleccionado");
-    coche=el.dataset.car;
-  };
-});
-function ir(c,rol){
-  const p=new URLSearchParams();
-  p.set("sala",c); p.set("rol",rol); p.set("coche",coche);
-  location.href="carrera-multijugador.html?"+p.toString();
-}
-function generarCodigo(){return String(Math.floor(100000+Math.random()*900000));}
+  // ------------- Lógica del lobby -------------
+  let coche = "🏎️";
+  let codigo = null;
 
-document.getElementById("crearBtn").onclick=()=>{
-  codigo=generarCodigo();
-  document.getElementById("codigo").textContent=codigo;
-  document.getElementById("sala").style.display="block";
-  document.getElementById("crearBtn").disabled=true;
-  document.getElementById("estadoHost").textContent="Abriendo la sala...";
-  /*
-    La conexión PeerJS se crea en carrera-multijugador.html.
-    Así no se destruye al cambiar de página.
-  */
-  setTimeout(()=>ir(codigo,"host"),250);
-};
+  document.querySelectorAll(".coche").forEach(el => {
+    el.addEventListener("click", () => {
+      document.querySelectorAll(".coche").forEach(x => x.classList.remove("seleccionado"));
+      el.classList.add("seleccionado");
+      coche = el.dataset.car;
+    });
+  });
 
-document.getElementById("unirseBtn").onclick=()=>{
-  const c=document.getElementById("codigoInput").value.trim();
-  if(!/^\d{6}$/.test(c)){
-    document.getElementById("estado").textContent="❌ Introduce un código de 6 números.";
-    return;
+  function ir(c, rol) {
+    const p = new URLSearchParams();
+    p.set("sala", c);
+    p.set("rol", rol);
+    p.set("coche", coche);
+    location.href = "carrera-multijugador.html?" + p.toString();
   }
-  ir(c,"guest");
-};
-document.getElementById("codigoInput").onkeydown=e=>{
-  if(e.key==="Enter") document.getElementById("unirseBtn").click();
-};
-document.getElementById("copiarBtn").onclick=async()=>{
-  try{
-    await navigator.clipboard.writeText(codigo);
-    document.getElementById("copiarBtn").textContent="✅ Código copiado";
-  }catch{
-    document.getElementById("estadoHost").textContent="Código: "+codigo;
+
+  function generarCodigo() {
+    return String(Math.floor(100000 + Math.random() * 900000));
   }
-};
+
+  document.getElementById("crearBtn").addEventListener("click", () => {
+    codigo = generarCodigo();
+    document.getElementById("codigo").textContent = codigo;
+    document.getElementById("sala").style.display = "block";
+    document.getElementById("crearBtn").disabled = true;
+    document.getElementById("estadoHost").innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i> Abriendo sala...';
+    setTimeout(() => ir(codigo, "host"), 300);
+  });
+
+  document.getElementById("unirseBtn").addEventListener("click", () => {
+    const c = document.getElementById("codigoInput").value.trim();
+    if (!/^\d{6}$/.test(c)) {
+      document.getElementById("estado").innerHTML =
+        '❌ Introduce un código válido de 6 números.';
+      return;
+    }
+    document.getElementById("estado").innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i> Conectando...';
+    ir(c, "guest");
+  });
+
+  document.getElementById("codigoInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("unirseBtn").click();
+  });
+
+  document.getElementById("codigoInput").addEventListener("input", e => {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
+  });
+
+  document.getElementById("copiarBtn").addEventListener("click", async () => {
+    const btn = document.getElementById("copiarBtn");
+    try {
+      await navigator.clipboard.writeText(codigo);
+      btn.classList.add("copiado");
+      btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+      setTimeout(() => {
+        btn.classList.remove("copiado");
+        btn.innerHTML = '<i class="fas fa-copy"></i> Copiar código';
+      }, 2000);
+    } catch {
+      document.getElementById("estadoHost").textContent = "Código: " + codigo;
+    }
+  });
+
+  // Menú móvil
+  document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+    document.getElementById('navMenu')?.classList.toggle('open');
+  });
+
+  // ------------- Auth (opcional, sin bloquear si falla) -------------
+  (async () => {
+    try {
+      const { auth, onAuthStateChanged } = await import('../js/firebase-init.js');
+      const { renderUserZone } = await import('../js/global-auth.js');
+      onAuthStateChanged(auth, () => renderUserZone());
+    } catch (e) {
+      console.warn("Firebase no disponible en el lobby:", e);
+    }
+  })();
 </script>
+
 </body>
 </html>
