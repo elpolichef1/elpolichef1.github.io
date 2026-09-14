@@ -55,6 +55,39 @@
             margin: 0 auto;
         }
 
+        /* AVISO PRÓXIMAMENTE */
+        .aviso-proximamente {
+            background: rgba(251,191,36,0.15);
+            border: 2px solid #fbbf24;
+            border-radius: 20px;
+            padding: 18px 25px;
+            margin-bottom: 40px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .aviso-proximamente i {
+            font-size: 1.8rem;
+            color: #fbbf24;
+            flex-shrink: 0;
+        }
+        .aviso-proximamente div { text-align: left; }
+        .aviso-proximamente strong {
+            display: block;
+            color: #fbbf24;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+        .aviso-proximamente span {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
         /* GRID DE PLANES */
         .planes-grid {
             display: grid;
@@ -208,6 +241,12 @@
             font-size: 0.9rem;
             opacity: 0.85;
         }
+        .estado-actual a {
+            color: #fbbf24;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .estado-actual a:hover { text-decoration: underline; }
 
         /* FOOTER */
         .premium-footer {
@@ -220,6 +259,7 @@
             color: #fbbf24;
             text-decoration: none;
         }
+        .premium-footer a:hover { text-decoration: underline; }
 
         /* VOLVER */
         .volver-link {
@@ -240,6 +280,11 @@
             .premium-header h1 { font-size: 2rem; }
             .premium-header p { font-size: 1rem; }
             .plan-precio { font-size: 2.4rem; }
+            .aviso-proximamente {
+                flex-direction: column;
+                text-align: center;
+            }
+            .aviso-proximamente div { text-align: center; }
         }
     </style>
 </head>
@@ -255,6 +300,15 @@
             <div class="badge-top">⭐ PREMIUM</div>
             <h1><i class="fas fa-crown"></i> Hazte Premium</h1>
             <p>Desbloquea todos los Mini Retos y accede a contenido exclusivo para aprobar tu examen DGT</p>
+        </div>
+
+        <!-- AVISO: PRÓXIMAMENTE -->
+        <div class="aviso-proximamente">
+            <i class="fas fa-hourglass-half"></i>
+            <div>
+                <strong>Próximamente disponible</strong>
+                <span>Estamos terminando de configurar el sistema de pago. Los planes Premium todavía no se pueden contratar.</span>
+            </div>
         </div>
 
         <!-- ESTADO ACTUAL DEL USUARIO -->
@@ -305,7 +359,7 @@
         </div>
 
         <div class="premium-footer">
-            ¿Tienes problemas? <a href="mailto:soporte@aprobadoya.com">Contacta con soporte</a>
+            ¿Tienes problemas? <a href="contacto.html">Contacta con soporte</a>
         </div>
 
     </div>
@@ -325,7 +379,7 @@
                 estado.classList.add('visible');
                 document.getElementById('estadoTitulo').textContent = '⚠️ Inicia sesión para hacerte Premium';
                 document.getElementById('estadoDesc').innerHTML =
-                    'Necesitas una cuenta para contratar Premium. <a href="login.html" style="color:#fbbf24;font-weight:700;">Inicia sesión</a> o <a href="registro.html" style="color:#fbbf24;font-weight:700;">regístrate gratis</a>.';
+                    'Necesitas una cuenta para contratar Premium. <a href="login.html">Inicia sesión</a> o <a href="registro.html">regístrate gratis</a>.';
                 document.getElementById('btnPremium').disabled = true;
                 document.getElementById('btnPremium').textContent = 'Inicia sesión primero';
                 return;
@@ -356,23 +410,21 @@
                     document.getElementById('estadoDesc').textContent =
                         'Mejora a Premium para desbloquear los Mini Retos.';
                 }
-            }, 800); // pequeña espera para que global-auth.js lea Firestore
+            }, 800);
         });
 
-        // Placeholder hasta que conectemos Stripe
+        // El botón de compra: por ahora avisa de que aún no está disponible
         window.iniciarCompra = function () {
             if (!usuarioActual) {
                 alert('Inicia sesión primero.');
                 return;
             }
 
-            // TODO: aquí irá la llamada a Stripe Checkout (paso 6 de la lista)
             alert(
-                '💳 El pago con Stripe se conectará en breve.\n\n' +
-                'De momento, si eres el administrador, activa Premium manualmente desde Firebase Console:\n' +
-                'usuarios → ' + usuarioActual.uid + '\n' +
-                '→ plan: "premium"\n' +
-                '→ premiumActivo: true'
+                '⏳ Premium aún no está disponible\n\n' +
+                'Estamos terminando de configurar el sistema de pago. ' +
+                'Muy pronto podrás contratar Premium y desbloquear todos los Mini Retos.\n\n' +
+                'Si tienes dudas, escríbenos desde la página de contacto.'
             );
         };
     </script>
