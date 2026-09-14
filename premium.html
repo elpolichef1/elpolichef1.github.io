@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hazte Premium | AprobadoYa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2a1a 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            padding: 40px 20px;
+        }
+
+        .premium-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .premium-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        .premium-header .badge-top {
+            display: inline-block;
+            background: rgba(251,191,36,0.2);
+            color: #fbbf24;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(251,191,36,0.4);
+        }
+        .premium-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+        .premium-header h1 i {
+            color: #fbbf24;
+            margin-right: 10px;
+        }
+        .premium-header p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* GRID DE PLANES */
+        .planes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border: 2px solid transparent;
+        }
+        .plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+        }
+        .plan-card.destacado {
+            border-color: #fbbf24;
+            box-shadow: 0 20px 50px rgba(251,191,36,0.3);
+        }
+        .plan-card.destacado::before {
+            content: "MÁS POPULAR";
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .plan-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .plan-nombre {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1a472a;
+            margin-bottom: 8px;
+        }
+
+        .plan-precio {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fbbf24;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        .plan-precio small {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .plan-periodo {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+        }
+
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 30px;
+            padding: 0;
+        }
+        .plan-features li {
+            padding: 8px 0;
+            color: #475569;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .plan-features li i {
+            color: #10b981;
+            font-size: 0.9rem;
+        }
+        .plan-features li.desactivada {
+            opacity: 0.4;
+        }
+        .plan-features li.desactivada i {
+            color: #cbd5e1;
+        }
+
+        .btn-plan {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a472a;
+            border: none;
+            padding: 16px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .btn-plan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(251,191,36,0.5);
+        }
+        .btn-plan.secundario {
+            background: #f1f5f9;
+            color: #1a472a;
+        }
+        .btn-plan.secundario:hover {
+            background: #e2e8f0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .btn-plan:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ESTADO ACTUAL */
+        .estado-actual {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(251,191,36,0.3);
+            border-radius: 20px;
+            padding: 20px 25px;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            display: none;
+        }
+        .estado-actual.visible { display: block; }
+        .estado-actual.premium { border-color: #10b981; }
+        .estado-actual h3 {
+            color: #fbbf24;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .estado-actual.premium h3 { color: #34d399; }
+        .estado-actual p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        /* FOOTER */
+        .premium-footer {
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+            padding-top: 30px;
+        }
+        .premium-footer a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        /* VOLVER */
+        .volver-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+        .volver-link:hover { transform: translateX(-4px); }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .premium-header h1 { font-size: 2rem; }
+            .premium-header p { font-size: 1rem; }
+            .plan-precio { font-size: 2.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="premium-container">
+
+        <a href="index.html" class="volver-link">
+            <i class="fas fa-arrow-left"></i> Volver al inicio
+        </a>
+
+        <div class="premium-header">
+            <div class="badge-top">⭐ PREMIUM</div>
+            <h1><i class="fas fa-crown"></i> Hazte Premium</h1>
+            <p>Desbloquea todos los Mini Retos y accede a contenido exclusivo para aprobar tu examen DGT</p>
+        </div>
+
+        <!-- ESTADO ACTUAL DEL USUARIO -->
+        <div class="estado-actual" id="estadoActual">
+            <h3 id="estadoTitulo">Cargando...</h3>
+            <p id="estadoDesc"></p>
+        </div>
+
+        <!-- PLANES -->
+        <div class="planes-grid">
+
+            <!-- FREE -->
+            <div class="plan-card">
+                <span class="plan-icon">🆓</span>
+                <div class="plan-nombre">Gratis</div>
+                <div class="plan-precio">0€</div>
+                <div class="plan-periodo">para siempre</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> Tests ilimitados</li>
+                    <li><i class="fas fa-check"></i> Todos los temas</li>
+                    <li><i class="fas fa-check"></i> Simulacros oficiales</li>
+                    <li><i class="fas fa-check"></i> Ranking global</li>
+                    <li class="desactivada"><i class="fas fa-times"></i> Mini Retos</li>
+                    <li class="desactivada"><i class="fas fa-times"></i> Juegos exclusivos</li>
+                </ul>
+                <button class="btn-plan secundario" disabled>Plan actual</button>
+            </div>
+
+            <!-- PREMIUM -->
+            <div class="plan-card destacado">
+                <span class="plan-icon">⭐</span>
+                <div class="plan-nombre">Premium</div>
+                <div class="plan-precio">4,99€<small>/mes</small></div>
+                <div class="plan-periodo">Cancela cuando quieras</div>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> <strong>Todo lo del plan Gratis</strong></li>
+                    <li><i class="fas fa-check"></i> <strong>Todos los Mini Retos</strong></li>
+                    <li><i class="fas fa-check"></i> Carrera multijugador</li>
+                    <li><i class="fas fa-check"></i> Pasapalabra DGT</li>
+                    <li><i class="fas fa-check"></i> Nuevos juegos cada mes</li>
+                    <li><i class="fas fa-check"></i> Sin anuncios</li>
+                </ul>
+                <button class="btn-plan" id="btnPremium" onclick="iniciarCompra()">
+                    ⭐ Hazte Premium
+                </button>
+            </div>
+
+        </div>
+
+        <div class="premium-footer">
+            ¿Tienes problemas? <a href="mailto:soporte@aprobadoya.com">Contacta con soporte</a>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './js/firebase-init.js';
+        import { getUserData } from './js/global-auth.js';
+
+        let usuarioActual = null;
+
+        onAuthStateChanged(auth, (user) => {
+            usuarioActual = user;
+
+            if (!user) {
+                // No logueado → no puede comprar
+                const estado = document.getElementById('estadoActual');
+                estado.classList.add('visible');
+                document.getElementById('estadoTitulo').textContent = '⚠️ Inicia sesión para hacerte Premium';
+                document.getElementById('estadoDesc').innerHTML =
+                    'Necesitas una cuenta para contratar Premium. <a href="login.html" style="color:#fbbf24;font-weight:700;">Inicia sesión</a> o <a href="registro.html" style="color:#fbbf24;font-weight:700;">regístrate gratis</a>.';
+                document.getElementById('btnPremium').disabled = true;
+                document.getElementById('btnPremium').textContent = 'Inicia sesión primero';
+                return;
+            }
+
+            // Logueado → comprobar si ya es premium
+            setTimeout(() => {
+                const data = getUserData();
+                if (!data) return;
+
+                const esPremium = data.plan === 'premium' && data.premiumActivo === true;
+
+                const estado = document.getElementById('estadoActual');
+                estado.classList.add('visible');
+
+                if (esPremium) {
+                    estado.classList.add('premium');
+                    document.getElementById('estadoTitulo').textContent = '⭐ Ya eres Premium';
+                    const hasta = data.premiumHasta
+                        ? new Date(data.premiumHasta).toLocaleDateString('es-ES')
+                        : 'siempre';
+                    document.getElementById('estadoDesc').textContent =
+                        `Disfrutas de todas las ventajas. Válido hasta: ${hasta}`;
+                    document.getElementById('btnPremium').disabled = true;
+                    document.getElementById('btnPremium').textContent = '✅ Ya eres Premium';
+                } else {
+                    document.getElementById('estadoTitulo').textContent = '🆓 Estás en el plan Gratis';
+                    document.getElementById('estadoDesc').textContent =
+                        'Mejora a Premium para desbloquear los Mini Retos.';
+                }
+            }, 800); // pequeña espera para que global-auth.js lea Firestore
+        });
+
+        // Placeholder hasta que conectemos Stripe
+        window.iniciarCompra = function () {
+            if (!usuarioActual) {
+                alert('Inicia sesión primero.');
+                return;
+            }
+
+            // TODO: aquí irá la llamada a Stripe Checkout (paso 6 de la lista)
+            alert(
+                '💳 El pago con Stripe se conectará en breve.\n\n' +
+                'De momento, si eres el administrador, activa Premium manualmente desde Firebase Console:\n' +
+                'usuarios → ' + usuarioActual.uid + '\n' +
+                '→ plan: "premium"\n' +
+                '→ premiumActivo: true'
+            );
+        };
+    </script>
+
+</body>
+</html>

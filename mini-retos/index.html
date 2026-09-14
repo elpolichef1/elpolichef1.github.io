@@ -540,7 +540,20 @@
                         <div class="btn-jugar">🎮 ¡Jugar ahora!</div>
                     </div>
                 </div>
-
+<div class="game-card" onclick="window.location.href='juego-pasapalabra.html'">
+    <span class="game-badge badge-medio">⚡ Medio</span>
+    <div class="game-icon">🅰️🅱️</div>
+    <div class="game-info">
+        <h3>Pasapalabra DGT</h3>
+        <p>Completa el rosco con 3 niveles de dificultad y tiempos distintos. ¡Puedes repetir todas las veces que quieras!</p>
+        <div class="game-stats">
+            <span><i class="fas fa-layer-group"></i> 3 niveles</span>
+            <span><i class="fas fa-clock"></i> 2-3 min</span>
+            <span><i class="fas fa-trophy"></i> +200 pts</span>
+        </div>
+        <div class="btn-jugar">🎮 ¡Jugar ahora!</div>
+    </div>
+</div>
                 <div class="game-card" onclick="window.location.href='juego-alcoholemia.html'">
                     <span class="game-badge badge-medio">🍺 Medio</span>
                     <div class="game-icon">🍻🚔</div>
@@ -589,80 +602,188 @@
     </footer>
 
     <script type="module">
-        import { auth, onAuthStateChanged } from '../js/firebase-init.js';
-        import { renderUserZone } from '../js/global-auth.js';
-        
-        // Cargar estadísticas desde localStorage
-        function cargarEstadisticasLocal() {
-            const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
-            document.getElementById('totalJuegos').textContent = stats.totalJuegos || 0;
-            document.getElementById('totalPuntos').textContent = stats.totalPuntos || 0;
-            document.getElementById('mejorRacha').textContent = stats.mejorRacha || 0;
-            // Calcular nivel (cada 1000 puntos)
-            const nivel = Math.floor((stats.totalPuntos || 0) / 1000) + 1;
-            document.getElementById('nivelDesbloqueado').textContent = nivel;
-        }
-        
-        // Cargar historial desde localStorage
-        function cargarHistorialLocal() {
-            const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
-            const historial = stats.historial || [];
-            const container = document.getElementById('historialContainer');
-            
-            if (!historial || historial.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-historial">
-                        <i class="fas fa-gamepad" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
-                        <p>Aún no has jugado a ningún minijuego. ¡Empieza ahora!</p>
-                    </div>
-                `;
-                return;
+    import { auth, onAuthStateChanged } from '../js/firebase-init.js';
+    import { renderUserZone } from '../js/global-auth.js';
+    import { esPremium, mostrarModalPremium } from '../js/premium.js';
+
+    // ============================================
+    // BLOQUEO PREMIUM
+    // ============================================
+
+    let esUsuarioPremium = false;
+
+    // Interceptar clicks de tarjetas de juego
+    function interceptarClicsJuegos() {
+        document.querySelectorAll('.game-card, .featured-btn').forEach(el => {
+            // Quitar onclick inline que pueda tener
+            const onclickAttr = el.getAttribute('onclick');
+            if (onclickAttr) {
+                // Guardar la URL original y quitarla
+                const match = onclickAttr.match(/window\.location\.href='([^']+)'/);
+                if (match) {
+                    el.dataset.urlOriginal = match[1];
+                }
+                el.removeAttribute('onclick');
             }
-            
-            const getIcono = (juego) => {
-                const iconos = {
-                    'Carrera de preguntas': '🏎️',
-                    'Memoria de señales': '🧠',
-                    'Verdadero o Falso': '✅',
-                    'Ráfaga de preguntas': '⚡',
-                    'Arcade de señales': '🎮',
-                    'Alcoholemia y Sanciones': '🍻'
-                };
-                return iconos[juego] || '🎮';
+
+            // Añadir listener propio
+            el.addEventListener('click', (e) => {
+                if (esUsuarioPremium) {
+                    // Si es premium → dejar pasar
+                    const url = el.dataset.urlOriginal;
+                    if (url) window.location.href = url;
+                } else {
+                    // Si es free → bloquear
+                    e.preventDefault();
+                    e.stopPropagation();
+                    mostrarModalPremium();
+                }
+            });
+        });
+    }
+
+    // Añadir candado visual a todas las tarjetas
+    function añadirCandados() {
+        document.querySelectorAll('.game-card').forEach(card => {
+            if (card.querySelector('.premium-lock')) return;
+
+            const lock = document.createElement('div');
+            lock.className = 'premium-lock';
+            lock.innerHTML = '<i class="fas fa-lock"></i>';
+            card.style.position = 'relative';
+            card.appendChild(lock);
+        });
+    }
+
+    // Estilos del candado (se inyectan una sola vez)
+    function inyectarEstilosCandado() {
+        if (document.getElementById('premiumLockStyles')) return;
+        const style = document.createElement('style');
+        style.id = 'premiumLockStyles';
+        style.textContent = `
+            .premium-lock {
+                position: absolute;
+                inset: 0;
+                background: rgba(15, 42, 26, 0.55);
+                backdrop-filter: blur(2px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 30px;
+                z-index: 5;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+            .premium-lock:hover {
+                background: rgba(15, 42, 26, 0.7);
+            }
+            .premium-lock i {
+                font-size: 3rem;
+                color: #fbbf24;
+                text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                animation: premiumFloat 2.5s ease-in-out infinite;
+            }
+            @keyframes premiumFloat {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+            }
+            .game-card { cursor: pointer; }
+            .game-card.bloqueada { cursor: pointer; }
+            .featured-btn.bloqueada { opacity: 0.6; }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // ============================================
+    // ESTADÍSTICAS Y HISTORIAL (como ya tenías)
+    // ============================================
+
+    function cargarEstadisticasLocal() {
+        const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
+        document.getElementById('totalJuegos').textContent = stats.totalJuegos || 0;
+        document.getElementById('totalPuntos').textContent = stats.totalPuntos || 0;
+        document.getElementById('mejorRacha').textContent = stats.mejorRacha || 0;
+        const nivel = Math.floor((stats.totalPuntos || 0) / 1000) + 1;
+        document.getElementById('nivelDesbloqueado').textContent = nivel;
+    }
+
+    function cargarHistorialLocal() {
+        const stats = JSON.parse(localStorage.getItem('aprobadoya_minijuegos') || '{}');
+        const historial = stats.historial || [];
+        const container = document.getElementById('historialContainer');
+
+        if (!historial || historial.length === 0) {
+            container.innerHTML = `
+                <div class="empty-historial">
+                    <i class="fas fa-gamepad" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                    <p>Aún no has jugado a ningún minijuego. ¡Empieza ahora!</p>
+                </div>
+            `;
+            return;
+        }
+
+        const getIcono = (juego) => {
+            const iconos = {
+                'Carrera de preguntas': '🏎️',
+                'Memoria de señales': '🧠',
+                'Verdadero o Falso': '✅',
+                'Ráfaga de preguntas': '⚡',
+                'Arcade de señales': '🎮',
+                'Alcoholemia y Sanciones': '🍻',
+                'Pasapalabra DGT': '🅰️'
             };
-            
-            container.innerHTML = historial.slice(0, 10).map(item => `
-                <div class="historial-item">
-                    <div class="historial-juego">
-                        <div class="historial-icono">${getIcono(item.juego)}</div>
-                        <div class="historial-info">
-                            <h4>${item.juego}</h4>
-                            <p>${item.fecha}</p>
-                        </div>
-                    </div>
-                    <div class="historial-puntuacion">
-                        <div class="historial-puntos">+${item.puntuacion} pts</div>
-                        <div class="historial-detalles">${item.aciertos || 0}/${item.total || 0} aciertos | 🔥 ${item.racha || 0} racha</div>
+            return iconos[juego] || '🎮';
+        };
+
+        container.innerHTML = historial.slice(0, 10).map(item => `
+            <div class="historial-item">
+                <div class="historial-juego">
+                    <div class="historial-icono">${getIcono(item.juego)}</div>
+                    <div class="historial-info">
+                        <h4>${item.juego}</h4>
+                        <p>${item.fecha}</p>
                     </div>
                 </div>
-            `).join('');
+                <div class="historial-puntuacion">
+                    <div class="historial-puntos">+${item.puntuacion} pts</div>
+                    <div class="historial-detalles">${item.aciertos || 0}/${item.total || 0} aciertos | 🔥 ${item.racha || 0} racha</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ============================================
+    // ARRANQUE
+    // ============================================
+
+    onAuthStateChanged(auth, (user) => {
+        renderUserZone();
+
+        if (!user) {
+            window.location.href = '../login.html';
+            return;
         }
-        
-        onAuthStateChanged(auth, (user) => {
-            renderUserZone();
-            
-            if (!user) {
-                window.location.href = '../login.html';
-            } else {
+
+        // Esperar a que global-auth.js lea Firestore y sepamos el plan
+        setTimeout(() => {
+            esUsuarioPremium = esPremium();
+
+            if (!esUsuarioPremium) {
+                inyectarEstilosCandado();
+                añadirCandados();
+            }
+            interceptarClicsJuegos();
+
+            // Estadísticas e historial (solo si es premium)
+            if (esUsuarioPremium) {
                 cargarEstadisticasLocal();
                 cargarHistorialLocal();
             }
-        });
-        
-        document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
-            const wrapper = document.querySelector('.nav-wrapper');
-            if (wrapper) wrapper.classList.toggle('active');
-        });
-    </script>
-</body>
-</html>
+        }, 800);
+    });
+
+    document.getElementById('menuMobileBtn')?.addEventListener('click', () => {
+        const wrapper = document.querySelector('.nav-wrapper');
+        if (wrapper) wrapper.classList.toggle('active');
+    });
+</script>
