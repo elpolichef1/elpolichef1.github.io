@@ -3,83 +3,88 @@
 // Todas las páginas usan esto
 // ============================================
 
-import { auth, onAuthStateChanged, signOut, db, doc, getDoc } from './firebase-init.js';
+import { auth, onAuthStateChanged, signOut, db, doc, getDoc, updateDoc } from './firebase-init.js';
+
+// Constantes usadas en el listener de storage
+const STORAGE_USER_UPDATE_FLAG = 'user_update_flag';
 
 // Variable global del usuario actual
 let currentUserGlobal = null;
 let userDataGlobal = null;
 let callbacks = [];
 
-// Función para obtener el usuario actual (síncrona)
+// ============================================
+// GETTERS
+// ============================================
+
 export function getCurrentUser() {
     return currentUserGlobal;
 }
 
-// Función para obtener los datos completos del usuario
 export function getUserData() {
     return userDataGlobal;
 }
 
-// Función para cerrar sesión
+// ============================================
+// CERRAR SESIÓN
+// ============================================
+
 export async function logoutUser() {
     await signOut(auth);
     window.location.href = '../index.html';
 }
 
-// Función para obtener el avatar del usuario desde Firestore
-async function obtenerAvatarUsuario(user) {
-    if (!user) return "🚗";
-    
-    try {
-        const userRef = doc(db, "usuarios", user.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-            const data = userDoc.data();
-            return data.avatar || "🚗";
-        }
-    } catch (error) {
-        console.error("Error al obtener avatar:", error);
+// ============================================
+// LECTURA DE DATOS DEL USUARIO
+// ============================================
+
+async function leerDatosUsuario(user) {
+    const userRef = doc(db, "usuarios", user.uid);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+        return null;
     }
-    return "🚗";
+
+    const data = userDoc.data();
+
+    return {
+        uid: user.uid,
+        email: user.email,
+        nombre: data.nombre || user.displayName || user.email.split('@')[0],
+        avatar: data.avatar || "🚗",
+
+        // PLAN
+        plan: data.plan || 'free',
+        premiumActivo: data.premiumActivo === true,
+        premiumDesde: data.premiumDesde || null,
+        premiumHasta: data.premiumHasta || null,
+
+        // EXTRA
+        displayName: user.displayName || null,
+        photoURL: user.photoURL || null
+    };
 }
 
-// Función para obtener nombre del usuario desde Firestore
-async function obtenerNombreUsuario(user) {
-    if (!user) return null;
-    
-    try {
-        const userRef = doc(db, "usuarios", user.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-            const data = userDoc.data();
-            return data.nombre || user.displayName || user.email.split('@')[0];
-        }
-    } catch (error) {
-        console.error("Error al obtener nombre:", error);
-    }
-    return user.displayName || user.email.split('@')[0];
-}
+// ============================================
+// ACTUALIZAR AVATAR
+// ============================================
 
-// Función para actualizar el avatar en Firestore
 export async function updateGlobalAvatar(avatar) {
     const user = currentUserGlobal;
     if (!user) return false;
-    
+
     try {
         const userRef = doc(db, "usuarios", user.uid);
         await updateDoc(userRef, { avatar: avatar });
-        
-        // Actualizar datos locales
+
         if (userDataGlobal) {
             userDataGlobal.avatar = avatar;
         }
-        
-        // Forzar actualización del header
+
         renderUserZone();
-        
-        // Disparar evento para que otras páginas se actualicen
         dispatchUserUpdatedEvent();
-        
+
         return true;
     } catch (error) {
         console.error("Error al actualizar avatar:", error);
@@ -87,62 +92,66 @@ export async function updateGlobalAvatar(avatar) {
     }
 }
 
-// Disparar evento de actualización
+// ============================================
+// EVENTOS
+// ============================================
+
 function dispatchUserUpdatedEvent() {
     if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('userUpdated'));
-        localStorage.setItem('user_update_flag', Date.now().toString());
+        localStorage.setItem(STORAGE_USER_UPDATE_FLAG, Date.now().toString());
     }
 }
 
-// Inicializar listener de autenticación
+// ============================================
+// LISTENER DE AUTENTICACIÓN
+// ============================================
+
 export function initAuthListener(callback) {
     if (callback) callbacks.push(callback);
-    
+
     onAuthStateChanged(auth, async (user) => {
         currentUserGlobal = user;
-        
+
         if (user) {
-            const nombre = await obtenerNombreUsuario(user);
-            const avatar = await obtenerAvatarUsuario(user);
-            userDataGlobal = {
-                uid: user.uid,
-                email: user.email,
-                nombre: nombre,
-                avatar: avatar,
-                displayName: user.displayName,
-                photoURL: user.photoURL
-            };
+            try {
+                userDataGlobal = await leerDatosUsuario(user);
+            } catch (error) {
+                console.error("Error leyendo datos del usuario:", error);
+                userDataGlobal = null;
+            }
         } else {
             userDataGlobal = null;
         }
-        
-        // Ejecutar todos los callbacks registrados
+
         callbacks.forEach(cb => cb(currentUserGlobal, userDataGlobal));
-        
-        // Actualizar header
         renderUserZone();
     });
 }
 
-// Función para actualizar el header de cualquier página
+// ============================================
+// RENDER DEL HEADER
+// ============================================
+
 export function renderUserZone() {
     const userZone = document.getElementById('userZone');
     if (!userZone) return;
-    
+
     if (currentUserGlobal && userDataGlobal) {
-        const nombreMostrar = userDataGlobal.nombre?.split(' ')[0] || currentUserGlobal.email?.split('@')[0] || 'Usuario';
+        const nombreMostrar = (userDataGlobal.nombre || 'Usuario').split(' ')[0];
         const avatar = userDataGlobal.avatar || "🚗";
-        
+        const esPremium = userDataGlobal.premiumActivo === true;
+
         userZone.innerHTML = `
             <div class="user-menu">
                 <div class="user-avatar" id="headerUserAvatar">${avatar}</div>
                 <span class="user-name" id="headerUserName">${escapeHtml(nombreMostrar)}</span>
+                ${esPremium ? '<span class="badge-premium">⭐ Premium</span>' : ''}
                 <a href="../perfil/index.html" class="btn-profile">Mi perfil</a>
                 <button id="globalLogoutBtn" class="btn-logout">Cerrar sesión</button>
             </div>
         `;
-        
+
         const logoutBtn = document.getElementById('globalLogoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => logoutUser());
@@ -152,13 +161,20 @@ export function renderUserZone() {
     }
 }
 
-// Función para actualizar SOLO el avatar en el header (sin recargar toda la página)
 export function updateHeaderAvatar(avatar) {
     const avatarElement = document.getElementById('headerUserAvatar');
     if (avatarElement) {
         avatarElement.textContent = avatar;
     }
 }
+
+export function forceUpdateHeader() {
+    renderUserZone();
+}
+
+// ============================================
+// UTILIDADES
+// ============================================
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -170,23 +186,22 @@ function escapeHtml(str) {
     });
 }
 
-// Función para forzar actualización del header
-export function forceUpdateHeader() {
-    renderUserZone();
-}
+// ============================================
+// INICIALIZACIÓN
+// ============================================
 
-// Inicializar el listener automáticamente
 initAuthListener();
 
-// Escuchar cambios en localStorage para actualizar entre pestañas
+// Escuchar cambios entre pestañas
 window.addEventListener('storage', function(e) {
-    if (e.key === 'user_update_flag' || e.key === STORAGE_USERS) {
+    if (e.key === STORAGE_USER_UPDATE_FLAG) {
         renderUserZone();
     }
 });
 
-// Exponer funciones globalmente
+// Exponer funciones globalmente (para uso desde onclick en HTML)
 window.getCurrentUser = getCurrentUser;
+window.getUserData = getUserData;
 window.logoutUser = logoutUser;
 window.forceUpdateHeader = forceUpdateHeader;
 window.updateGlobalAvatar = updateGlobalAvatar;
